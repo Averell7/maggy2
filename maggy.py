@@ -1,16 +1,19 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
-# Version 2.0.0 build 43  décembre 2015
+# Version 2.0.0 build 44  4 janiver 2016
 
 
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
 
-maggy_version = "2.0.0.43"
+maggy_version = "2.0.0.44"
 print "Maggy Version : ", maggy_version
 """
-TODO :
+In this version :
+
+Improved Mysql support
+bugs fixed for peripheral tables edition
 
 """
 
@@ -1285,7 +1288,6 @@ class db_utilities :
         # retrieve structure
         db_structure= {}
 
-        req = "PRAGMA table_info(candidats)"
 
         """SELECT name FROM sqlite_master
         WHERE type  IN (?,?)
@@ -1308,6 +1310,56 @@ class db_utilities :
                     db_structure[b][s[1]] = s[0]
 
         return (link, cursor, db_structure, db_active_file)
+
+
+    def mysql_db_structure(self, cursor) :
+
+
+        table_def = {}
+        index_def = {}
+        constraint_def = {}
+        errors_count = 0
+
+        # Extract mysql structure
+        # Extract tables list
+        cursor.execute("show tables")
+
+        tables = []
+        for row in cursor :
+            key = row.keys()[0]
+            name = row[key]
+            try :
+                cursor.execute("show columns from " + name)   # Test the validity of the table name.
+                                                              # We have seen a database with a table named "1" which was impossible to handle with sql commands
+                tables.append(name)
+            except :
+                print ("WARNING : Unable to handle table " + name + "\nCheck if there is no problem with it.")
+
+
+        for name in tables :
+
+
+            table_def[name] = {}
+            index_def[name] = {}
+
+            # extract columns
+            cursor.execute("show columns from " + name)
+            columns = cursor.fetchall()
+            for col in columns :
+                keys = col.keys()
+                colname = col['Field']
+                table_def[name][colname] = {}
+                table_def[name][colname]['type'] = col['Type']
+                table_def[name][colname]['null'] = col['Null']
+                table_def[name][colname]['primary'] = col['Key']
+                table_def[name][colname]['default'] = col['Default']
+                table_def[name][colname]['autoinc'] = col['Extra']
+
+
+
+
+
+        return(table_def)
 
 
 
@@ -1431,8 +1483,9 @@ class db_utilities :
 
             elif db_type == "mysql" :
 
-                result = cursor.execute("DESCRIBE " + table  + " " + field);
-                if mysql_num_rows(result) > 0 :
+                cursor.execute("DESCRIBE " + table  + " " + field);
+                result = cursor.fetchall()
+                if len(result) > 0 :
                      found = True
 
 
@@ -1513,7 +1566,7 @@ class explode_db :
 
 
                     query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, fonction)
-                    print "test1"
+
                     cursor.execute(query)
                     link.commit()
                     # update central
@@ -1547,7 +1600,7 @@ class explode_db :
                         id_personne = result[0]
                         query = "insert into maison (id_livre, id_chartreuse) values (%s,%s)" % (id_livre, id_personne)
                         cursor.execute(query)
-                        print ".",
+
 
                     else :
                         print myauteur
@@ -1884,7 +1937,7 @@ class zoomx() :
 
     def __init__(self, treeview)  :
 
-        global configdir, arWidgets, config, config_info, periph_tables, mem, popup_saisie, tab_conversion
+        global arWidgets, config, config_info, periph_tables, mem, popup_saisie, tab_conversion
 
         self.widgets = gtk.Builder()
         self.widgets.add_from_file('./data/zoom1.glade')
@@ -1906,7 +1959,6 @@ class zoomx() :
         #      Récupérer les informations sur les modèles à utiliser
 
         list_name = treeview.get_name()
-        print "--------->", list_name
         table = utils.get_extension(list_name)  # nom de la table périphérique
         gateway = periph_tables[table]['gateway']                       # nom de la passerelle
         id_type = periph_tables[table]['id_type']
@@ -2117,6 +2169,7 @@ or the list does not exist."""))
         self.arZoom['view_details'].connect('clicked', self.view_details)
         self.arZoom['save_position'].connect('activate', self.save_position) #$self.arZoom['treeleft']->connect_simple('cursor-changed',array($self,'details'), $table, $id_type,$left);
         self.arZoom['tapez_saisie'].connect('changed', self.tapez_saisiex,clists)
+        self.arZoom['edit'].connect('clicked', self.edit_clicked,clists)
         mag.arw['tapez_saisie'] = self.arZoom['tapez_saisie']
         self.arZoom['add_entry_button'].connect('clicked', self.add_entry,table,clists)
 
@@ -2431,14 +2484,15 @@ or the list does not exist."""))
         global mem
 
         mem['edit_mode'] = 1
-        window.set_modal(False)        # permettre à la fenêtre de passer derrière
-        #    $win=$window1->window;            // mettre au premier plan la liste
-##        if win :
-##
-##            win.raise()
+        self.arZoom['window1'].set_modal(False)        # permettre à la fenêtre de passer derrière
+        x = mag.arw["clist5"].path()
+        mag.arw['s_notebook'].set_current_page(0)
+        #win=mag.arw["s_window"].window             # mettre au premier plan la liste
+
+##        win.raisex()
 
 
-        mag.arw['s_notebook1'].set_show_tabs(False)
+        #mag.arw['s_notebook1'].set_show_tabs(False)
         mag.arw['s_notebook1'].set_current_page(tab - 1)
 
 
@@ -2626,7 +2680,6 @@ class Prompt :
     def run(self) :
     	result = self.dialog.run();
     	self.dialog.destroy();
-        print self.reponse
         return self.reponse
 
 
@@ -2705,7 +2758,6 @@ class Prompt2A :
         self.model = {}
         self.ok = 0
 
-        print "====>", fields
         dialog = gtk.Dialog('Edit', None, gtk.DIALOG_MODAL|gtk.DIALOG_NO_SEPARATOR)
         table = gtk.Table()
         self.display_table(table, fields)
@@ -2848,7 +2900,7 @@ class maglist() :
 
     def build_listes(self) :
         t1 = time.time()
-        global  configdir, mem, listes, cr;
+        global  mem, listes, cr;
         global  node, affichage, link;
         global  config, tab_conversion, popup_condition;
 
@@ -3008,7 +3060,7 @@ class maglist() :
                                     data2 = ""
                                 listStore.append([data,data2]);
                             except :                            # for mysql
-                                data = fiche.keys()[0];
+                                data = fiche[fiche.keys()[0]];
                                 if len(fiche.keys()) > 1 :
                                     data2 = fiche.keys()[1]
                                 else :
@@ -3075,7 +3127,7 @@ class maglist() :
                     n = len(result)
                     popup_condition[key] = []
                     for row in result :
-                        popup_condition[key].append(row[0])
+                        popup_condition[key].append(row.keys()[0])
 
 
 
@@ -3919,7 +3971,6 @@ class maglist() :
         global mem, config, config_info, popup_saisie, listes, query
         global tab_conversion, periph_tables, treeview_data, affichage;
 
-
         listes_combinees = []
         query = {}
         # déclarations
@@ -3940,6 +3991,15 @@ class maglist() :
 
             # si la fonction est appelée par un contrôle lié à une liste, ou par la liste elle-même
             nom_liste1 = treeview.name
+            # Is there a selection (function is launched by the signal "cursor changed"
+            # the first time the tab is opened, with no selection, which provokes
+            # an annoying alert
+
+            sel = treeview.get_selection()
+            (model, arPaths) = sel.get_selected_rows();
+            if len(arPaths) == 0 :
+                return                      # No selection, return
+
             # recherche des données de la liste
             liste_data = treeview_data[nom_liste1];
             in_liste = self.ok_liste_b(treeview,nom_liste1);
@@ -4021,12 +4081,12 @@ class maglist() :
         #   TODO ? if nom_liste1 != "complex" :
 
         if len(in_liste) > 0 :
-            ids_list = in_liste[0]
-            for ids in in_liste[1:] :
-                ids_list += "," + ids
+            ids_list = ",".join(in_liste)
             query["ids"] = "(" + ids_list + ")"
         else :
             query["ids"] = "()"
+
+
 
         if len(query["ids"])>2 :
 
@@ -4100,8 +4160,6 @@ class maglist() :
     """
 
     def ok_liste_b(self, treeview, nom_liste) :
-
-        print "ok_list2 - debug"
 
         global mem,listes,in_liste, checkbox_list, msg;
         temp6 = "";
@@ -4726,7 +4784,7 @@ class maglist() :
 
     def item_update(self, list1) :
 
-
+        # Update commande for tree serach lists
 
         global config, periph_tables, link, tab_conversion;
 
@@ -4807,14 +4865,15 @@ class maglist() :
 
                 # Si le nom a été changé
                 req="select mainfield from table where renvoi like '%ancien_nom%' ";
-                ok=cursor.execute(req);
+                cursor.execute(req);
+                result = cursor.fetchall()
                 sql_error(link,req);
-                num = mysql_num_rows(ok);
+                num = len(result);
                 if num>0 :
 
                     for i in range(0, num) :
 
-                        noms+=mysql_result(ok,i) + " -";
+                        noms += result[i] + " -";
 
                     msg = sprintf(_("Warning ! There are %d  cross-reference(s) on %s . See records : \n %s "), num, ancien_nom, noms);
                     alert(msg);
@@ -4825,10 +4884,11 @@ class maglist() :
         # traitement différent selon que le nouveau nom est déjà utilisé ou non
 
 
-        exist=cursor.execute("select id_type from table where mainfield= binary nom1");
-        if mysql_num_rows(exist)>0 :
+        cursor.execute("select id_type from table where mainfield= binary nom1");
+        exist = cursor.fetchall()
+        if len(exist) > 0 :
 
-            test=mysql_result(exist,0,0);
+            test = exist[0][0]
 
         if isset(test) and  test!=id and len(gateway) >0  :
 
@@ -5028,14 +5088,16 @@ class maglist() :
                 db_utils.is_field(cursor, table, i_data, "TEXT")
 
 
-                # TODO
-                """ version mysql
-                req0 = "update $table t set $i_data = ("
-                req0 += " select group_concat(distinct $id_main order by $order_field separator ',')"
-                req0 += " from $gateway g "
-                req0 += " where t.$id_type = g.$id_type"
-                """
-                if db_type == "sqlite" :
+                if db_type == "mysql" :
+                    req0 = "update $table t set $i_data = ("
+                    req0 += " select group_concat(distinct $id_main order by $order_field separator ',')"
+                    req0 += " from $gateway g "
+                    req0 += " where t.$id_type = g.$id_type "
+                    if condition.strip() != "" :
+                        req0 += condition
+                    req0 += ")"
+
+                elif db_type == "sqlite" :
                     req0 = "update $table set $i_data = ("
                     req0 += " select group_concat(distinct $id_main)"
                     req0 += " from $gateway "
@@ -5043,16 +5105,14 @@ class maglist() :
                     if condition.strip() != "" :
                         req0 += condition
                     req0 += ")"
-                    req1 = eval(php_string(req0))
-                    # TODO order à la ligne 2 de cette requête.
-
 
                 elif db_type == "accdb" :
                     req0 = "select distinct $id_main, $table.$id_type"
                     req0 += " from $table, $gateway "
                     req0 += " where $table.$id_type = $gateway.$id_type"
-                    req1 = eval(php_string(req0))
-                    # TODO order à la ligne 2 de cette requête. (?)
+
+                req1 = eval(php_string(req0))
+                # TODO order à la ligne 2 de cette requête. (?)
 
 
                 # affichage dans le TextView
@@ -5175,15 +5235,18 @@ class maglist() :
 
 
     def create_tempx(self) :
-        cursor.execute("DROP TABLE IF EXISTS [tempx]")
+
         if db_type == "mysql" :
+            cursor.execute("DROP TABLE IF EXISTS tempx")
             req = """CREATE TABLE `tempx` (
-                `word` varchar(128) NOT Null,
+                `word` varchar(128) collate utf8_unicode_ci NOT Null,
                 `record` int(10) unsigned NOT Null,
                 PRIMARY KEY  (`word`,`record`)
-                ) DEFAULT CHARSET=utf8 collate collation;""";
+                ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;""";             # TODO mysql : il y avait : collate collation
+
 
         elif db_type == "sqlite" :
+            cursor.execute("DROP TABLE IF EXISTS [tempx]")
             req = """CREATE TABLE [tempx] (
                 [word] TEXT  NULL,
                 [record] TEXT  NULL,
@@ -5323,14 +5386,15 @@ class maglist() :
 
         message =  " =====================================\n\n"
         message += _("End of inversion process") + "\n"
-        message += _("Now compressing database") + "\n"
-        insertion_tv(buffer1,message);
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
-            gtk.main_iteration();
-        cursor.execute("VACUUM")
+        if db_type == "sqlite" :
+            message += _("Now compressing database") + "\n"
+            insertion_tv(buffer1,message);
+            info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+            while (gtk.events_pending()) :
+                gtk.main_iteration();
+            cursor.execute("VACUUM")
+            message = "\n"
 
-        message = "\n"
         message += _("Process terminated")
         message += "\n\n =========================================\n\n"
         insertion_tv(buffer1,message);
@@ -5394,20 +5458,22 @@ class maglist() :
 
 
             contenu =unicode2(contenu)
-            ex1 = re.findall("(?u)\w+",contenu);   # division en mots
+            ex1 = re.findall(u"\w+",contenu);   # division en mots
 
             # suppression des doublons
             ex=array_unique(ex1);
 
             for k in range(len(ex)) :
-
+              try :
                 # si le mot n'est pas dans la liste des mots vides
                 if (not ex[k] in mots_vides) and (len(ex[k])>1) :
-
-                    #  mots[] = ex[k] .chr(9). fiche[0];
-                    mots.append("('" + ex[k] + "'," + str(fiche[0]) + ")");
-
-
+                    if isinstance(ex[k], unicode) :
+                        mot1 = ex[k].encode("utf8")
+                    else :
+                        mot1 = ex[k]
+                    mots.append("('" + mot1 + "'," + str(fiche[main_field]) + ")");
+              except :
+                print "======>", len(mots), repr(contenu), repr(ex1), repr(ex[k])
 
 
         count = len(mots);
@@ -5447,18 +5513,25 @@ class maglist() :
 ##            cursor_execute(self.cursor2, sqlite_query, mysql_query)
 
         cursor.execute("delete from tempx")
-        for data in mots :
 
+        if db_type == "mysql" :
+            # Divide the list in 1000 items lists
 
+            for i in range (0, len(mots), 1000) :
+                mots2 = mots[i:i + 1000]
+                data = ",".join(mots2)
+                req1 = "insert ignore into tempx VALUES "
+                req1 += data
+
+        else :
             if db_type == "sqlite" :
                 req1 = "insert or ignore into tempx VALUES ";
             elif db_type == "accdb" :
                 req1 = "insert into tempx VALUES ";
 
-            req1 += data
-
-            cursor.execute(req1)
-
+            for data in mots :
+                req2 = req1 + data
+                cursor.execute(req2)
 
 
         link.commit()
@@ -5477,16 +5550,19 @@ class maglist() :
 
 
         # Insert in words table the words which are not yet present
-        req2 = "insert into $words_table ($word_field) select distinct word from tempx where tempx.word not in (select $word_field from $words_table)";
+        req2 = """insert into $words_table ($word_field)
+                select distinct word from tempx
+                where tempx.word not in (select $word_field from $words_table)"""
         req2 = eval(php_string(req2))
         cursor.execute(req2)
         link.commit()
 
 
-##        mysql : req3 = """update $words_table set $i_field = (
-##                select group_concat(distinct record separator ',')
-##                from tempx
-##                where $words_table.$word_field = tempx.word)""";
+        if db_type == "mysql" :
+            req3 = """update $words_table set $i_field = (
+                select group_concat(distinct record separator ',')
+                from tempx
+                where $words_table.$word_field = tempx.word)""";
 
         if db_type == "sqlite" :
             req3 = "update $words_table set $i_field = (select group_concat(distinct record ) from tempx where $words_table.$word_field = tempx.word)"
@@ -5549,9 +5625,12 @@ class maglist() :
             else :
                 return dict1[field1]
 
-
         info = self.arw['s_info10'];
         buffer1 = info.get_buffer();
+        try :
+            separator = config['ini']['output']['field_separator']
+        except :
+            separator = "; "
 
         todo_a = {}
 
@@ -5634,6 +5713,7 @@ class maglist() :
 
         for key in todo_a :
 
+            t1 = time.time()
             (table, gateway, id_type, name, central_def, linked_field, main_field, central_table, condition, fieldname, content) = todo_a[key]
 
 
@@ -5650,12 +5730,14 @@ class maglist() :
 
                 if db_type == "mysql" :
 
-                    req1 = """update central_table set fieldname = (
-                        select group_concat(distinct content order by gateway.order_field separator ' separator ' )
-                        from table
-                        left join gateway on (table.id_type=gateway.id_type)
-                        where central_table.main_field=gateway.main_field
-                        and condition)"""
+                    req1 = """update $central_table set $fieldname = (
+                        select group_concat(distinct $content order by $gateway.$order_field separator '$separator' )
+                        from $table
+                        left join $gateway on ($table.$id_type=$gateway.$id_type)
+                        where $central_table.$main_field=$gateway.$main_field"""
+                    if condition != "" :
+                        req1 += " and $condition "
+                    req1 += ")"
 
                 else :
 
@@ -5703,10 +5785,10 @@ class maglist() :
                 req1 += "select $name from $table "
                 req1 += "where $central_table.$linked_field = $table.$id_type)"
 
-            req1 = eval(php_string(req1))
-            print ">>>>", req1
-            pos = strpos(req1,"=");
-            titre = substr(req1,0,pos);
+            req2 = eval(php_string(req1))
+
+            pos = strpos(req2,"=");
+            titre = substr(req2,0,pos);
             insertion_tv(buffer1,titre);
             info.scroll_to_mark(buffer1.get_insert(), 0);    # Kksou 87
 
@@ -5714,13 +5796,12 @@ class maglist() :
 
                 gtk.main_iteration();
 
-            t1 = time.time()
 
             if db_type != "accdb" :
                 try :
-                    result = cursor.execute(req1)
+                    result = cursor.execute(req2)
                 except :
-                    print "Error for : ", req1
+                    print "Error for : ", req2
                     utils.printExcept()
                 link.commit()
 
@@ -5738,7 +5819,7 @@ class maglist() :
                     req1 += "join $gateway on ($table.$id_type=$gateway.$id_type) "
                     req1 += "where $central_table.$main_field = $gateway.$main_field ";
                     req1 = eval(php_string(req1))
-                    print "==========>", req1
+
 
 ##                        req1 = "update $central_table set g_$table = ("
 ##                        req1 += "select group_concat(distinct $table.$name) from $table "
@@ -5754,7 +5835,7 @@ class maglist() :
                     req1 = "select $content as content, $central_table.$main_field from $table, $central_table "
                     req1 += "where $central_table.$linked_field = $table.$id_type"
                     req1 = eval(php_string(req1))
-                    print "==========>", req1
+
                     cursor.execute(req1)
 
                     data1 = cursor.fetchall()
@@ -7283,12 +7364,12 @@ class edit() :
                 widgetname = value['detail']
                 if len(widgetname) > 0 :
                     datafield = value['field']
-                    contenu = self.Chaine_guillemets(get_text(self.arw[widgetname]))
+                    contenu = get_text(self.arw[widgetname])
                     datadef[datafield] = contenu
 
         # contenu du champ principal
 
-        nom1 = datadef[mainfield]
+        nom1 = unicode2(datadef[mainfield])
 
 
         if (renvoi != None) and (len(renvoi) > 0) :
@@ -7296,10 +7377,13 @@ class edit() :
             query = eval(php_string("select $mainfield from $table where $id_type=$id"))
             cursor.execute(query)
             sql_error(link,query)
-            ancien_nom=self.Chaine(cursor.fetchone()[0])
+            result = cursor.fetchone()
+            ancien_nom = result[mainfield]
+
 
             if (ancien_nom != nom1) and(ancien_nom != "") :
             # Si le nom a été changé
+                ancien_nom=self.Chaine(ancien_nom)
                 req = eval(php_string("select $mainfield from $table where $renvoi like '%$ancien_nom%' "))
                 cursor.execute(req)
                 rows = cursor.fetchall()
@@ -7318,16 +7402,16 @@ class edit() :
         # traitement différent selon que le nouveau nom est déjà utilisé ou non
 
         # mysql :  "select $id_type from $table where $mainfield= binary $nom1"
-        req = eval(php_string("select $id_type from $table where $mainfield= $nom1"))
+        req = eval(php_string("select $id_type from $table where $mainfield like '$nom1'"))
         cursor.execute(req)
         rows = cursor.fetchall()
         num = len(rows)
         if num > 0 :
-            test = rows[0][0]
+            test = rows[0][id_type]
         else :
             test = None
 
-        if test != None and  test != id and len(gateway) > 0  :     # Si le nouveau nom existe et s'il a été changé
+        if test != None and  int(test) != int(id) and len(gateway) > 0  :     # Si le nouveau nom existe et s'il a été changé
             req = eval(php_string("update $gateway set $id_type=$test where $id_type=$id")) # on copie les entrées d'un thème à l'autre
             cursor.execute(req)
             sql_error(link,req)
@@ -7341,7 +7425,7 @@ class edit() :
             req= eval(php_string("update $table set "))
             for  key  in datadef  :
                 val = datadef [ key ]
-                req += key+"="+val+","
+                req += key + "= '" + val+ "',"
 
             # champs et données
             req = substr(req,0,len(req) -1) # enlever la virgule finale
@@ -7350,7 +7434,7 @@ class edit() :
             sql_error(link, req)
 
 
-
+        link.commit()
 
 
 
@@ -8088,7 +8172,7 @@ class predef_queries :
 
 
     def predef_query_duplicate(self, widget) :
-        global link, queries, configdir, mem
+        global link, queries, mem
 
         iter1 = self.predef_query_new("")
 
@@ -8154,7 +8238,7 @@ class predef_queries :
         # In conjunction with the signals set in predef_query_build(),
         # this function updates the dictionary when something is changed in the form
 
-        global link, queries, configdir, mem
+        global link, queries, mem
 
         if mem['update_query'] == 0 :
             return
@@ -8514,8 +8598,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         #dataHelp = fHelp.read(5000)
         #fHelp.close()
 
-        global stores, affichage, configdir
+        global stores, affichage, configdir_u
         self.colonnes_resultat = {}
+        self.configdir_u = configdir_u
 
         self.colors = {}
         for a in [0, 1, 2, 3, 's_reference'] :
@@ -9066,8 +9151,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
     def call_user_func(self, func_name, fiches) :
         command_s = "data = self.myfunctions." + func_name.strip() + "(fiches)"
-        print command_s
-
         exec(command_s)
 
         return data
@@ -9123,7 +9206,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 ##        affichage, stores, modelsort, order, timing,
 ##        link, result, col_view, mem,
 ##        d_champsinv, nomschamps, resultat, cr_editable ;
-        print "debug chercher"
+
         global col_view
 
 
@@ -9259,7 +9342,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                         nom = title[k]
                     else :
                         nom = " "
-                elif k in fields_names :                # if there was a * in the sselect
+                elif k in fields_names :                # if there was a * in the select
                     nom = fields_names[k][0]
                 else :
                     nom = " "
@@ -9325,24 +9408,39 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 ##            i += 1
 ##        tt("c")
 
-        fields_names = cursor.description
+
         result_a = cursor.fetchall()
-        fields_names = cursor.description
+
         store.clear()
 
-        clist.set_model(None)
-        # Détruire le tri est nécessaire, sinon la croissance du temps d'affichages est exponentielle
-        if page in modelsort :
-                del modelsort[page]
+        # detach store to make the process faster for long lists
+        if len(result_a) > 200 :
+            clist.set_model(None)
+            # Détruire le tri est nécessaire, sinon la croissance du temps d'affichages est exponentielle
+            if page in modelsort :
+                    del modelsort[page]
 
         # populate the store
         i = 0
         data2 = []
-        for z in result_a :
-            data1 = []
-            for a in z :
-                data1.append(a)
-            data2.append(data1)
+        if db_type != "mysql" :
+            for z in result_a :
+                data1 = []
+                for a in z :
+                    data1.append(a)
+                data2.append(data1)
+        else :                      # mysql results are presented in a different format
+            fields = []             # Create the list of fields
+            for z in fields_names :
+                fields.append(z[0])
+            for z in result_a :
+                data1 = []
+                for a in fields :
+                    data1.append(z[a])
+                data2.append(data1)
+                data1 = []
+
+
         for data1 in data2 :
             append(store,data1);
             if i % 100 == 0 :
@@ -9357,11 +9455,13 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         status_text = str(i) + _(" records")
         self.arw["status"].set_text(status_text);
 
-        # reattach store and modelSort
-        modelsort[page] = gtk.TreeModelSort(store);
-        clist.set_model(modelsort[page])
+        # reattach store and modelSort (if they were detached)
+        if len(result_a) > 200 :
+            modelsort[page] = gtk.TreeModelSort(store);
+            clist.set_model(modelsort[page])
 
-        # select first line
+        # select first line to force display of the details
+        # TODO : this approach is not the most beautiful and provokes a blinking
         first = modelsort[page].get_iter_first();
         sel = clist.get_selection();
         if first :
@@ -9369,7 +9469,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
         clist.grab_focus();
-
 
 
         # Mémoriser le nombre de fiches
@@ -9875,12 +9974,12 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         buffer1.apply_tag_by_name("haut",iter2,iter1);
 
         # Création du bouton de lien
+        if nom != None :
+            link_button1 = gtk.LinkButton(None, nom);
+            link_button1.connect('clicked', self.on_linkbutton, nom,model);
 
-        link_button1 = gtk.LinkButton(None, nom);
-        link_button1.connect('clicked', self.on_linkbutton, nom,model);
-
-        link_button1.show();
-        textview.add_child_at_anchor(link_button1,anchor);
+            link_button1.show();
+            textview.add_child_at_anchor(link_button1,anchor);
 
         # Add tooltip
         nom = nom.strip()
@@ -9929,9 +10028,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             table_def = config['popup'][model]['table_def'];
             table = config['peripheral'][table_def]['table'];
             field = periph_tables[table]['main_field'];
+            if db_type == "sqlite" :
+                url = url.replace("'", "''")
             req =  eval(php_string("SELECT * FROM $table WHERE $field = '$url'"))
-            # TODO : échapper les '
-            print "TODO : échapper les '"
+            # TODO : échapper les ' pour mysql
             cursor.execute(req);
             fiches = cursor.fetchone()
 
@@ -10015,7 +10115,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
     def impression(self, widget, option) :
 
-        global mem, config, config_info, affichage, configdir;
+        global mem, config, config_info, affichage
         page = mem['result_page'];
         liste = self.arw['s_list2' + str(page)];
         model=liste.get_model();
@@ -10193,8 +10293,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         page = mem['result_page'];
         liste = self.arw['s_list2' + str(page)];
         model=liste.get_model();
-
-        print 'impression2'
 
         #fichier_impression = MessageBox("Nom du fichier de sortie ","fichier de sortie",10001,None,perso['repertoire_impression']);
 
@@ -11043,7 +11141,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         #ouverture du bon onglet
         central_def = affichage[page]['central_def'];
         n = config['central'][central_def]['edit_tab'];
-        print(central_def, n)
         self.arw['s_notebook4'].set_current_page(int(n) - 1);
         self.montrer('window4',1);
 
@@ -11300,15 +11397,13 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
     def create_backup(self, auto = None, *params) :
 
 
-
-
-        filename_u = os.path.split(db_file)[1]
-        (name_u,ext_u) = os.path.splitext(filename_u)
+        (db_dir, db_name) = os.path.split(db_file)
+        (name_u,ext) = os.path.splitext(db_name)
         date1 = datetime.date.today()
         today_u = unicode2(date1.isoformat())
         name_u = name_u + " " + today_u  + u".zip"
 
-        backup_name_u = os.path.join(configdir_u,"backup",name_u)
+        backup_name_u = os.path.join(db_dir,"backup",name_u)
         if auto == True :
             if os.path.isfile(backup_name_u) :         # Automatic backup only once a day.
                 return                                 # TODO : keep only a limited number of backups.
@@ -11321,14 +11416,16 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 while gtk.events_pending():
                     gtk.main_iteration()
 
-        if not os.path.isdir(os.path.join(configdir_u,"backup")) :
-            os.makedirs(os.path.join(configdir_u,"backup"))
+
+        if not os.path.isdir(os.path.join(db_dir,u"backup")) :
+            os.makedirs(os.path.join(db_dir,u"backup"))
 
         try :
             output = zipfile.ZipFile(backup_name_u, "w", zipfile.ZIP_DEFLATED)
             db_filename = os.path.split(db_file)[1]
 
-            files_list = glob.glob(os.path.join(configdir_u, u"*"))
+            files_list = glob.glob(os.path.join(configdir_u, u"*"))     # add all config files
+            files_list.append(db_file)
             for filename_u in files_list :
                 if os.path.isfile(filename_u) :
                     output.write(filename_u, os.path.split(filename_u)[1])
@@ -11429,7 +11526,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
     def open_history(self, widget) :
 
         self.montrer("s_history",3)
-        print "fini"
 
 
     def open_about(self,widget) :           # TODO : does not work
@@ -11837,7 +11933,7 @@ def verify_config() :
 
 def save_settings(widget = "") :
 
-        global configdir, settings, config;
+        global settings, config;
 
         #crÃ©ation d'un backup.
         # procÃ©dure un peu lourde mais qui Ã©vite l'enfer des " pour les commandes shell
@@ -12109,7 +12205,7 @@ if __name__ == '__main__' :
 
         import imp
         if os.path.isfile(os.path.join(configdir_u, "userfunctions.py")) :
-            myfunctions = imp.load_source("myfunctions.general", os.path.join(configdir_u, "userfunctions.py"))
+            myfunctions = imp.load_source("standard.myfunctions", os.path.join(configdir_u, "userfunctions.py"))
 
         # chargement de la configuration
 
@@ -12151,8 +12247,8 @@ if __name__ == '__main__' :
 
         """
 
-        if (is_file(configdir . "colors.php")):
-            include(configdir . "colors.php")
+        if (is_file(configdir_u . "colors.php")):
+            include(configdir_u . "colors.php")
         require_once("extensions/rt_zoom.php");
         require_once("extensions/zoom_images.php");
 
@@ -12287,7 +12383,7 @@ if __name__ == '__main__' :
             link.query("set names utf8");
             # ££ link.query("SET GLOBAL group_concat_max_len = 128000"); OperationalError: (1227, 'Access denied; you need the SUPER privilege for this operation')
             db_type = "mysql"
-            db_structure = []
+            db_structure = db_utils.mysql_db_structure(cursor)
 
             rep = link.select_db(bddLocale)
 ##            if not rep:

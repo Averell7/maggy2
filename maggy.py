@@ -1,17 +1,18 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
-# Version 2.0.0 build 44  4 janiver 2016
+# Version 2.0.0 build 45  24 janvier 2016
 
 
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
 
-maggy_version = "2.0.0.44"
+maggy_version = "2.0.0.45"
 print "Maggy Version : ", maggy_version
 """
 In this version :
 
+added year2ymd in Sqlite functions
 Improved Mysql support
 bugs fixed for peripheral tables edition
 
@@ -104,10 +105,10 @@ try :
 except :
     print("Mysql modules not installed.")
 
-try :
-    import pypyodbc         # for accdb tables
-except :
-    print ("pypyobdc not installed. accdb database not supported")
+##try :
+##    import pypyodbc         # for accdb tables
+##except :
+##    print ("pypyobdc not installed. accdb database not supported")
 
 import sqlite3 as sqlite
 
@@ -698,6 +699,26 @@ class SqliteUnicode :
         else :
             return date1
 
+    def date2ymd(self,date1) :
+        # converts dmy format to ymd to allow sorting
+        # The job could be done with a regex
+        separator = "-"
+        if date1 == None :
+            return date1
+        date2 = date1.split("-")
+        if len(date2) < 3 :
+            date2 = date1.split("/")
+            separator = "/"
+        if len(date2) == 3 :
+            if len(date2[0]) == 1 :
+                date2[0] = "0" + date2[0]
+            if len(date2[1]) == 1 :
+                date2[1] = "0" + date2[1]
+
+            return date2[2] + separator + date2[1] + separator + date2[0]
+        else :
+            return date1
+
 
 class Import_csv :
 
@@ -1284,6 +1305,7 @@ class db_utilities :
         link.create_function("concat_ws", -1, extension.concat_ws)
         link.create_function("clean_commas", 1, extension.clean_commas)
         link.create_function("date2year", 1, extension.date2year)
+        link.create_function("date2ymd", 1, extension.date2ymd)
 
         # retrieve structure
         db_structure= {}

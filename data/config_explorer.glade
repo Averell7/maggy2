@@ -1218,7 +1218,7 @@
                                 <child>
                                   <object class="GtkTable" id="table3">
                                     <property name="visible">True</property>
-                                    <property name="n_rows">8</property>
+                                    <property name="n_rows">9</property>
                                     <property name="n_columns">2</property>
                                     <child>
                                       <object class="GtkLabel" id="label47">
@@ -1375,7 +1375,7 @@
                                     <child>
                                       <object class="GtkLabel" id="label54">
                                         <property name="visible">True</property>
-                                        <property name="label" translatable="yes">from</property>
+                                        <property name="label" translatable="yes">full from</property>
                                       </object>
                                       <packing>
                                         <property name="top_attach">7</property>
@@ -1391,7 +1391,7 @@
                                         <property name="vscrollbar_policy">automatic</property>
                                         <property name="shadow_type">in</property>
                                         <child>
-                                          <object class="GtkTextView" id="central@from">
+                                          <object class="GtkTextView" id="central@full_from">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="wrap_mode">word</property>
@@ -1404,6 +1404,30 @@
                                         <property name="right_attach">2</property>
                                         <property name="top_attach">7</property>
                                         <property name="bottom_attach">8</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label16">
+                                        <property name="visible">True</property>
+                                        <property name="label" translatable="yes">from</property>
+                                      </object>
+                                      <packing>
+                                        <property name="top_attach">8</property>
+                                        <property name="bottom_attach">9</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="central@from">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="invisible_char">&#x25CF;</property>
+                                        <signal name="key_release_event" handler="entry_update"/>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">8</property>
+                                        <property name="bottom_attach">9</property>
                                       </packing>
                                     </child>
                                     <child>

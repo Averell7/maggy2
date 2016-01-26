@@ -2334,7 +2334,15 @@ class Restore(utilities, Treeview_handle) :
 
 
 
+    def check_config(self, widget = None) :
 
+        # central tables
+
+        for c_table in config['central'] :
+            # details
+            details = c_table['details']
+            if not details in config['details'] :
+                alert ("error for details in central table")
 
 
 

@@ -1,5 +1,6 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
+# Version 2.0.0.46  - January 2016
 # Version 2.0.0     - Averell - GTK GUI - May 17th, 2012
 # Version 1.9.6     - Gaston - Sept 03th, 2011 - Cosmetic enhancements (title, background color)
 # Version 1.9.5     - Revision 5 - Mar 03rd, 2012
@@ -11,6 +12,7 @@
 '''
 problème possible : result lists : si un grand nombre de lignes, comme on utilise un dictionnaire,
 l'ordre des colonnes sera-t-il conservé ? Et si non, show_result_details donnera un résultat faux
+Solution : Avec Python 2.7, utliser OrderedDict
 
 central/table/result fait double emploi avec result ???
 Pas entièrement, on sélectionne les résultats utilisés par cette table
@@ -373,23 +375,26 @@ class Treeview_handle :
 
     def treeview2_select(self, treeview) :
 
-        if treeview.name == "treeview6" :
-            name = self.search_active
-            use_config = self.config["xtabs"][name]
+        try :
+            if treeview.name == "treeview6" :
+                name = self.search_active
+                use_config = self.config["xtabs"][name]
 
-        elif treeview.name == "treeview5" :
-            name = self.result_active
-            use_config = self.config["result"][name]
+            elif treeview.name == "treeview5" :
+                name = self.result_active
+                use_config = self.config["result"][name]
 
-        elif treeview.name == "treeview7" :         # Sort
-            name = self.result_active
-            use_config = self.config["result"][name]
+            elif treeview.name == "treeview7" :         # Sort
+                name = self.result_active
+                use_config = self.config["result"][name]
 
-        elif treeview.name == "gateway_details" :         # Sort
-            name = self.gateway_active
-            use_config = self.config["gateway_data"][name]
+            elif treeview.name == "gateway_details" :         # Sort
+                name = self.gateway_active
+                use_config = self.config["gateway_data"][name]
 
-        return use_config
+            return use_config
+        except :
+            alert(_("no configuration selected"))
 
 
     def treeview_add2(self, treeview) :
@@ -3811,7 +3816,10 @@ if __name__ == '__main__' :
         selector.load_inversion_list()
         selector.load_result_list()
         selector.load_details()
-        selector.load_popup_list()
+        try :
+            selector.load_popup_list()
+        except :
+            print "Error loading popup list"
         selector.load_gateway_data_list()
         selector.load_advanced_details()
         gtk.main()

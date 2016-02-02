@@ -1,20 +1,18 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
-# Version 2.0.0 build 45  24 janvier 2016
+# Version 2.0.0 build 46  29 janvier 2016
 
 
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
 
-maggy_version = "2.0.0.45"
+maggy_version = "2.0.0.46"
 print "Maggy Version : ", maggy_version
 """
 In this version :
 
-added year2ymd in Sqlite functions
-Improved Mysql support
-bugs fixed for peripheral tables edition
+bug fix for supprimer_fiche  (commit was missing)
 
 """
 
@@ -8106,7 +8104,7 @@ class predef_queries :
         model = self.arw['s_clist4'].get_model()
         model.clear()
 
-        fields = ["name", "query", "widths", "comment", "parameters", "central_def", "details", "result", "config"]
+        fields = ["name", "query", "widths", "names", "comment", "parameters", "central_def", "details", "result", "config"]
         if self.queries :
 
             for  key in self.queries  :
@@ -8139,7 +8137,7 @@ class predef_queries :
             iter = null
 
 
-        fields = ["name", "query", "widths", "comment", "parameters", "details", "central_def", "result"]
+        fields = ["name", "query", "widths", "names", "comment", "parameters", "details", "central_def", "result"]
 
         for i  in range( 0, 8) :
             if effacer == 1 :
@@ -8171,7 +8169,7 @@ class predef_queries :
         line_name = get_text(self.arw["s_name4"])       # name of active query
         for option in ["query", "parameters", "comment",
                         "central_def", "result", "details",
-                        "widths", "config"] :
+                        "widths", "names", "config"] :
             text = get_text(self.arw["s_" + option + "4"])
             self.queries[line_name][option] = text
 
@@ -8323,6 +8321,7 @@ class predef_queries :
 
             fiche = self.queries[req];
             largeurs = ""
+            names = ""
             comment = ""
             parameters = ""
             central_def = ""
@@ -8334,6 +8333,9 @@ class predef_queries :
             titre=fiche['name'];
             if 'widths' in fiche :
                 largeurs=fiche['widths'];
+
+            if 'names' in fiche :
+                names=fiche['names'];
 
             if 'comment' in fiche :
                 comment = fiche['comment'];
@@ -8366,6 +8368,7 @@ class predef_queries :
 
             titre=get_text(self.arw['s_name4']);
             largeurs=get_text(self.arw['s_widths4']);
+            names=get_text(self.arw['s_names4']);
             comment = get_text(self.arw['s_comment4']);
             parameters = get_text(self.arw['s_parameters4']);
             details = get_text(self.arw['s_details4']);
@@ -8561,7 +8564,7 @@ class predef_queries :
             self.chercher(requete);
 
             arLargeurs= largeurs.split(",");
-            titles = cursor.description
+            titles = names.split(",")
 
 
             for i in range(0,35) : #(i=0; i<35; i+= 1)
@@ -8571,7 +8574,7 @@ class predef_queries :
                 try :
                     col.set_fixed_width(int(arLargeurs[i]));
                     if i < len(titles) :
-                        col.set_title(titles[i][0])
+                        col.set_title(titles[i])
                 except :
                     col.set_fixed_width(10);
 
@@ -11234,6 +11237,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 # result = cursor.execute("insert into central_table(main_field,notes) values(id,\"b\")");
                 # on recrée une fiche vide avec note "b", afin que le numéro soit réutilisé
 
+                link.commit()
                 self.rafraichir("");
 
 

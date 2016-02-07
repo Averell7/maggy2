@@ -1,0 +1,165 @@
+#       Syntaxe des commandes
+# Répertoires contenant les images
+# pixmap_path "<dir 1>:<dir 2>:<dir 3>:..."
+#
+#pixmap_path "/usr/include/X11R6/pixmaps:/home/imain/pixmaps"
+#
+# Définition d'un style
+# style <name> [= <name>]
+# {
+#   <option>
+# }
+#
+#  Application d'un style à un objet ou à un groupe d'objets (class) 
+# widget <widget_set> style <style_name>
+# widget_class <widget_class_set> style <style_name>
+#
+#
+# Liste de tous les états possibles d'un widget. Notez que tous les widgets 
+# ne sont pas susceptibles de prendre tous les états.
+#
+# NORMAL - Etat normal, quand la souris n'est pas sur le widget, qu'il n'est pas pressé etc. 
+# 
+#
+# PRELIGHT - Quand la souris vient sur le widget, mais sans qu'on ait encore cliqué
+# 
+#
+# ACTIVE - Quand le widget est enfoncé ou cliqué 
+# 
+#
+# INSENSITIVE - Quand le widget est inactif et ne peut pas être sélectionné
+# 
+#
+# SELECTED - Quand un objet est sélectionné. 
+#
+# Pour chacun de ces états on peut définir 
+#
+#
+# fg - Couleur d'avant plan (le texte normalement).
+# bg - Couleur de fond.
+# bg_pixmap - Image utilisée en fond (image tuilée).
+# font - Fonte utilisée dans le widget.
+#
+# Cette commande définit que le widget prend l'image de fond de son parent
+# Cela vaut pour n'importe quel attribut.
+#bg_pixmap[NORMAL] = "<parent>"
+
+# Ceci définit un style appelé "button".  Le nom n'a pas d'importance car l'attribution aux widgets 
+# est faite à la fin du fichier (on peut attribuer ce style à n'importe quel type d'objet).
+
+style "button"
+{
+  # Cela montre tous les états possibles à l'exception de SELECTED qui ne s'applique pas aux boutons
+  # (probablement seulement aux listes).
+  
+  fg[PRELIGHT] = { 0.5, 1.0, 1.0 }
+  bg[PRELIGHT] = { 0.5, 0.5, 1.0 }
+  #bg[ACTIVE] = { 1.0, 0.5, 0.5 }
+  #fg[ACTIVE] = { 0.0, 1.0, 0.0 }
+  bg[NORMAL] = { 0.2, 0.7, 0.7 }
+#  fg[NORMAL] = { .99, 0, .99 }
+  bg[INSENSITIVE] = { 1.0, 1.0, 1.0 }
+  fg[INSENSITIVE] = { 1.0, 0.0, 1.0 }
+}
+
+  
+style "window"
+{
+  #This sets the padding around the window to the pixmap specified.
+  #bg_pixmap[<STATE>] = "<pixmap filename>"
+  #bg_pixmap[NORMAL] = "bois_062.jpg"
+}
+
+style "scale"
+{
+  #Sets the foreground color (font color) to red when in the "NORMAL"
+  #state.
+  
+  fg[NORMAL] = { 1.0, 0.0, 0.0 }
+  
+  #Sets the background pixmap of this widget to that of its parent.
+  bg_pixmap[NORMAL] = "<parent>"
+}
+
+
+# Dans cet exemple le nouveau style "main_button" hérite de toutes les définitions du style "button"
+# en les complétant ou éventuellement les redéfinissant
+# 
+
+style "main_button" = "button"
+{
+#  font = "-adobe-helvetica-medium-r-normal--*-100-*-*-*-*-*-*"
+#  font = "-*-Times New Roman-*-r-normal-*-21-*-*-*-*-*-*-*"
+  font = "-*-Arial-*-r-normal-*-21-*-*-*-*-*-*-*"
+  bg[PRELIGHT] = { 0.75, 0.2, 0.2 }
+}
+
+# boutons Combiner, Simplifier et Mode édition
+style "toggle_button" 
+{
+  bg[NORMAL] = { 0.4, 0.6, 0.8 }
+  bg[ACTIVE] = { 0.8, 0.4, 0.8 }
+  bg[PRELIGHT] = { 0.8, 0.2, 0.6 }
+
+#  fg[NORMAL] = { 1.0, 1.0, 1.0 }       Ceci devrait normalement définir la couleur du texte, mais ça ne marche pas pour l'instant
+#  fg[ACTIVE] = { 0.4, 0, 0 }
+#  fg[PRELIGHT] = { 0.2, 0.2, 0 }
+
+}
+
+# couleur des zones d'entrée et de texte : encadrés à droite des listes, une partie de l'affichage détaillé, zones du formulaire de saisie etc.
+style "text"
+{
+  base[NORMAL] = { 0.9, 0.94, 1.0 }
+}
+ 
+style "test"
+{
+  bg[NORMAL] = { 0, 1.0, 0 }
+  fg[NORMAL] = { 1.0, 0, 0 }
+  base[NORMAL] = { 0, 0, 1.0 }
+  bg[ACTIVE] = { 0, 0.2, 0 }
+  fg[ACTIVE] = { 0.2, 0, 0 }
+  base[ACTIVE] = { 0, 0, 0.2 }
+   bg[PRELIGHT] = { 0, 0.2, 0.2 }
+  fg[PRELIGHT] = { 0.2, 0.2, 0 }
+  base[PRELIGHT] = { 0, 0.2, 0.2 }
+}
+
+# couleur du fond des clist
+style "listes"
+{
+  base[NORMAL] = { 0.9, 1.0, 0.9 }
+
+}
+
+
+# pixmap_path "~/.pixmaps"
+
+# Application aux groupes de widgets des styles définis plus haut.
+# La question délicate ici est celle des * (avant ou après) qui implique de comprendre que les  
+# widgets se trouvent l'un dans l'autre. 
+# L'étoile commençante signifie que le widget prendra ce style quel que soit son parent.
+# L'étoile finissante signifie que tous les widgets inclus dans le widget prendront le même style.
+# C'est important par exemple pour le widget "GtkButton" qui contient un label (et peut contenir 
+# bien d'autres choses. 
+
+#widget_class "GtkWindow" style "window"
+widget "window2" style "window"
+widget_class "GtkDialog" style "window"
+#widget_class "GtkFileSelection" style "window"
+#widget_class "*Gtk*Scale" style "scale"
+#widget_class "*GtkCheckButton*" style "check"
+#widget_class "*GtkRadioButton*" style "toggle_button"
+widget_class "*GtkButton*" style "button"
+widget_class "*GtkToggleButton" style "toggle_button"
+widget_class "*GtkTreeView" style "listes"
+widget_class "*GtkTextView" style "text"
+widget_class "*GtkEntry" style "text"
+
+
+# Ceci définit que tous les boutons qui sont enfants de "main window" 
+# prndront le style "main_button" (au lieu du style "button" défini généralement ci-dessus. 
+# Ceci ne peut fonctionner que si le nom "main_window" a été défini et attribué dans le code. 
+# Cela permet donc de définir plus spécifquement un groupe de widgets. 
+widget "main window.*GtkButton*" style "main_button"

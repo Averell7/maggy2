@@ -1,6 +1,5 @@
-
 # coding: utf-8
-# version 0.1
+# version 2.0.0.38  December 2015
 
 import traceback, sys
 

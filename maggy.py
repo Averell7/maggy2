@@ -1,18 +1,20 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
-# Version 2.0.0 build 46  29 janvier 2016
+# Version 2.0.0 build 47  07 février 2016
 
 
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
 
-maggy_version = "2.0.0.46"
+maggy_version = "2.0.0.47"
 print "Maggy Version : ", maggy_version
 """
 In this version :
 
 bug fix for supprimer_fiche  (commit was missing)
+Suppress ScriptPosix (no longer used)
+Add ScriptExcept
 
 """
 
@@ -130,7 +132,7 @@ from magutils import *
 # import path
 sys.path.append(os.getenv("PYLIB"))
 
-from ScriptPosix import *
+from ScriptExcept import *
 import time, datetime
 import gobject
 #
@@ -11364,9 +11366,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             alert(_("You cannot overwrite your existing database.\nAborting"))
             return
 
-        try :
-            #posix.copyFile(db_file, filename_u, view = 0)
-            #posix.compressFile(db_file, filename_u, posix.gzip_e, view = 0)
+        try :                       
             output = zipfile.ZipFile(filename_u, "w", zipfile.ZIP_DEFLATED)
             db_filename = os.path.split(db_file)[1]
             output.write(db_file, db_filename)
@@ -12222,9 +12222,7 @@ if __name__ == '__main__' :
                 configname_u = unicode2(configname_s)
 
         tmp_u = unicode2(os.path.abspath("./"))
-        configdir_u = os.path.join(tmp_u, u"config", configname_u)
-
-        posix = ScriptPosix()
+        configdir_u = os.path.join(tmp_u, u"config", configname_u)        
 
 
         # Load plugins

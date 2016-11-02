@@ -89,15 +89,16 @@ os.system('sudo alien --generate --scripts ' + rpm_file)
 control_file = new_dir + "debian/control"
 if os.path.isfile(control_file) :
   print "control found"
-
-# walk directory
-f1 = open("./log.txt", "w")
-for data in os.walk("./") :
-    f1.write(repr(data))
-f1.close()
-try :
-    command = 'STOR ' + "./log.txt"
-    x = ftp.storbinary(command, open("./log.txt", 'rb'))
+else :
+    print "control NOT found. See log.txt"
+    # walkdirectory
+    f1 = open("./log.txt", "w")
+    for data in os.walk("./") :
+        f1.write(repr(data))
+    f1.close()
+    try :
+        command = 'STOR ' + "./log.txt"
+        x = ftp.storbinary(command, open("./log.txt", 'rb'))
 
 f1 = open(control_file, "r")
 

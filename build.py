@@ -111,7 +111,10 @@ f1.close()
 
 os.system("cd " + new_dir + "; sudo dpkg-buildpackage")
 
-deb_file = "./pdfbooklet_" + version + "-2_all.deb"
+deb_file = "./maggy2_" + version + "-2_all.deb"
+if not os.path.isfile(deb_file) :
+    deb_file = "./maggy2-" + version + "-2_all.deb"
+    print "=========> file is : ", deb_file
 
 # install package
 print "\n\n ================ Installing debian package =============================\n\n"

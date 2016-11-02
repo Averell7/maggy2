@@ -35,9 +35,9 @@ os.system('sudo python setup.py sdist')
 print "\n\n ================ end sdist - start bdist_rpm =============\n\n"
 os.system('sudo python setup.py bdist_rpm')
 print "\n\n ================ end bdist_rpm ===========================\n\n"
-rpm_file = "./dist/maggy-" + version + "-1.noarch.rpm"
-tar_file = "./dist/maggy-" + version + ".tar.gz"
-tar64_file = "./dist/maggy-" + version + ".linux-x86_64.tar.gz"
+rpm_file = "./dist/maggy2-" + version + "-1.noarch.rpm"
+tar_file = "./dist/maggy2-" + version + ".tar.gz"
+tar64_file = "./dist/maggy2-" + version + ".linux-x86_64.tar.gz"
 
 if os.path.isfile(rpm_file) :
   print "found rpm", rpm_file

@@ -4361,7 +4361,7 @@ concat_ws(select ...)</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="fermer_combi6">
+              <object class="GtkButton" id="quit_program">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>

@@ -1,6 +1,6 @@
 
 # coding: utf-8
-# version 2.0.0.38  December 2015
+# version 0.1
 
 import traceback, sys
 
@@ -44,25 +44,23 @@ def test_signal(object) :
 
 # GTK2-add ###################################################
 
-def get_store_length(store) :
-    # works only if all columns are str
-    if len(store) > 0 :
-        row = store[0]
-        length = len(row)
-    else :  # len(row) doesn't work if there is no row. Dirty workaround :
-            # we try to insert a row  until it works
-        for i in range(100) :
-            test = (["a"] * i)
-            try :
-                store.append(test)
-                length = len(test)
-                store.clear()
-                break
-            except :
-                pass
+def count_store(store) :
 
-    return length
+    # This function was useful in php-Gtk2. It is no longer in python php
+    return len(store)
 
+
+def insert_new_line_in_store(store) :
+
+    # there is a function for this : store.insert()
+
+    """
+        Creates a new row at position. iter will be changed to point to this new row.
+        If position is larger than the number of rows on the list,
+        then the new row will be appended to the list. The row will be empty after this function is called.
+        To fill in values, you need to call gtk_list_store_set() or gtk_list_store_set_value()."""
+
+    store.insert(10000)
 
 
 # retourne l'array des iter d'un store. Pourrait être fait plus simplement en python.
@@ -83,7 +81,7 @@ def array_iter(store) :
     return iters
 
 
-""" à effacer
+
 def arIter(treeview) :
 
     sel=treeview.get_selection()
@@ -93,7 +91,7 @@ def arIter(treeview) :
         for path in arPaths :  arIter.append( model.get_iter(path))
 
     return arIter
-"""
+
 
 
 
@@ -125,7 +123,7 @@ def iter_sel(treeview, single = False) :
     iters = []
 
     sel=treeview.get_selection()
-    if single == True :
+    if single == true :
 
         (model, iter) = sel.get_selected()
         return iter
@@ -157,91 +155,59 @@ def get_sel_row_data(treeview,row,col) :
 
     else :
 
-        return None;
+        return None
 
 
 
 
 
-def get_text(widget, **kwargs) :
-    # kwargs :  "col" : column number (used for treeview)
-    #           "row" : row number (used for treeview)
+def get_text(widget, column = 0) :
+    # get text of different widgets.
+    # column : used only for ComboBox.
 
-    type_s = widget_type(widget);
-    text = ""
+    text = None
+    type_s = widget_type(widget)
 
-    if type_s == "GtkLabel" :
-        text = widget.get_label()
-        # get_text() would get the text without the pango markup if any
+    if type_s == "GtkTextView" :
 
-
-    elif type_s == "GtkTextView" :
-
-        buf = widget.get_buffer();
-        (a,z) = buf.get_bounds();
-        text = buf.get_text(a,z);
-
+        buf = widget.get_buffer()
+        (a,z) = buf.get_bounds()
+        text = buf.get_text(a,z)
 
     elif type_s == "GtkEntry" :
-        text = widget.get_text();
-
+        text = widget.get_text()
 
     elif type_s == "GtkComboBox" :
-        model = widget.get_model();
-        if widget.get_has_entry() :
-            text = widget.child.get_text()
-        else :
-            iter1 = widget.get_active_iter();
-            if iter1 :
-                text = model.get_value(iter1, 0);
-
-
+        model = widget.get_model()
+        iter = widget.get_active_iter()
+        text = model.get_value(iter, column)
 
     elif type_s == "GtkComboBoxEntry" :
-        text= widget.get_child().get_text();
-
+        text= widget.get_child().get_text()
 
     elif (type_s == "GtkCheckButton" or
-        type_s == "GtkToggleButton" or
-        type_s == "GtkRadioButton") :
-        state = widget.get_active();
-        if state == True :
-            text = 1
-        else :
-            text = 0
-
-
+          type_s == "GtkToggleButton") :
+        state = widget.get_active()
+        if (state == true)  : text  =  1
+        else : text  =  0
 
     elif type_s == "GtkTreeView" :
-        if "col" in kwargs :
-            col = kwargs["col"]
-        else :
-            col = 0
-        if "row" in kwargs :
-            row = kwargs["row"]
-        else :
-            row = 0
-        text = get_sel_row_data(widget,row, col)
+        text = get_sel_row_data(widget,0,0)
 
 
-    return text;
+    return text
 
 
 def set_text(widget, text) :
 
-    type_s = widget_type(widget);
-    if text == None :
-        text = ""
-
+    type_s = widget_type(widget)
 
     if type_s == "GtkTextView" :
-
-        buf = widget.get_buffer();
-        buf.set_text(text);
-
+        buf = widget.get_buffer()
+        buf.set_text(text)
 
     elif (type_s == "GtkEntry" or
-        type_s == "GtkLabel") :
+          type_s == "GtkLabel") :
         widget.set_text(str(text));
 
 
@@ -259,13 +225,6 @@ def set_text(widget, text) :
     elif type_s == "GtkComboBoxEntry" :
         entry = widget.get_child()
         entry.set_text(text)
-
-
-    elif type_s == "GtkRadioButton" :
-        if text == "" :
-            text = "0"
-        i = int(text)
-        widget.set_active(False)
 
     elif type_s == "GtkTreeView" :
         pass
@@ -337,6 +296,12 @@ def textbuffer_text(buf, count = 0, action = "get") :
 
 def insertion_tv(buffer,text,tag = "") :
 
+    try:
+        print text
+    except :
+        pass
+    return
+
     if tag == "" :
 
         buffer.insert_at_cursor(text)
@@ -345,15 +310,13 @@ def insertion_tv(buffer,text,tag = "") :
 
         tags = explode(";",tag)
         x=buffer.get_end_iter()
-        a = buffer.create_mark("a",x,True)
+        a = buffer.create_mark("a",x,true)
         buffer.insert_at_cursor(text)
         y=buffer.get_end_iter()
         a1 = buffer.get_iter_at_mark(a)
         for z in tags :
 
             buffer.apply_tag_by_name(z,a1,y)
-
-
 
 
 
@@ -368,7 +331,6 @@ def widget_type(widget) :
         return z[-1]
     except :
         return
-
 
 
 
@@ -387,19 +349,12 @@ def widget_group_type(type,container,arWidgets) :
 
 def widget_group(container,arWidgets) :
 
-    arObjects = []
-    for key in arWidgets :
-        widget = arWidgets[key]
-        try :
-            z = widget.path()
-            if (z.find(container + ".") == 0 ) or(z.find("." + container + ".") > 0) :
-                arObjects.append(widget)
-        except :
-##            a,b,c = sys.exc_info()
-##            for d in traceback.format_exception(a,b,c) :
-##                print d,
-##            print "error for :", key, widget
-            pass
+    for object in arWidgets :
+
+        z = object.path()
+        if (strpos(z, container + ".") == 0 ) or(strpos(z, "." + container + ".") > 0) :
+
+            arObjects.append( object)
 
 
     return arObjects
@@ -551,7 +506,7 @@ def mysql_dir2() :
     dialog.show_all()
     win=dialog.window
     # get the GdkWindow
-    win.set_keep_above(True)
+    win.set_keep_above(true)
     if dialog.run() == gtk.RESPONSE_OK :
 
         file = dialog.get_filename()
@@ -566,7 +521,6 @@ def mysql_dir2() :
 
 
 def sql_error(link, req = "") :
-
 
     message=mysql_error(link)
     ok=mysql_query("SHOW COUNT(*) WARNINGS")
@@ -744,7 +698,7 @@ def save_config() :
     dialog.destroy()
 
     set = fopen(file,"w")
-    data = var_export(config,True)
+    data = var_export(config,true)
     fputs(set,"<?php" + chr(10) + '$config = ')
     fputs(set,data)
     fputs(set,";" + chr(10) +"?>")
@@ -823,12 +777,6 @@ N.B. : d'autres vÃ©rifications ont Ã©tÃ© transfÃ©rÃ©es ailleurs, dans 
 
 
 
-
-
-
-
-
-
 def php_array_to_py(input_file, output_file) :
 
 
@@ -882,5 +830,10 @@ def php_array_to_py(input_file, output_file) :
     f2 = open(output_file, "w")
     f2.write(data2)
     f2.close()
+
+
+
+
+
 
 

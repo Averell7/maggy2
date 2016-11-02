@@ -2097,7 +2097,6 @@ of the separators</property>
                 <child>
                   <object class="GtkLabel" id="label523">
                     <property name="visible">True</property>
-                    <property name="ypad">5</property>
                     <property name="label" translatable="yes">Request Name</property>
                     <property name="justify">center</property>
                   </object>
@@ -2123,7 +2122,6 @@ of the separators</property>
                 <child>
                   <object class="GtkLabel" id="label522">
                     <property name="visible">True</property>
-                    <property name="ypad">15</property>
                     <property name="label" translatable="yes">Request SQL Syntax</property>
                     <property name="justify">center</property>
                   </object>
@@ -2155,8 +2153,7 @@ of the separators</property>
                 <child>
                   <object class="GtkLabel" id="label904">
                     <property name="visible">True</property>
-                    <property name="ypad">5</property>
-                    <property name="label" translatable="yes">Form: parameters</property>
+                    <property name="label" translatable="yes">Form: variables</property>
                     <property name="justify">center</property>
                   </object>
                   <packing>
@@ -2186,7 +2183,6 @@ of the separators</property>
                 <child>
                   <object class="GtkLabel" id="label905">
                     <property name="visible">True</property>
-                    <property name="ypad">8</property>
                     <property name="label" translatable="yes">Form: comment</property>
                     <property name="justify">center</property>
                   </object>
@@ -2274,27 +2270,39 @@ of the separators</property>
                             <child>
                               <object class="GtkLabel" id="label_names4">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">Column name</property>
+                                <property name="label" translatable="yes">Columns names</property>
                               </object>
                               <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
                                 <property name="position">0</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkEntry" id="names4">
+                              <object class="GtkScrolledWindow" id="scrolledwindow144">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
-                                <property name="invisible_char">&#x25CF;</property>
+                                <property name="hscrollbar_policy">never</property>
+                                <property name="vscrollbar_policy">automatic</property>
+                                <property name="shadow_type">in</property>
+                                <child>
+                                  <object class="GtkTextView" id="names4">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="wrap_mode">word</property>
+                                  </object>
+                                </child>
                               </object>
                               <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkLabel" id="label1036">
                                 <property name="visible">True</property>
-                                <property name="ypad">15</property>
-                                <property name="label" translatable="yes">Column width</property>
+                                <property name="label" translatable="yes">Columns widths</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -2329,7 +2337,6 @@ of the separators</property>
                                 <child>
                                   <object class="GtkLabel" id="label141">
                                     <property name="visible">True</property>
-                                    <property name="ypad">5</property>
                                     <property name="label" translatable="yes">Detail configuration</property>
                                   </object>
                                   <packing>
@@ -2457,7 +2464,6 @@ of the separators</property>
                         <property name="can_default">True</property>
                         <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">Effacer le contenu du cadre de gauche</property>
-                        <property name="border_width">3</property>
                         <signal name="clicked" handler="gtk_widget_hide"/>
                         <child>
                           <object class="GtkAlignment" id="alignment7">
@@ -2505,7 +2511,6 @@ of the separators</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="padding">9</property>
                     <property name="position">14</property>
                   </packing>
                 </child>

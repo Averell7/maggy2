@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
-# Version 2.0.0.46  - January 2016
+# Version 2.0.0.48  - April 2016
 # Version 2.0.0     - Averell - GTK GUI - May 17th, 2012
 # Version 1.9.6     - Gaston - Sept 03th, 2011 - Cosmetic enhancements (title, background color)
 # Version 1.9.5     - Revision 5 - Mar 03rd, 2012
@@ -19,6 +19,11 @@ Pas entièrement, on sélectionne les résultats utilisés par cette table
 
 '''
 
+"""
+TODO :
+Pour plusieurs champs (par exemple central tables, result), si on modifie à la main au lieu de sélectionner une valeur dans la liste, le changement n'est pas mémorisé.
+
+"""
 ###########################################################################
 # SYSTEM LIBS #############################################################
 ###########################################################################
@@ -73,7 +78,7 @@ elib_intl.install("archeotes", "share/locale")
 
 
 from magutils import *
-from ScriptPosix import *
+from ScriptExcept import *
 import time, datetime
 import gobject
 #
@@ -205,6 +210,260 @@ class SqliteUnicode :
         return cmp(string1.lower(), string2.lower())
 
 
+
+class db_utilities :
+
+    def __init__(self) :
+        pass
+
+    # connexion à  la base de données
+    # If a proper sqlite file is found, load it
+
+
+    def load_sqlite(self, db_file_s) :
+
+
+        #db_active_file = os.path.split(db_file_s)[1]
+        db_active_file = db_file_s
+        db_type = "sqlite"
+        link = sqlite.connect(db_file_s)
+        # optimize performances
+        link.isolation_level = "DEFERRED"
+        link.row_factory = sqlite.Row
+        cursor = link.cursor()
+        extension = SqliteUnicode()
+
+
+        link.create_collation("france", extension.collate)
+        link.create_function("regexp", 2, extension.regexp)
+        link.create_function("like", 2, extension.like)
+        link.create_function("concat_ws", -1, extension.concat_ws)
+        link.create_function("clean_commas", 1, extension.clean_commas)
+        link.create_function("date2year", 1, extension.date2year)
+        link.create_function("date2ymd", 1, extension.date2ymd)
+
+        # retrieve structure
+        db_structure= {}
+
+
+        """SELECT name FROM sqlite_master
+        WHERE type  IN (?,?)
+        AND name NOT LIKE ?
+        UNION ALL SELECT name FROM sqlite_temp_master
+        WHERE type IN (?,?)
+        ORDER BY 1','table','view','sqlite_%','table','view') ;
+        """
+
+        req= "select name from sqlite_master where type in ('table')"
+        cursor.execute(req)
+        result = cursor.fetchall()
+        for a in result :
+            for b in a :
+                db_structure[b] = {}
+                req = "PRAGMA table_info (" + b + ")"
+                cursor.execute(req)
+                for s in cursor :
+                    db_structure[b][s[0]] = s[1]
+                    db_structure[b][s[1]] = s[0]
+
+        return (link, cursor, db_structure, db_active_file)
+
+
+    def mysql_db_structure(self, cursor) :
+
+
+        table_def = {}
+        index_def = {}
+        constraint_def = {}
+        errors_count = 0
+
+        # Extract mysql structure
+        # Extract tables list
+        cursor.execute("show tables")
+
+        tables = []
+        for row in cursor :
+            key = row.keys()[0]
+            name = row[key]
+            try :
+                cursor.execute("show columns from " + name)   # Test the validity of the table name.
+                                                              # We have seen a database with a table named "1" which was impossible to handle with sql commands
+                tables.append(name)
+            except :
+                print ("WARNING : Unable to handle table " + name + "\nCheck if there is no problem with it.")
+
+
+        for name in tables :
+
+
+            table_def[name] = {}
+            index_def[name] = {}
+
+            # extract columns
+            cursor.execute("show columns from " + name)
+            columns = cursor.fetchall()
+            for col in columns :
+                keys = col.keys()
+                colname = col['Field']
+                table_def[name][colname] = {}
+                table_def[name][colname]['type'] = col['Type']
+                table_def[name][colname]['null'] = col['Null']
+                table_def[name][colname]['primary'] = col['Key']
+                table_def[name][colname]['default'] = col['Default']
+                table_def[name][colname]['autoinc'] = col['Extra']
+
+
+
+
+
+        return(table_def)
+
+
+
+    def db_compare(self, *params) :
+
+        chooser = gtk.FileChooserDialog(title=_('_Open Configuration'),
+                action=gtk.FILE_CHOOSER_ACTION_OPEN,
+                buttons=(gtk.STOCK_CANCEL,
+                    gtk.RESPONSE_CANCEL,
+                    gtk.STOCK_OPEN,
+                    gtk.RESPONSE_OK))
+        chooser.set_current_folder(configdir_u)
+        chooser.set_show_hidden(True)  #Test : does not work. Why ??
+
+        filter_all = gtk.FileFilter()
+        filter_all.set_name(_('All files'))
+        filter_all.add_pattern('*')
+        chooser.add_filter(filter_all)
+
+        filter_ini = gtk.FileFilter()
+        filter_ini.set_name(_('sqlite files'))
+        filter_ini.add_pattern('*.sqlite')
+        filter_ini.add_pattern('*.db3')
+        chooser.add_filter(filter_ini)
+        chooser.set_filter(filter_ini)
+
+        response = chooser.run()
+        if response == gtk.RESPONSE_OK:
+            filename = chooser.get_filename()
+            filename_u = unicode(filename,"utf-8")            # convert utf-8 to unicode for internal use
+
+        elif response == gtk.RESPONSE_CANCEL:
+            print(_('Closed, no files selected'))
+            chooser.destroy()
+            return
+        chooser.destroy()
+
+        new_records_a = []
+        (link2,cursor2,db_structure2,db_active_file2) = self.load_sqlite(filename_u)
+
+
+        # create columns list
+
+        cursor.execute("select * from complete")
+        row = cursor.fetchone()
+        list_cols = row.keys()
+
+
+        info = self.arw['s_info10'];
+        buffer1 = info.get_buffer();
+        buffer1.set_text("");
+
+        treeview = mag.arw["s_compare_tree"]
+        model1 = treeview.get_model()
+
+        cursor.execute("select * from complete")
+        #cursor2.execute("select * from complete")
+        i = 0
+
+        for row in cursor :
+            id1 = row["id_livre"]
+            i += 1
+
+            cursor2.execute("select * from complete where id_livre = %s" % id1)
+            row2 = cursor2.fetchone()
+
+            if row2 :
+
+                for field in list_cols :
+                    #print field
+                    #print row[field]
+                    if field in row2.keys() :
+                        #print row2[field]
+                        if row[field] != row2[field] :
+                            model1.append([str(id1), field, row[field], row2[field]])
+
+            else :
+                new_records_a.append(id1)   # new records in base1
+
+
+        # new records
+        insertion_tv(buffer1, "\n terminé\n")
+        insertion_tv(buffer1, str(i) + "records")
+        temp = "\n\n NEW RECORDS :  "
+
+        for rec in new_records_a :
+            temp += str(rec) + " ,  "
+        insertion_tv(buffer1, temp)
+
+        # deleted records
+        deleted_a = []
+        cursor2.execute("select * from complete")
+        for row2 in cursor2 :
+            id2 = row2["id_livre"]
+            cursor.execute("select * from complete where id_livre = %s" % id2)
+            row = cursor.fetchone()
+
+            if not row :
+                deleted_a.append(id2)
+
+        temp = "\n\n DELETED RECORDS :  "
+        for rec in deleted_a :
+            temp += str(rec) + " ,  "
+        insertion_tv(buffer1, temp)
+
+
+    def is_field(self, cursor, table, field, coltype = None) :
+
+            if not table in db_structure :
+                alert("Table "+ table + " does not exist !")
+                return False
+            found = False
+            if db_type == "sqlite" :
+                req = "PRAGMA table_info(" + table + ")"
+                cursor.execute(req)
+                found = False
+                for row in cursor :
+                    if row[1] == field :
+                        found = True
+
+
+            elif db_type == "mysql" :
+
+                cursor.execute("DESCRIBE " + table  + " " + field);
+                result = cursor.fetchall()
+                if len(result) > 0 :
+                     found = True
+
+
+            elif db_type == "accdb" :
+                cursor.execute("select * from " + table)
+                data1 = cursor.description
+                for line in data1 :
+                    if line[0] == field.lower() :
+                        found = True
+
+            if not found :
+                if db_type == "accdb" and coltype.lower() == "text" :
+                    coltype = "MEMO"
+                #insertion_tv(buffer1, "g_" + table + " not present, we should create it")
+                print table + "." + field + " not present, we should create it"
+                req = "ALTER TABLE $table ADD COLUMN $field $coltype"
+                req1 = eval(php_string(req))
+                cursor.execute(req1)
+                link.commit()
+
+            return found
 
 class ask_for_config:
     def __init__(self) :
@@ -534,7 +793,7 @@ class Restore(utilities, Treeview_handle) :
 
     def __init__(self):
 
-
+        global table_def, link, cursor
         app = self
 
         self.program_dir = os.path.abspath('.').replace('\\', '/')
@@ -750,7 +1009,6 @@ class Restore(utilities, Treeview_handle) :
             f1.close()
         self.load_ini(myinifile)
         self.populate_tree(self.config, self.model)
-        self.populate_tree(table_def, self.model2)
         self.load_glade_objects(os.path.join("./config", configname_u  ,configname_u + ".glade"))
 
 
@@ -863,10 +1121,19 @@ class Restore(utilities, Treeview_handle) :
 
 
 
+        try :
+            (link, cursor) = self.connect()
+        except :
+            (link, cursor) = (None, None)   # TODO : message d'erreur mais erreur non forcément fatale
+        if db_type == "sqlite" :
+            table_def = sqlite_db_structure()
+        elif db_type == "mysql" :
+            table_def = db_utils.mysql_db_structure(cursor)
+        elif db_type == "accdb" :
+            table_def = access_db_structure()
 
 
-
-
+        self.populate_tree(table_def, self.model2)
 
 
 
@@ -874,9 +1141,79 @@ class Restore(utilities, Treeview_handle) :
         window1.show()
         #window1.set_title("Restore ARCHEOTES  [ 2.0 - RC6 ]")
         window1.connect("destroy", lambda w: gtk.main_quit())
+        self.arw["quit_program"].connect("destroy", lambda w: gtk.main_quit())
 
 
         #view.expand_all()
+
+
+
+    def connect(self) :
+
+        # connexion à  la base de données
+        global db_type
+        # If a proper sqlite file is found, load it
+        db_file_sqlite = os.path.join(configdir_u, configname_u + ".sqlite")
+        db_file_sqlite2 = os.path.join(configdir_u, configname_u + ".db3")
+        db_file_mdb = os.path.join(configdir_u, configname_u + ".mdb")
+        db_file_accdb = os.path.join(configdir_u, configname_u + ".accdb")
+
+
+        if os.path.isfile(db_file_sqlite) or os.path.isfile(db_file_sqlite2):
+            db_type = "sqlite"
+            db_file = db_file_sqlite
+        elif os.path.isfile(db_file_mdb) :
+            db_type = "mdb"
+            db_file = db_file_mdb
+        elif os.path.isfile(db_file_accdb) :
+            db_type = "accdb"
+            db_file = db_file_accdb
+        else :
+            db_file = None
+            db_type = None
+
+        if db_type == "sqlite" :
+            link = sqlite.connect(db_file)
+            # optimize performances
+            #cnx.isolation_level = "DEFERRED"
+            link.row_factory = sqlite.Row
+            cursor = link.cursor()
+            extension = SqliteUnicode()
+            link.create_collation("test", extension.collate)
+            link.create_function("regexp", 2, extension.regexp)
+            link.create_function("like", 2, extension.like)
+
+
+        elif db_type == "accdb" :
+
+
+    ##        if not os.path.isfile(db_file) :
+    ##            pypyodbc.win_create_mdb(db_file)
+
+            connection_string = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + db_file
+            link = pypyodbc.connect(connection_string)
+            cursor = link.cursor()
+
+        else :
+            host = self.config["ini"]["database"]["host"]
+            user = self.config["ini"]["database"]["user"]
+            password = self.config["ini"]["database"]["pass"]
+            bdd = self.config["ini"]["database"]["database"]
+
+
+            link = MySQLdb.connect(host=host,user=user,passwd=password, db=bdd, cursorclass=cursors.DictCursor);
+            cursor = link.cursor()
+            link.query("set character set utf8");
+            link.query("set names utf8");
+
+            db_type = "mysql"
+
+            cursor.execute("set character set utf8");
+            cursor.execute("set names utf8");
+
+        return (link, cursor)
+
+
 
 
     def load_ini(self, file_s) :
@@ -2405,153 +2742,13 @@ def readable_repr(data0) :
 
         return out
 
-def mysql_db_structure() :
 
-
-    table_def = {}
-    errors_count = 0
-
-
-
-    # Extract mysql structure
-
-    cursor.execute("show tables")
-
-    tables = cursor.fetchall()
-
-
-    for table in tables :
-        key = table.keys()[0]
-        name = table[key]
-        table_def[name] = {}
-
-        cursor.execute("show columns from " + name)
-        columns = cursor.fetchall()
-        for col in columns :
-            keys = col.keys()
-            colname = col['Field']
-            table_def[name][colname] = {}
-            table_def[name][colname]['type'] = col['Type']
-            table_def[name][colname]['null'] = col['Null']
-            table_def[name][colname]['primary'] = col['Key']
-            table_def[name][colname]['default'] = col['Default']
-            table_def[name][colname]['autoinc'] = col['Extra']
-
-
-    central = "complete"
-
-    # get links
-    links_table1 = {}
-    # list of fields : We create an array of fields as key and tables as data, with the indication if the field is the primary key
-    for name in table_def :
-        for colname in table_def[name] :
-            if not colname in links_table1 :
-                links_table1[colname] = []
-            primary = False
-            if table_def[name][colname]['primary'] == "PRI" :
-                primary = True
-            links_table1[colname].append([name, primary])
-
-    # filter useless fields (unique) : we delete the fields wich belongs to a single table
-
-    links_table = {}
-    primarylinks_table = {}
-    for key in links_table1 :
-        if len(links_table1[key]) > 1 :
-            value = links_table1[key]
-            links_table[key] = value
-            primary = False
-            for val2 in value :
-                if val2[1] :
-                    primary = True
-            if primary :
-                primarylinks_table[key] = value
-
-
-    plink2_table = {}
-
-    for colname in primarylinks_table :         # same data but with the tables as key, and fields as data
-        data = primarylinks_table[colname]
-        for data2 in data :
-            table = data2[0]
-            if not table in plink2_table :
-                plink2_table[table] = []
-            plink2_table[table].append([colname, data2[1]])
-
-
-    # all tables which have two primary keys are possible gateways
-    gateways = {}
-
-    for a in plink2_table :
-        data =  plink2_table[a]
-        if len(data) == 2 :
-            if data[0][1] == True and data[1][1] == True :
-                gateways[a] = [data[0][0], data[1][0]]
-                print a, gateways[a]
-                # now try to find the peripheral table
-                # look the tables correponding to the fields
-                field1 = gateways[a][0]
-                field2 = gateways[a][1]
-                tables1 = primarylinks_table[field1]
-                tables1.append(primarylinks_table[field2])
-
-                for table2 in tables1 :
-                    for table3 in table2 :
-                        linked_tables = []
-                        if table2 == central :
-                            continue
-                        elif table2 == a :
-                            continue
-                        else :
-                            linked_tables.append(table2)
-                if len(linked_tables) == 1 :
-                    gateways[a].append(linked_tables[0])
-
-
-                tables1 = primarylinks_table
-
-    for a in gateways :
-        print a, gateways[a]
-    print ; print
-
-    periph_table = {}
-
-    central = "complete"
-
-##    for colname in primarylinks_table :
-##        data = primarylinks_table[colname]
-##        if [central, True] in data :
-##            for data2 in data :
-##                if data2[0] == central :
-##                    continue
-##                elif data2[1] == False :
-##                    continue
-##                else :
-##                    periph_table[data2[0]] = {}
-##                    periph_table[data2[0]]['central'] = central
-##                    periph_table[data2[0]]["link"] = colname
-
-    print "periph_table"
-    for a in periph_table :
-        print a, periph_table[a]
-
-    print "\n\n primarylinks_table"
-    for a in primarylinks_table :
-        print a, primarylinks_table[a]
-
-
-
-##    # possible links
-##    for key in links_table :
-##        if len(links_table[key].keys()) > 1 :
-##            print "tables", links_table[key].keys(), "may have a link on", key
-
-    return table_def
 
 
 
 def sqlite_db_structure() :
     table_def= {}
+    global cursor
 
     req = "PRAGMA table_info(candidats)"
 
@@ -2649,70 +2846,6 @@ def access_db_structure() :
     return table_def
 
 
-def connect() :
-
-    # connexion à  la base de données
-    global db_type
-    # If a proper sqlite file is found, load it
-    db_file_sqlite = os.path.join(configdir_u, configname_u + ".sqlite")
-    db_file_sqlite2 = os.path.join(configdir_u, configname_u + ".db3")
-    db_file_mdb = os.path.join(configdir_u, configname_u + ".mdb")
-    db_file_accdb = os.path.join(configdir_u, configname_u + ".accdb")
-
-
-    if os.path.isfile(db_file_sqlite) or os.path.isfile(db_file_sqlite2):
-        db_type = "sqlite"
-        db_file = db_file_sqlite
-    elif os.path.isfile(db_file_mdb) :
-        db_type = "mdb"
-        db_file = db_file_mdb
-    elif os.path.isfile(db_file_accdb) :
-        db_type = "accdb"
-        db_file = db_file_accdb
-    else :
-        db_file = None
-        db_type = None
-
-    if db_type == "sqlite" :
-        link = sqlite.connect(db_file)
-        # optimize performances
-        #cnx.isolation_level = "DEFERRED"
-        link.row_factory = sqlite.Row
-        cursor = link.cursor()
-        extension = SqliteUnicode()
-        link.create_collation("test", extension.collate)
-        link.create_function("regexp", 2, extension.regexp)
-        link.create_function("like", 2, extension.like)
-
-
-    elif db_type == "accdb" :
-
-
-##        if not os.path.isfile(db_file) :
-##            pypyodbc.win_create_mdb(db_file)
-
-        connection_string = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + db_file
-        link = pypyodbc.connect(connection_string)
-        cursor = link.cursor()
-
-    else :
-        hostLocale = "localhost"
-        userLocale = "dysmas"
-        passLocale = ""
-        bddLocale = "maggy"
-
-
-        link = MySQLdb.connect(host=hostLocale,user=userLocale,passwd=passLocale, db=bddLocale, cursorclass=cursors.DictCursor);
-        cursor = link.cursor()
-        link.query("set character set utf8");
-        link.query("set names utf8");
-        link.query("SET GLOBAL group_concat_max_len = 128000");
-        db_type = "mysql"
-
-        cursor.execute("set character set utf8");
-        cursor.execute("set names utf8");
-
-    return (link, cursor)
 
 
 
@@ -3725,6 +3858,14 @@ def show_selected_colors(list) :
 # MAIN ####################################################################
 ###########################################################################
 
+global selector, utils, table_def, configdir_u, mem, db_type
+global db_utils
+
+mem = {}
+db_type = ""
+table_def = {}
+configdir_u = ""
+
 if __name__ == '__main__' :
 
     # init
@@ -3733,9 +3874,9 @@ if __name__ == '__main__' :
         "\tbackup filesystem"
     isExcept = False
     excMsg_s = ""
-    mem = {}
 
-    global selector, utils
+
+
 
     # parse command line
     parser = OptionParser(usage = usage_s)
@@ -3791,23 +3932,11 @@ if __name__ == '__main__' :
         tmp_u = unicode2(os.path.abspath("./"))
         configdir_u = os.path.join(tmp_u, u"config", configname_u)
 
-        db_type = ""
-        try :
-            (link, cursor) = connect()
-        except :
-            (link, cursor) = (None, None)
-        if db_type == "sqlite" :
-            table_def = sqlite_db_structure()
-        elif db_type == "mysql" :
-            table_def = mysql_db_structure()
-        elif db_type == "accdb" :
-            table_def = access_db_structure()
-        else :
-            table_def = {}
 
-
+        db_utils = db_utilities()
         selector = Restore()
         utils = utilities()
+
         #selector.load_config_menu()
         selector.load_settings()
         selector.load_search_list()

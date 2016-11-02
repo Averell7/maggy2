@@ -1,0 +1,2289 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: maggy2 V. 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-27 20:03+0100\n"
+"PO-Revision-Date: 2015-10-27 20:14+0100\n"
+"Last-Translator: Averell7 <averell7@users.sourceforge.net>\n"
+"Language-Team: GAF Software <averell7@source-forge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: maggy.py:669
+#: maggy.py:1176
+#, fuzzy
+msgid "_Open Configuration"
+msgstr "Ouvrir une configuration"
+
+#: maggy.py:679
+#: maggy.py:1186
+#: maggy.py:11001
+msgid "All files"
+msgstr "Tous les fichiers"
+
+#: maggy.py:684
+msgid "TXT files"
+msgstr "Fichiers TXT"
+
+#: maggy.py:695
+#: maggy.py:1203
+#: maggy.py:11023
+msgid "Closed, no files selected"
+msgstr "Fermé, aucun fichier sélectionné"
+
+#: maggy.py:1191
+msgid "sqlite files"
+msgstr "Fichiers Sqlite"
+
+#: maggy.py:1783
+msgid ""
+" There is no Search list for this table.\n"
+" There is no way to populate the list"
+msgstr ""
+"Il n'y a aucune liste de recherche définie pour cette table.\n"
+"Aucun moyen de remplir la liste. "
+
+#: maggy.py:1790
+msgid ""
+" is not a GtkTreeView.\n"
+"Either your control has not a valid name\n"
+"or the list does not exist."
+msgstr ""
+" n'est pas un GtkTreeview.\n"
+"Ou bien votre contrôle n'a pas un nom valide\n"
+"ou bien la liste n'existe pas"
+
+#: maggy.py:2309
+msgid "Hide details"
+msgstr "Cacher les détails"
+
+#: maggy.py:2313
+msgid "Show details"
+msgstr "Montrer les détails"
+
+#: maggy.py:2351
+msgid " already exists."
+msgstr "existe déjà"
+
+#: maggy.py:2964
+msgid "not found !!"
+msgstr " introuvable !!"
+
+#: maggy.py:2997
+msgid ""
+" is not a GtkTreeView. \n"
+"Verify your configuration"
+msgstr ""
+" Nest pas un GtkTreeview.\n"
+"vérifierz votre configuration."
+
+#: maggy.py:3313
+#, python-format
+msgid "WARNING : table %s does not seem to exist, or information missing for this table"
+msgstr "AVERTISSEMENT : la table %s ne semble pas exister, ou bien les informations sur cette table ne sont pas disponibles. "
+
+#: maggy.py:3795
+#, python-format
+msgid "This search returns %d records."
+msgstr "Cette recherche trouve %d fiches"
+
+#: maggy.py:3986
+#: maggy.py:3990
+msgid "This search doesn't give any result"
+msgstr "Cette recherche ne donne pas de résultat."
+
+#: maggy.py:4052
+#, python-format
+msgid "checkbox %s unknown"
+msgstr "La case à cocher %s est inconnue."
+
+#: maggy.py:4580
+msgid "No line selected. Aborting"
+msgstr "Fermé, aucun fichier sélectionné"
+
+#: maggy.py:4584
+#: maggy.py:4662
+#: maggy.py:7158
+#: maggy.py:10818
+msgid "more than one line"
+msgstr "Il y a plus d'une ligne sélectionnées"
+
+#: maggy.py:4609
+#: maggy.py:7111
+msgid " deleted"
+msgstr "effacé"
+
+#: maggy.py:4658
+#: maggy.py:7084
+#: maggy.py:7154
+#: maggy.py:7980
+#: maggy.py:8017
+#: maggy.py:8042
+msgid "No line selected. Aborting."
+msgstr "Aucune ligne sélectionnée, abandon"
+
+#: maggy.py:4717
+#: maggy.py:7202
+#, python-format
+msgid ""
+"Warning ! There are %d  cross-reference(s) on %s . See records : \n"
+" %s "
+msgstr ""
+"Attention ! Il y a %d références croisées sur %s. Voyez les fiches : \n"
+"%s"
+
+#: maggy.py:4742
+#: maggy.py:7226
+msgid " renamed."
+msgstr "renommé."
+
+#: maggy.py:4822
+#: maggy.py:7300
+msgid "exists already !"
+msgstr "existe déjà !"
+
+#: maggy.py:5067
+#: maggy.py:5222
+msgid "End of inversion process"
+msgstr "Fin du processus d'inversion"
+
+#: maggy.py:5167
+msgid "Global field creation\n"
+msgstr "Création du champ global\n"
+
+#: maggy.py:5304
+msgid "array created for"
+msgstr "Array créé pour"
+
+#: maggy.py:5304
+msgid "words"
+msgstr "mots"
+
+#: maggy.py:5355
+msgid "data loaded"
+msgstr "data chargé"
+
+#: maggy.py:5423
+msgid "Ended\n"
+msgstr "Terminé\n"
+
+#: maggy.py:5540
+#: maggy.py:5624
+msgid "main field not present"
+msgstr "Le champ principal est absent"
+
+#: maggy.py:5592
+msgid "linked field not present for "
+msgstr "Le champ lié est absent"
+
+#: maggy.py:5643
+msgid "linked field not present"
+msgstr "Le champ lié est absent"
+
+#: maggy.py:5666
+msgid "duration"
+msgstr "Durée"
+
+#: maggy.py:5666
+msgid "seconds"
+msgstr "secondes"
+
+#: maggy.py:5757
+msgid "End of Central table update"
+msgstr "Fin de la mise à jour de la table centrale."
+
+#: maggy.py:5894
+#: maggy.py:7536
+msgid ""
+"Your button is misconfigured, \n"
+"you must select a list as parameter."
+msgstr ""
+"Votre bouton est mal configuré, \n"
+"vous devez sélectionner une liste comme paramètre."
+
+#: maggy.py:5995
+msgid "Nothing selected."
+msgstr "Rien de sélectionné."
+
+#: maggy.py:6141
+#, python-format
+msgid ""
+"There is a problem with the object which corresponds to the table %s \n"
+" which does not seem to exist. Verify your configuration or your glade file \n"
+" or your database."
+msgstr ""
+"Il y a un problème avec l'objet qui correspond à la table %s \n"
+"qui ne semble pas exister. Vérifiez votre configuration, votre fichierglade,ou votre base de données."
+
+#: maggy.py:6381
+msgid " records added in memory"
+msgstr "Les fiches ont été mémorisées."
+
+#: maggy.py:6392
+#: maggy.py:6487
+msgid "no more records in list"
+msgstr "Il n'y a plus de fiches dans la liste."
+
+#: maggy.py:6438
+#, python-format
+msgid ""
+"Original name : %s\n"
+" Present name : %s \n"
+"\n"
+"Accept ?"
+msgstr ""
+"Original name : %s\n"
+" Present name : %s \n"
+"\n"
+"Accept ?"
+
+#: maggy.py:6443
+msgid "Please, note that there is a problem with this record"
+msgstr "Veuillez noter qu'il y a un problème avec cet enregistrement"
+
+#: maggy.py:6459
+msgid "no records in list"
+msgstr "Il n'y a plus de fiches dans la liste."
+
+#: maggy.py:6469
+msgid "record "
+msgstr "enregistrement"
+
+#: maggy.py:6598
+#, python-format
+msgid "There is no object in the interface for the primary key %s, impossible to save the record"
+msgstr "Il n'y a pas d'objet dans l'interface pour la clé primaire %s, impossible d'enregistrer la fiche."
+
+#: maggy.py:7088
+msgid "Please, select only one line."
+msgstr "Vous devez sélectionner une seule ligne"
+
+#: maggy.py:7102
+msgid "Do you really want to delete"
+msgstr "Voulez-vous effacer ?"
+
+#: maggy.py:7499
+msgid "Advanced Options"
+msgstr "Options avancées"
+
+#: maggy.py:7504
+#: data/maggy.glade:1132
+msgid "Simplify"
+msgstr "Simplifier"
+
+#: maggy.py:7560
+msgid "complex query"
+msgstr "requête complexe"
+
+#: maggy.py:7643
+msgid "This search does not give any result."
+msgstr "Cette recherche ne donne pas de résultat"
+
+#: maggy.py:7646
+msgid "No criteria given !"
+msgstr "Aucun critère fourni !"
+
+#: maggy.py:7887
+msgid "The file queries.py is invalid"
+msgstr "Le fichier \"queries.py\" est invalide"
+
+#: maggy.py:7964
+#: maggy.py:7966
+#: maggy.py:8002
+msgid "New query"
+msgstr "Nouvelle recherche"
+
+#: maggy.py:7984
+#: maggy.py:8021
+#: maggy.py:8046
+msgid "More than one line selected. Aborting."
+msgstr "Plus d'une ligne sélectionnée. Abandon. "
+
+#: maggy.py:8142
+msgid " is not defined in central tables"
+msgstr "N'est pas défini dans les tables centrales"
+
+#: maggy.py:8723
+msgid "This container is not valid for edition : "
+msgstr "Ce container n'est pas valide pour l'édition :"
+
+#: maggy.py:8730
+msgid ""
+"There is no indicator defined for editing\n"
+" Edition is not possible"
+msgstr "Aucun indicateur n'est défini pour l'édition . L'édition n'est pas possible. Veuillez compléter votre configuration (premier onglet dans le configurateur)"
+
+#: maggy.py:8755
+#, python-format
+msgid ""
+"You have an edit control for the field %s \n"
+"but this field does not exist in the table %s."
+msgstr ""
+"Vous avez un contrôle pour l'édition du champ %s \n"
+" mais ce champ n'existe pas dans la table %s."
+
+#: maggy.py:8830
+msgid " does not exist\n"
+msgstr " n'existe pas\n"
+
+#: maggy.py:9104
+msgid " records"
+msgstr " fiches"
+
+#: maggy.py:9723
+#: maggy.py:9893
+msgid "All"
+msgstr "Tout"
+
+#: maggy.py:9724
+#: maggy.py:9893
+msgid "Selection"
+msgstr "Sélection"
+
+#: maggy.py:9727
+#: maggy.py:9894
+msgid "Records to export"
+msgstr "Enregistrements à exporter"
+
+#: maggy.py:10131
+#, python-format
+msgid "Editing the field %s is not allowed."
+msgstr "L'édition du champ %s n'est pas autorisée."
+
+#: maggy.py:10787
+msgid "There is no query recorded for this list."
+msgstr "Aucune requête n'a été enregistrée pour cette liste."
+
+#: maggy.py:10827
+#, python-format
+msgid "Are you sure you want to delete the record %s"
+msgstr "Êtes-vous sûr que vous voulez effacer la fiche %s ? "
+
+#: maggy.py:10867
+msgid "there is no line selected"
+msgstr "Aucune ligne sélectionnée"
+
+#: maggy.py:10907
+msgid ""
+"Your button is misconfigured, \n"
+"you must select a window as parameter."
+msgstr ""
+"Votre bouton est mal configuré, \n"
+"vous devez sélectionner une fenêtre comme paramètre."
+
+#: maggy.py:10938
+msgid "Save database..."
+msgstr "Enregistrer la base de données"
+
+#: maggy.py:10970
+msgid ""
+"You cannot overwrite your existing database.\n"
+"Aborting"
+msgstr ""
+"Vous ne pouvez pas écraser votre propre base de données.\n"
+"Abandon. "
+
+#: maggy.py:10991
+msgid "_Open Database"
+msgstr "_Ouvrir une base de données"
+
+#: maggy.py:11006
+msgid "SQLITE files"
+msgstr "Fichiers Sqlite"
+
+#: maggy.py:11054
+#, python-format
+msgid ""
+"The backup of %s has been created successfully. \n"
+" It contains the following files :\n"
+"\n"
+msgstr ""
+"La sauvegarde de %s a été créée avec succès. \n"
+"Elle contient les fichiers suivants : \n"
+"\n"
+
+#: maggy.py:11062
+msgid ""
+"There was a problem during the backup. \n"
+"Some files may have been saved nevertheless, \n"
+" Please, verify"
+msgstr ""
+"Il y a eu un problème pendant la sauvegarde.\n"
+"Cependant il est possible que certains fichiers aient été sauvegardés.\n"
+"Vérifier SVP."
+
+#: maggy.py:11469
+#, python-format
+msgid "The name %s is already used for a peripheral table, it cannot be used for a words table !"
+msgstr ""
+"Le nom %s est déjà utilisé pour une table périphérique,\n"
+" il ne peut pas être utilisé pour une table de mots !"
+
+#: maggy.py:12044
+msgid ""
+"MySQL server not found.\n"
+"Verify it is started or check your configuration.\n"
+"Continue ? "
+msgstr ""
+"Impossible de trouver le serveur MySQL\n"
+"Assurez-vous qu'il est démarré ou vérifiez votre configuration\n"
+"Faut-il continuer ?"
+
+#: maggy.py:12045
+msgid "Server unreachable"
+msgstr "Serveur introuvable"
+
+#: data/maggy.glade:41
+#: data/maggy.glade:95
+msgid "Clear the content of the frame from left"
+msgstr "Effacer le contenu du cadre de gauche"
+
+#: data/maggy.glade:67
+#: data/maggy.glade:351
+#: data/maggy.glade:1398
+#: data/maggy.glade:2830
+msgid "Position"
+msgstr "Position"
+
+#: data/maggy.glade:121
+#: data/maggy.glade:403
+#: data/maggy.glade:1237
+#: data/maggy.glade:1420
+#: data/maggy.glade:1743
+#: data/maggy.glade:2398
+#: data/maggy.glade:2881
+msgid "Close"
+msgstr "Fermer"
+
+#: data/maggy.glade:161
+msgid "Combinaison de plusieurs critères de recherche (boutons Combiner)"
+msgstr ""
+
+#: data/maggy.glade:164
+msgid "Combination of many search criteria (combine buttons)"
+msgstr "Combinaison de plusieurs critères de recherche (boutons Combiner)"
+
+#: data/maggy.glade:207
+#: config/demo2/demo2.glade:4372
+#: config/Portes/portes.glade:4402
+#: config/gbnew/gbnew.glade:4410
+msgid "       "
+msgstr "      "
+
+#: data/maggy.glade:247
+#: data/maggy.glade:659
+#: data/maggy.glade:783
+#: data/maggy.glade:907
+msgid "Records"
+msgstr " fiches"
+
+#: data/maggy.glade:273
+#: data/maggy.glade:324
+#: data/maggy.glade:377
+#: data/maggy.glade:1372
+#: data/maggy.glade:1717
+#: data/maggy.glade:2372
+#: data/maggy.glade:2804
+#: data/maggy.glade:2855
+msgid "Effacer le contenu du cadre de gauche"
+msgstr ""
+
+#: data/maggy.glade:298
+#: config/demo2/demo2.glade:4833
+#: config/Portes/portes.glade:4863
+#: config/gbnew/gbnew.glade:4871
+msgid "Reset"
+msgstr "Défauts"
+
+#: data/maggy.glade:350
+msgid " Fullscreen"
+msgstr "_Plein écran"
+
+#: data/maggy.glade:457
+msgid "Recherche sur d'autres critères que ceux proposés par les listes"
+msgstr ""
+
+#: data/maggy.glade:459
+msgid "<b>Search on criteria other than those proposed by the lists</b>"
+msgstr "Recherche sur d'autres critères que ceux proposés par les listes"
+
+#: data/maggy.glade:481
+msgid "Choice of the table"
+msgstr "Choix de la table"
+
+#: data/maggy.glade:510
+msgid "Choice of the list of result"
+msgstr "Choix de la liste de résultats"
+
+#: data/maggy.glade:538
+msgid "Choice of the zone details"
+msgstr "Choix de la zone détails"
+
+#: data/maggy.glade:569
+msgid "First criteria"
+msgstr "Premier critère"
+
+#: data/maggy.glade:658
+msgid "Fiches"
+msgstr "Fiches"
+
+#: data/maggy.glade:694
+msgid "Second criteria"
+msgstr "Deuxièime critère"
+
+#: data/maggy.glade:818
+msgid "Third criteria"
+msgstr "Troisième critère"
+
+#: data/maggy.glade:963
+msgid "Various options"
+msgstr "Options diverses"
+
+#: data/maggy.glade:987
+msgid "Search on:"
+msgstr "Recherche sur :"
+
+#: data/maggy.glade:998
+msgid "central table"
+msgstr " table centrale"
+
+#: data/maggy.glade:1014
+msgid "star"
+msgstr "étoile"
+
+#: data/maggy.glade:1034
+msgid ""
+"Case\n"
+"sensitive"
+msgstr "Respecter la &casse"
+
+#: data/maggy.glade:1039
+msgid ""
+"Sensible \n"
+"à la casse"
+msgstr ""
+
+#: data/maggy.glade:1082
+#: config/demo2/demo2.glade:4340
+#: config/Portes/portes.glade:4370
+#: config/gbnew/gbnew.glade:4378
+msgid "Combine"
+msgstr "Combiner"
+
+#: data/maggy.glade:1107
+msgid "Delete the display of certain elements of this screen"
+msgstr "Cache certains éléments de cet écran"
+
+#: data/maggy.glade:1158
+msgid "Clear the content of the left frames"
+msgstr "Cacher le contenu du cadre de gauche"
+
+#: data/maggy.glade:1184
+msgid " Delete what has been entered in the fields."
+msgstr "Efface ce qui a été entré dans les champs."
+
+#: data/maggy.glade:1185
+msgid "_Reset"
+msgstr "Défauts"
+
+#: data/maggy.glade:1211
+msgid "Close this window"
+msgstr "Fermer cette fenêtre"
+
+#: data/maggy.glade:1312
+msgid "<b><u><span foreground = \"red\">Historical account</span></u></b>"
+msgstr "<b><u><span foreground = \"red\">Historique</span></u></b>"
+
+#: data/maggy.glade:1322
+msgid "Active tab:"
+msgstr "Onglet actif :"
+
+#: data/maggy.glade:1334
+msgid "0"
+msgstr "0"
+
+#: data/maggy.glade:1346
+msgid "  "
+msgstr "  "
+
+#: data/maggy.glade:1354
+msgid "Review the result"
+msgstr "Revoir le résultat"
+
+#: data/maggy.glade:1447
+msgid "Parameters"
+msgstr "Paramètres"
+
+#: data/maggy.glade:1471
+msgid "Language file"
+msgstr "Fichier de langue"
+
+#: data/maggy.glade:1497
+msgid "Save colors"
+msgstr "Enregistrer les couleurs"
+
+#: data/maggy.glade:1551
+msgid "Nombre de lignes maxi."
+msgstr ""
+
+#: data/maggy.glade:1553
+msgid "Maximum number of lines"
+msgstr "Nombre de lignes maximum"
+
+#: data/maggy.glade:1578
+msgid "Délai de frappe"
+msgstr "Délai de frappe"
+
+#: data/maggy.glade:1579
+msgid "Typing time limit"
+msgstr "Délai de frappe"
+
+#: data/maggy.glade:1599
+msgid "hauteur des lignes"
+msgstr "hauteur des lignes"
+
+#: data/maggy.glade:1600
+msgid "line height"
+msgstr "hauteur des lignes"
+
+#: data/maggy.glade:1610
+msgid "Font size"
+msgstr "Taille de la police"
+
+#: data/maggy.glade:1648
+msgid "police des listes"
+msgstr "police des listes"
+
+#: data/maggy.glade:1649
+msgid "font of the lists"
+msgstr "police des listes"
+
+#: data/maggy.glade:1663
+msgid "<b>Listes de recherche</b>\n"
+msgstr "<b>Listes de recherche</b>\n"
+
+#: data/maggy.glade:1665
+msgid "<b>Search from lists</b>"
+msgstr "<b>Listes de recherche</b>"
+
+#: data/maggy.glade:1685
+#: data/maggy.glade:1891
+#: data/maggy.glade:2442
+#: config/gbnew/gbnew.glade:5392
+msgid "Save"
+msgstr "Enregistrer"
+
+#: data/maggy.glade:1699
+#: data/maggy.glade:1846
+msgid "Apply"
+msgstr "Appliquer"
+
+#: data/maggy.glade:1824
+#: data/maggy.glade:2453
+#: config/demo2/demo2.glade:2685
+#: config/Portes/portes.glade:2715
+#: config/gbnew/gbnew.glade:2723
+msgid "Add"
+msgstr "&Ajouter..."
+
+#: data/maggy.glade:1835
+msgid "Edit"
+msgstr "&Modifier..."
+
+#: data/maggy.glade:1857
+#: config/demo2/demo2.glade:2693
+#: config/Portes/portes.glade:2723
+#: config/gbnew/gbnew.glade:2731
+msgid "Delete"
+msgstr "Effacer"
+
+#: data/maggy.glade:1880
+msgid ""
+"Enregistrer la position \n"
+"des séparateurs"
+msgstr ""
+"Enregistrer la position \n"
+"des séparateurs"
+
+#: data/maggy.glade:1882
+msgid ""
+"Save the position\n"
+"of the separators"
+msgstr ""
+"Enregistrer la position \n"
+"des séparateurs"
+
+#: data/maggy.glade:1917
+msgid "Show on start "
+msgstr "Montrer au démarrage"
+
+#: data/maggy.glade:2016
+msgid "Paramètres utilisateur"
+msgstr ""
+
+#: data/maggy.glade:2017
+msgid "User parameters"
+msgstr "Paramètres utilisateurs"
+
+#: data/maggy.glade:2100
+msgid "Request Name"
+msgstr "Nom de la requête"
+
+#: data/maggy.glade:2126
+msgid "Request SQL Syntax"
+msgstr "Requête SQL"
+
+#: data/maggy.glade:2158
+msgid "Column width"
+msgstr "Largeurde la colonne"
+
+#: data/maggy.glade:2189
+msgid "Form: comment"
+msgstr "Commentaires"
+
+#: data/maggy.glade:2220
+msgid "Form: parameters"
+msgstr "Paramètres"
+
+#: data/maggy.glade:2258
+msgid "Configuration central table"
+msgstr "Configuration de la table centrale"
+
+#: data/maggy.glade:2260
+msgid "Central table configuration"
+msgstr "Configuration de la table centrale"
+
+#: data/maggy.glade:2270
+msgid "Configuration details"
+msgstr "Configuration détails"
+
+#: data/maggy.glade:2272
+msgid "Detail configuration"
+msgstr "Configuration details"
+
+#: data/maggy.glade:2339
+msgid "Indexes"
+msgstr "Indexs"
+
+#: data/maggy.glade:2340
+msgid "_Records"
+msgstr " fiches"
+
+#: data/maggy.glade:2463
+msgid "Duplicate"
+msgstr "Dupliquer"
+
+#: data/maggy.glade:2472
+msgid "Supprimer/Delete"
+msgstr "Effacer"
+
+#: data/maggy.glade:2487
+#: config/demo2/demo2.glade:268
+#: config/Portes/portes.glade:268
+#: config/gbnew/gbnew.glade:268
+msgid "Save position"
+msgstr "Enregistrer la position"
+
+#: data/maggy.glade:2518
+msgid "Tri et Colonnes"
+msgstr ""
+
+#: data/maggy.glade:2520
+msgid "Sort and Columns"
+msgstr "Tri et colonnes"
+
+#: data/maggy.glade:2530
+msgid "\n"
+msgstr "\n"
+
+#: data/maggy.glade:2550
+msgid "Critères"
+msgstr ""
+
+#: data/maggy.glade:2552
+msgid "Criteria"
+msgstr "Critères"
+
+#: data/maggy.glade:2574
+#: data/maggy.glade:2622
+#: data/maggy.glade:2669
+#: data/maggy.glade:2716
+msgid "numerical"
+msgstr "numérique"
+
+#: data/maggy.glade:2590
+msgid "decreasing\n"
+msgstr "décroissant\n"
+
+#: data/maggy.glade:2638
+#: data/maggy.glade:2685
+#: data/maggy.glade:2732
+msgid "decreasing"
+msgstr "décroissant"
+
+#: data/maggy.glade:2755
+msgid "Tri personnalisé\n"
+msgstr ""
+
+#: data/maggy.glade:2757
+msgid "User-defined sort"
+msgstr "Tri personnalisé"
+
+#: data/maggy.glade:2768
+msgid "_Sort"
+msgstr "Tri"
+
+#: data/maggy.glade:2785
+msgid "                        \n"
+msgstr "                        \n"
+
+#: data/maggy.glade:2943
+msgid "Invert base"
+msgstr "Inverser la base"
+
+#: data/maggy.glade:2957
+msgid "Update Central table"
+msgstr "Mettre à jour de la table centrale."
+
+#: data/maggy.glade:2971
+msgid "Invert words table"
+msgstr "Inverser la table de mots"
+
+#: data/maggy.glade:2985
+msgid "Invert All"
+msgstr "Tout inverser"
+
+#: data/maggy.glade:2999
+msgid "Clean inverted tables"
+msgstr "Nettoyer les tables inversées"
+
+#: data/maggy.glade:3028
+#: data/maggy.glade:3108
+#: data/maggy.glade:3590
+#: data/maggy.glade:3695
+msgid "gtk-close"
+msgstr "gtk-close"
+
+#: data/maggy.glade:3052
+msgid "Database"
+msgstr "Base de données"
+
+#: data/maggy.glade:3093
+#: data/maggy.glade:3135
+#: config/demo2/demo2.glade:240
+#: config/Portes/portes.glade:240
+#: config/gbnew/gbnew.glade:240
+msgid "Compare"
+msgstr "Comparer"
+
+#: data/maggy.glade:3155
+msgid "gtk-ok"
+msgstr "gtk-ok"
+
+#: data/maggy.glade:3174
+msgid "New Author"
+msgstr "Nouvel auteur"
+
+#: data/maggy.glade:3193
+msgid "Import Utility"
+msgstr "Utilitaire d'importation"
+
+#: data/maggy.glade:3282
+msgid "<b>Author :</b>"
+msgstr "<b>Auteur :</b>"
+
+#: data/maggy.glade:3313
+msgid "<b>Title : </b>"
+msgstr "<b>Titre :</b>"
+
+#: data/maggy.glade:3327
+#: data/maggy.glade:3488
+#: config/demo2/demo2.glade:359
+#: config/demo2/demo2.glade:5087
+#: config/Portes/portes.glade:359
+#: config/Portes/portes.glade:5117
+#: config/gbnew/gbnew.glade:367
+#: config/gbnew/gbnew.glade:5125
+msgid "label"
+msgstr "étiquette"
+
+#: data/maggy.glade:3349
+msgid "Siècle :"
+msgstr ""
+
+#: data/maggy.glade:3372
+msgid "Cote :"
+msgstr "Cote :"
+
+#: data/maggy.glade:3440
+msgid "Search"
+msgstr "Chercher"
+
+#: data/maggy.glade:3457
+msgid "Record : "
+msgstr "Enregistrement :"
+
+#: data/maggy.glade:3498
+msgid "  <  "
+msgstr "  <"
+
+#: data/maggy.glade:3513
+msgid "  >  "
+msgstr "  >"
+
+#: data/maggy.glade:3531
+#: config/demo2/demo2.glade:1155
+#: config/demo2/demo2.glade:1180
+#: config/Portes/portes.glade:1185
+#: config/Portes/portes.glade:1210
+#: config/gbnew/gbnew.glade:1193
+#: config/gbnew/gbnew.glade:1218
+msgid " "
+msgstr " "
+
+#: data/maggy.glade:3546
+msgid "No author"
+msgstr "Pas d'auteur"
+
+#: data/maggy.glade:3567
+msgid "Open file"
+msgstr "Ouvrir un fichier"
+
+#: data/maggy.glade:3634
+#: config/demo2/demo2.glade:248
+#: config/Portes/portes.glade:248
+#: config/gbnew/gbnew.glade:248
+msgid "Import"
+msgstr "Importer"
+
+#: data/maggy.glade:3679
+msgid "Start"
+msgstr "Lancer"
+
+#: data/maggy.glade:3718
+msgid "Export Utility"
+msgstr "Utilitaire d'exportation"
+
+#: data/maggy.glade:3729
+msgid "Start number"
+msgstr "Nombre de départ"
+
+#: data/maggy.glade:3752
+msgid "Model"
+msgstr "Modèle"
+
+#: data/maggy.glade:3820
+msgid "page 4"
+msgstr "page 4"
+
+#: data/maggy.glade:3836
+msgid "Public domain"
+msgstr "Domaine public"
+
+#: data/maggy.glade:3837
+msgid "Octobre 2015"
+msgstr ""
+
+#: config/demo2/demo2.glade:127
+#: config/Portes/portes.glade:127
+#: config/gbnew/gbnew.glade:127
+msgid "Files"
+msgstr "Fichiers"
+
+#: config/demo2/demo2.glade:134
+#: config/Portes/portes.glade:134
+#: config/gbnew/gbnew.glade:134
+msgid "Create a backup ..."
+msgstr "Créer une sauvegarde"
+
+#: config/demo2/demo2.glade:143
+#: config/Portes/portes.glade:143
+#: config/gbnew/gbnew.glade:143
+msgid "Save Database"
+msgstr "Enregistrer la base de données"
+
+#: config/demo2/demo2.glade:154
+#: config/Portes/portes.glade:154
+#: config/gbnew/gbnew.glade:154
+msgid "Open Database"
+msgstr "_Ouvrir une base de données"
+
+#: config/demo2/demo2.glade:166
+#: config/Portes/portes.glade:166
+#: config/gbnew/gbnew.glade:166
+msgid "Quit"
+msgstr "_Quitter"
+
+#: config/demo2/demo2.glade:181
+#: config/Portes/portes.glade:181
+#: config/gbnew/gbnew.glade:181
+msgid "Windows"
+msgstr "Fenêtres"
+
+#: config/demo2/demo2.glade:188
+#: config/Portes/portes.glade:188
+#: config/gbnew/gbnew.glade:188
+msgid "Listes"
+msgstr ""
+
+#: config/demo2/demo2.glade:196
+#: config/Portes/portes.glade:196
+#: config/gbnew/gbnew.glade:196
+msgid "Saisie"
+msgstr "Saisie"
+
+#: config/demo2/demo2.glade:204
+#: config/demo2/demo2.glade:5405
+#: config/Portes/portes.glade:204
+#: config/Portes/portes.glade:5435
+#: config/gbnew/gbnew.glade:204
+#: config/gbnew/gbnew.glade:5502
+msgid "Résultat"
+msgstr ""
+
+#: config/demo2/demo2.glade:212
+#: config/demo2/demo2.glade:260
+#: config/Portes/portes.glade:212
+#: config/Portes/portes.glade:260
+#: config/gbnew/gbnew.glade:212
+#: config/gbnew/gbnew.glade:260
+msgid "Options"
+msgstr "Options"
+
+#: config/demo2/demo2.glade:224
+#: config/Portes/portes.glade:224
+#: config/gbnew/gbnew.glade:224
+msgid "Tools"
+msgstr "Outils"
+
+#: config/demo2/demo2.glade:232
+#: config/Portes/portes.glade:232
+#: config/gbnew/gbnew.glade:232
+msgid "Invert "
+msgstr "Inverser"
+
+#: config/demo2/demo2.glade:276
+#: config/Portes/portes.glade:276
+#: config/gbnew/gbnew.glade:276
+msgid "Save separators' position"
+msgstr ""
+"Enregistrer la position \n"
+"des séparateurs"
+
+#: config/demo2/demo2.glade:288
+#: config/Portes/portes.glade:288
+#: config/gbnew/gbnew.glade:288
+msgid "Help"
+msgstr "Aide"
+
+#: config/demo2/demo2.glade:296
+#: config/Portes/portes.glade:296
+#: config/gbnew/gbnew.glade:296
+msgid "Configuration"
+msgstr "Configuration"
+
+#: config/demo2/demo2.glade:308
+#: config/Portes/portes.glade:308
+#: config/gbnew/gbnew.glade:316
+msgid "Fiches (édition)"
+msgstr ""
+
+#: config/demo2/demo2.glade:316
+#: config/Portes/portes.glade:316
+#: config/gbnew/gbnew.glade:324
+msgid "mémoriser la fiche"
+msgstr "mémoriser la fiche"
+
+#: config/demo2/demo2.glade:324
+#: config/Portes/portes.glade:324
+#: config/gbnew/gbnew.glade:332
+msgid "mémoriser toutes les fiches"
+msgstr ""
+
+#: config/demo2/demo2.glade:332
+#: config/Portes/portes.glade:332
+#: config/gbnew/gbnew.glade:340
+msgid "restaurer une fiche"
+msgstr "restaurer une fiche"
+
+#: config/demo2/demo2.glade:340
+#: config/Portes/portes.glade:340
+#: config/gbnew/gbnew.glade:348
+msgid "Restaurer toutes les fiches"
+msgstr ""
+
+#: config/demo2/demo2.glade:424
+#: config/demo2/demo2.glade:916
+#: config/Portes/portes.glade:454
+#: config/Portes/portes.glade:946
+#: config/gbnew/gbnew.glade:462
+#: config/gbnew/gbnew.glade:954
+msgid "Tapez les premières lettres : "
+msgstr ""
+
+#: config/demo2/demo2.glade:463
+#: config/demo2/demo2.glade:954
+#: config/demo2/demo2.glade:1680
+#: config/demo2/demo2.glade:2832
+#: config/demo2/demo2.glade:3496
+#: config/demo2/demo2.glade:3847
+#: config/Portes/portes.glade:493
+#: config/Portes/portes.glade:984
+#: config/Portes/portes.glade:1710
+#: config/Portes/portes.glade:2862
+#: config/Portes/portes.glade:3526
+#: config/Portes/portes.glade:3877
+#: config/gbnew/gbnew.glade:501
+#: config/gbnew/gbnew.glade:992
+#: config/gbnew/gbnew.glade:1718
+#: config/gbnew/gbnew.glade:2870
+#: config/gbnew/gbnew.glade:3534
+#: config/gbnew/gbnew.glade:3885
+msgid "lignes"
+msgstr ""
+
+#: config/demo2/demo2.glade:483
+#: config/Portes/portes.glade:513
+#: config/gbnew/gbnew.glade:521
+msgid "Personne"
+msgstr ""
+
+#: config/demo2/demo2.glade:517
+#: config/demo2/demo2.glade:1758
+#: config/demo2/demo2.glade:3129
+#: config/Portes/portes.glade:547
+#: config/Portes/portes.glade:1788
+#: config/Portes/portes.glade:3159
+#: config/gbnew/gbnew.glade:555
+#: config/gbnew/gbnew.glade:1796
+#: config/gbnew/gbnew.glade:3167
+msgid "Renvoi"
+msgstr ""
+
+#: config/demo2/demo2.glade:549
+#: config/demo2/demo2.glade:5726
+#: config/Portes/portes.glade:579
+#: config/Portes/portes.glade:5756
+#: config/gbnew/gbnew.glade:587
+#: config/gbnew/gbnew.glade:5834
+msgid "Présentation"
+msgstr ""
+
+#: config/demo2/demo2.glade:590
+#: config/Portes/portes.glade:620
+#: config/gbnew/gbnew.glade:628
+msgid "Autres"
+msgstr ""
+
+#: config/demo2/demo2.glade:605
+#: config/Portes/portes.glade:635
+#: config/gbnew/gbnew.glade:643
+msgid "Tout"
+msgstr ""
+
+#: config/demo2/demo2.glade:620
+#: config/Portes/portes.glade:650
+#: config/gbnew/gbnew.glade:658
+msgid "Auteurs"
+msgstr ""
+
+#: config/demo2/demo2.glade:636
+#: config/Portes/portes.glade:666
+#: config/gbnew/gbnew.glade:674
+msgid "Collaborateurs"
+msgstr ""
+
+#: config/demo2/demo2.glade:652
+#: config/Portes/portes.glade:682
+#: config/gbnew/gbnew.glade:690
+msgid "Études sur"
+msgstr ""
+
+#: config/demo2/demo2.glade:670
+#: config/Portes/portes.glade:700
+#: config/gbnew/gbnew.glade:708
+msgid "Biographiés"
+msgstr ""
+
+#: config/demo2/demo2.glade:722
+#: config/demo2/demo2.glade:1441
+#: config/demo2/demo2.glade:1889
+#: config/demo2/demo2.glade:2576
+#: config/demo2/demo2.glade:3232
+#: config/demo2/demo2.glade:3621
+#: config/demo2/demo2.glade:3979
+#: config/Portes/portes.glade:752
+#: config/Portes/portes.glade:1471
+#: config/Portes/portes.glade:1919
+#: config/Portes/portes.glade:2606
+#: config/Portes/portes.glade:3262
+#: config/Portes/portes.glade:3651
+#: config/Portes/portes.glade:4009
+#: config/gbnew/gbnew.glade:760
+#: config/gbnew/gbnew.glade:1479
+#: config/gbnew/gbnew.glade:1927
+#: config/gbnew/gbnew.glade:2614
+#: config/gbnew/gbnew.glade:3270
+#: config/gbnew/gbnew.glade:3659
+#: config/gbnew/gbnew.glade:4017
+msgid "_Fiches"
+msgstr "_Fiches"
+
+#: config/demo2/demo2.glade:771
+#: config/demo2/demo2.glade:1490
+#: config/demo2/demo2.glade:1938
+#: config/demo2/demo2.glade:2625
+#: config/demo2/demo2.glade:3281
+#: config/demo2/demo2.glade:3670
+#: config/demo2/demo2.glade:4028
+#: config/demo2/demo2.glade:4339
+#: config/Portes/portes.glade:801
+#: config/Portes/portes.glade:1520
+#: config/Portes/portes.glade:1968
+#: config/Portes/portes.glade:2655
+#: config/Portes/portes.glade:3311
+#: config/Portes/portes.glade:3700
+#: config/Portes/portes.glade:4058
+#: config/Portes/portes.glade:4369
+#: config/gbnew/gbnew.glade:809
+#: config/gbnew/gbnew.glade:1528
+#: config/gbnew/gbnew.glade:1976
+#: config/gbnew/gbnew.glade:2663
+#: config/gbnew/gbnew.glade:3319
+#: config/gbnew/gbnew.glade:3708
+#: config/gbnew/gbnew.glade:4066
+#: config/gbnew/gbnew.glade:4377
+msgid "Combiner"
+msgstr ""
+
+#: config/demo2/demo2.glade:810
+#: config/demo2/demo2.glade:2674
+#: config/Portes/portes.glade:840
+#: config/Portes/portes.glade:2704
+#: config/gbnew/gbnew.glade:848
+#: config/gbnew/gbnew.glade:2712
+msgid "Edition"
+msgstr "Edition"
+
+#: config/demo2/demo2.glade:820
+#: config/demo2/demo2.glade:2349
+#: config/Portes/portes.glade:850
+#: config/Portes/portes.glade:2379
+#: config/gbnew/gbnew.glade:858
+#: config/gbnew/gbnew.glade:2387
+msgid "Enregistrer"
+msgstr ""
+
+#: config/demo2/demo2.glade:830
+#: config/Portes/portes.glade:860
+#: config/gbnew/gbnew.glade:868
+msgid "Nouveau"
+msgstr ""
+
+#: config/demo2/demo2.glade:840
+#: config/demo2/demo2.glade:2456
+#: config/Portes/portes.glade:870
+#: config/Portes/portes.glade:2486
+#: config/gbnew/gbnew.glade:878
+#: config/gbnew/gbnew.glade:2494
+msgid "Supprimer"
+msgstr "Supprimer"
+
+#: config/demo2/demo2.glade:875
+#: config/demo2/demo2.glade:5680
+#: config/Portes/portes.glade:905
+#: config/Portes/portes.glade:5710
+#: config/gbnew/gbnew.glade:913
+#: config/gbnew/gbnew.glade:5788
+msgid "Personnes"
+msgstr ""
+
+#: config/demo2/demo2.glade:1009
+#: config/Portes/portes.glade:1039
+#: config/gbnew/gbnew.glade:1047
+msgid "+ ou /"
+msgstr ""
+
+#: config/demo2/demo2.glade:1022
+#: config/demo2/demo2.glade:1069
+#: config/demo2/demo2.glade:1113
+#: config/Portes/portes.glade:1052
+#: config/Portes/portes.glade:1099
+#: config/Portes/portes.glade:1143
+#: config/gbnew/gbnew.glade:1060
+#: config/gbnew/gbnew.glade:1107
+#: config/gbnew/gbnew.glade:1151
+msgid "pour"
+msgstr "pour"
+
+#: config/demo2/demo2.glade:1038
+#: config/Portes/portes.glade:1068
+#: config/gbnew/gbnew.glade:1076
+msgid "\"OU\""
+msgstr ""
+
+#: config/demo2/demo2.glade:1053
+#: config/Portes/portes.glade:1083
+#: config/gbnew/gbnew.glade:1091
+msgid " Trait de soulignement "
+msgstr " Trait de soulignement "
+
+#: config/demo2/demo2.glade:1055
+#: config/Portes/portes.glade:1085
+#: config/gbnew/gbnew.glade:1093
+msgid " _ "
+msgstr " _ "
+
+#: config/demo2/demo2.glade:1085
+#: config/Portes/portes.glade:1115
+#: config/gbnew/gbnew.glade:1123
+msgid "\"SAUF\""
+msgstr ""
+
+#: config/demo2/demo2.glade:1101
+#: config/Portes/portes.glade:1131
+#: config/gbnew/gbnew.glade:1139
+msgid "\"ET\""
+msgstr ""
+
+#: config/demo2/demo2.glade:1126
+#: config/Portes/portes.glade:1156
+#: config/gbnew/gbnew.glade:1164
+msgid "&"
+msgstr ""
+
+#: config/demo2/demo2.glade:1143
+#: config/Portes/portes.glade:1173
+#: config/gbnew/gbnew.glade:1181
+msgid "ou taper ci-dessous le terme à exclure :"
+msgstr ""
+
+#: config/demo2/demo2.glade:1204
+#: config/Portes/portes.glade:1234
+#: config/gbnew/gbnew.glade:1242
+msgid "Dans quel champ faut-il rechercher le mot ?"
+msgstr ""
+
+#: config/demo2/demo2.glade:1219
+#: config/Portes/portes.glade:1249
+#: config/gbnew/gbnew.glade:1257
+msgid "Tous les champs"
+msgstr ""
+
+#: config/demo2/demo2.glade:1242
+#: config/demo2/demo2.glade:5913
+#: config/Portes/portes.glade:1272
+#: config/Portes/portes.glade:5943
+#: config/gbnew/gbnew.glade:1280
+#: config/gbnew/gbnew.glade:6021
+msgid "Titre"
+msgstr ""
+
+#: config/demo2/demo2.glade:1258
+#: config/Portes/portes.glade:1288
+#: config/gbnew/gbnew.glade:1296
+msgid "Sous-titre"
+msgstr ""
+
+#: config/demo2/demo2.glade:1274
+#: config/demo2/demo2.glade:5898
+#: config/Portes/portes.glade:1304
+#: config/Portes/portes.glade:5928
+#: config/gbnew/gbnew.glade:1312
+#: config/gbnew/gbnew.glade:6006
+msgid "Complément"
+msgstr ""
+
+#: config/demo2/demo2.glade:1297
+#: config/demo2/demo2.glade:5883
+#: config/Portes/portes.glade:1327
+#: config/Portes/portes.glade:5913
+#: config/gbnew/gbnew.glade:1335
+#: config/gbnew/gbnew.glade:5991
+msgid "Traduction"
+msgstr ""
+
+#: config/demo2/demo2.glade:1313
+#: config/demo2/demo2.glade:6501
+#: config/Portes/portes.glade:1343
+#: config/Portes/portes.glade:6531
+#: config/gbnew/gbnew.glade:1351
+#: config/gbnew/gbnew.glade:6609
+msgid "Contenu"
+msgstr ""
+
+#: config/demo2/demo2.glade:1328
+#: config/demo2/demo2.glade:6438
+#: config/Portes/portes.glade:1358
+#: config/Portes/portes.glade:6468
+#: config/gbnew/gbnew.glade:1366
+#: config/gbnew/gbnew.glade:6546
+msgid "Remarques"
+msgstr ""
+
+#: config/demo2/demo2.glade:1380
+#: config/Portes/portes.glade:1410
+#: config/gbnew/gbnew.glade:1418
+msgid "Cette recherche renvoie ... fiches"
+msgstr ""
+
+#: config/demo2/demo2.glade:1541
+#: config/Portes/portes.glade:1571
+#: config/gbnew/gbnew.glade:1579
+msgid "_Quitter"
+msgstr ""
+
+#: config/demo2/demo2.glade:1600
+#: config/Portes/portes.glade:1630
+#: config/gbnew/gbnew.glade:1638
+msgid "Mots"
+msgstr ""
+
+#: config/demo2/demo2.glade:1642
+#: config/demo2/demo2.glade:2794
+#: config/demo2/demo2.glade:3458
+#: config/demo2/demo2.glade:3809
+#: config/Portes/portes.glade:1672
+#: config/Portes/portes.glade:2824
+#: config/Portes/portes.glade:3488
+#: config/Portes/portes.glade:3839
+#: config/gbnew/gbnew.glade:1680
+#: config/gbnew/gbnew.glade:2832
+#: config/gbnew/gbnew.glade:3496
+#: config/gbnew/gbnew.glade:3847
+msgid "Tapez les premières lettres :"
+msgstr ""
+
+#: config/demo2/demo2.glade:1700
+#: config/demo2/demo2.glade:2084
+#: config/Portes/portes.glade:1730
+#: config/Portes/portes.glade:2114
+#: config/gbnew/gbnew.glade:1738
+#: config/gbnew/gbnew.glade:2122
+msgid "Thème"
+msgstr ""
+
+#: config/demo2/demo2.glade:1726
+#: config/demo2/demo2.glade:2110
+#: config/Portes/portes.glade:1756
+#: config/Portes/portes.glade:2140
+#: config/gbnew/gbnew.glade:1764
+#: config/gbnew/gbnew.glade:2148
+msgid "Observations"
+msgstr ""
+
+#: config/demo2/demo2.glade:1784
+#: config/demo2/demo2.glade:2142
+#: config/demo2/demo2.glade:5536
+#: config/Portes/portes.glade:1814
+#: config/Portes/portes.glade:2172
+#: config/Portes/portes.glade:5566
+#: config/gbnew/gbnew.glade:1822
+#: config/gbnew/gbnew.glade:2180
+#: config/gbnew/gbnew.glade:5644
+msgid "Notes"
+msgstr "Notes"
+
+#: config/demo2/demo2.glade:1822
+#: config/demo2/demo2.glade:2180
+#: config/Portes/portes.glade:1852
+#: config/Portes/portes.glade:2210
+#: config/gbnew/gbnew.glade:1860
+#: config/gbnew/gbnew.glade:2218
+msgid "Fiches papier :  "
+msgstr ""
+
+#: config/demo2/demo2.glade:1969
+#: config/demo2/demo2.glade:2665
+#: config/demo2/demo2.glade:3360
+#: config/demo2/demo2.glade:3713
+#: config/demo2/demo2.glade:4116
+#: config/Portes/portes.glade:1999
+#: config/Portes/portes.glade:2695
+#: config/Portes/portes.glade:3390
+#: config/Portes/portes.glade:3743
+#: config/Portes/portes.glade:4146
+#: config/gbnew/gbnew.glade:2007
+#: config/gbnew/gbnew.glade:2703
+#: config/gbnew/gbnew.glade:3398
+#: config/gbnew/gbnew.glade:3751
+#: config/gbnew/gbnew.glade:4154
+msgid "Recherche"
+msgstr ""
+
+#: config/demo2/demo2.glade:1978
+#: config/demo2/demo2.glade:3369
+#: config/demo2/demo2.glade:3722
+#: config/demo2/demo2.glade:4071
+#: config/demo2/demo2.glade:6952
+#: config/Portes/portes.glade:2008
+#: config/Portes/portes.glade:3399
+#: config/Portes/portes.glade:3752
+#: config/Portes/portes.glade:4101
+#: config/Portes/portes.glade:6982
+#: config/gbnew/gbnew.glade:2016
+#: config/gbnew/gbnew.glade:3407
+#: config/gbnew/gbnew.glade:3760
+#: config/gbnew/gbnew.glade:4109
+#: config/gbnew/gbnew.glade:7060
+msgid "Édition"
+msgstr "Édition"
+
+#: config/demo2/demo2.glade:1987
+#: config/demo2/demo2.glade:2711
+#: config/demo2/demo2.glade:3378
+#: config/demo2/demo2.glade:3731
+#: config/Portes/portes.glade:2017
+#: config/Portes/portes.glade:2741
+#: config/Portes/portes.glade:3408
+#: config/Portes/portes.glade:3761
+#: config/gbnew/gbnew.glade:2025
+#: config/gbnew/gbnew.glade:2749
+#: config/gbnew/gbnew.glade:3416
+#: config/gbnew/gbnew.glade:3769
+msgid "Aide"
+msgstr ""
+
+#: config/demo2/demo2.glade:1996
+#: config/demo2/demo2.glade:2720
+#: config/demo2/demo2.glade:3387
+#: config/demo2/demo2.glade:3740
+#: config/Portes/portes.glade:2026
+#: config/Portes/portes.glade:2750
+#: config/Portes/portes.glade:3417
+#: config/Portes/portes.glade:3770
+#: config/gbnew/gbnew.glade:2034
+#: config/gbnew/gbnew.glade:2758
+#: config/gbnew/gbnew.glade:3425
+#: config/gbnew/gbnew.glade:3778
+msgid "Quitter"
+msgstr ""
+
+#: config/demo2/demo2.glade:2043
+#: config/demo2/demo2.glade:6304
+#: config/Portes/portes.glade:2073
+#: config/Portes/portes.glade:6334
+#: config/gbnew/gbnew.glade:2081
+#: config/gbnew/gbnew.glade:6412
+msgid "Thèmes"
+msgstr ""
+
+#: config/demo2/demo2.glade:2228
+#: config/Portes/portes.glade:2258
+#: config/gbnew/gbnew.glade:2266
+msgid " Afficher un niveau de plus dans toules les sections "
+msgstr ""
+
+#: config/demo2/demo2.glade:2229
+#: config/Portes/portes.glade:2259
+#: config/gbnew/gbnew.glade:2267
+msgid "Un niveau de +"
+msgstr "Un niveau de +"
+
+#: config/demo2/demo2.glade:2241
+#: config/Portes/portes.glade:2271
+#: config/gbnew/gbnew.glade:2279
+msgid " Développer complètement la section sélectionnée "
+msgstr ""
+
+#: config/demo2/demo2.glade:2242
+#: config/Portes/portes.glade:2272
+#: config/gbnew/gbnew.glade:2280
+msgid "Développer 1"
+msgstr ""
+
+#: config/demo2/demo2.glade:2254
+#: config/Portes/portes.glade:2284
+#: config/gbnew/gbnew.glade:2292
+msgid " Développer toutes les sections "
+msgstr ""
+
+#: config/demo2/demo2.glade:2255
+#: config/Portes/portes.glade:2285
+#: config/gbnew/gbnew.glade:2293
+msgid "Développer tout"
+msgstr ""
+
+#: config/demo2/demo2.glade:2281
+#: config/Portes/portes.glade:2311
+#: config/gbnew/gbnew.glade:2319
+msgid " Réduire toutes les sections "
+msgstr ""
+
+#: config/demo2/demo2.glade:2282
+#: config/Portes/portes.glade:2312
+#: config/gbnew/gbnew.glade:2320
+msgid "Tout réduire"
+msgstr ""
+
+#: config/demo2/demo2.glade:2294
+#: config/Portes/portes.glade:2324
+#: config/gbnew/gbnew.glade:2332
+msgid " Actualiser l'affichage de l'arbre après une modification "
+msgstr ""
+
+#: config/demo2/demo2.glade:2295
+#: config/Portes/portes.glade:2325
+#: config/gbnew/gbnew.glade:2333
+msgid "Rafraîchir"
+msgstr ""
+
+#: config/demo2/demo2.glade:2323
+#: config/Portes/portes.glade:2353
+#: config/gbnew/gbnew.glade:2361
+msgid "Enregistrer le thème"
+msgstr ""
+
+#: config/demo2/demo2.glade:2377
+#: config/Portes/portes.glade:2407
+#: config/gbnew/gbnew.glade:2415
+msgid "Nouveau thème"
+msgstr ""
+
+#: config/demo2/demo2.glade:2403
+#: config/Portes/portes.glade:2433
+#: config/gbnew/gbnew.glade:2441
+msgid "_Nouveau"
+msgstr ""
+
+#: config/demo2/demo2.glade:2431
+#: config/Portes/portes.glade:2461
+#: config/gbnew/gbnew.glade:2469
+msgid "Supprimer le thème"
+msgstr "Supprimer le thème"
+
+#: config/demo2/demo2.glade:2484
+#: config/Portes/portes.glade:2514
+#: config/gbnew/gbnew.glade:2522
+msgid "Enregistrer les modifications réalisées dans l'arborescence"
+msgstr ""
+
+#: config/demo2/demo2.glade:2510
+#: config/Portes/portes.glade:2540
+#: config/gbnew/gbnew.glade:2548
+msgid "Enregistrer l'arbre"
+msgstr "Enregistrer l'arbre"
+
+#: config/demo2/demo2.glade:2700
+#: config/Portes/portes.glade:2730
+#: config/gbnew/gbnew.glade:2738
+msgid "Update"
+msgstr "Mettre à jour"
+
+#: config/demo2/demo2.glade:2753
+#: config/Portes/portes.glade:2783
+#: config/gbnew/gbnew.glade:2791
+msgid "Arborescence des thèmes"
+msgstr "Arborescence des thèmes"
+
+#: config/demo2/demo2.glade:2851
+#: config/Portes/portes.glade:2881
+#: config/gbnew/gbnew.glade:2889
+msgid "Chartreuse"
+msgstr ""
+
+#: config/demo2/demo2.glade:2920
+#: config/Portes/portes.glade:2950
+#: config/gbnew/gbnew.glade:2958
+msgid "Patronage   \\   Province"
+msgstr "Patronage   \\   Province"
+
+#: config/demo2/demo2.glade:2962
+#: config/Portes/portes.glade:2992
+#: config/gbnew/gbnew.glade:3000
+msgid "page 1"
+msgstr "page 1"
+
+#: config/demo2/demo2.glade:2974
+#: config/Portes/portes.glade:3004
+#: config/gbnew/gbnew.glade:3012
+msgid "Pays   \\   Lieu"
+msgstr ""
+
+#: config/demo2/demo2.glade:3019
+#: config/Portes/portes.glade:3049
+#: config/gbnew/gbnew.glade:3057
+msgid "page 2"
+msgstr "page 2"
+
+#: config/demo2/demo2.glade:3032
+#: config/Portes/portes.glade:3062
+#: config/gbnew/gbnew.glade:3070
+msgid "Dates   \\   Transfert"
+msgstr ""
+
+#: config/demo2/demo2.glade:3078
+#: config/Portes/portes.glade:3108
+#: config/gbnew/gbnew.glade:3116
+msgid "page 3"
+msgstr "page 3"
+
+#: config/demo2/demo2.glade:3097
+#: config/Portes/portes.glade:3127
+#: config/gbnew/gbnew.glade:3135
+msgid "Chartreuse de :"
+msgstr "Chartreuse de :"
+
+#: config/demo2/demo2.glade:3154
+#: config/demo2/demo2.glade:4286
+#: config/Portes/portes.glade:3184
+#: config/Portes/portes.glade:4316
+#: config/gbnew/gbnew.glade:3192
+#: config/gbnew/gbnew.glade:4324
+msgid "Historique"
+msgstr ""
+
+#: config/demo2/demo2.glade:3329
+#: config/Portes/portes.glade:3359
+#: config/gbnew/gbnew.glade:3367
+msgid "_Simplifier"
+msgstr ""
+
+#: config/demo2/demo2.glade:3420
+#: config/demo2/demo2.glade:6352
+#: config/Portes/portes.glade:3450
+#: config/Portes/portes.glade:6382
+#: config/gbnew/gbnew.glade:3458
+#: config/gbnew/gbnew.glade:6460
+msgid "Chartreuses"
+msgstr ""
+
+#: config/demo2/demo2.glade:3516
+#: config/Portes/portes.glade:3546
+#: config/gbnew/gbnew.glade:3554
+msgid "Langue"
+msgstr "Langue"
+
+#: config/demo2/demo2.glade:3542
+#: config/Portes/portes.glade:3572
+#: config/gbnew/gbnew.glade:3580
+msgid "Commentaire"
+msgstr ""
+
+#: config/demo2/demo2.glade:3768
+#: config/demo2/demo2.glade:6257
+#: config/Portes/portes.glade:3798
+#: config/Portes/portes.glade:6287
+#: config/gbnew/gbnew.glade:3806
+#: config/gbnew/gbnew.glade:6365
+msgid "Langues"
+msgstr "Langues"
+
+#: config/demo2/demo2.glade:3867
+#: config/demo2/demo2.glade:5945
+#: config/Portes/portes.glade:3897
+#: config/Portes/portes.glade:5965
+#: config/gbnew/gbnew.glade:3905
+#: config/gbnew/gbnew.glade:6053
+msgid "Collection"
+msgstr "Collection"
+
+#: config/demo2/demo2.glade:3900
+#: config/Portes/portes.glade:3930
+#: config/gbnew/gbnew.glade:3938
+msgid "Annotation"
+msgstr ""
+
+#: config/demo2/demo2.glade:4103
+#: config/Portes/portes.glade:4133
+#: config/gbnew/gbnew.glade:4141
+msgid "Collections"
+msgstr "Collections"
+
+#: config/demo2/demo2.glade:4132
+#: config/Portes/portes.glade:4162
+#: config/gbnew/gbnew.glade:4170
+msgid " Éditer la fiche "
+msgstr " Éditer la fiche "
+
+#: config/demo2/demo2.glade:4139
+#: config/Portes/portes.glade:4169
+#: config/gbnew/gbnew.glade:4177
+msgid " Modifier la fiche dans le formulaire de saisie "
+msgstr ""
+
+#: config/demo2/demo2.glade:4151
+#: config/Portes/portes.glade:4181
+#: config/gbnew/gbnew.glade:4189
+msgid " Éditer en tableau le résultat de la recherche "
+msgstr ""
+
+#: config/demo2/demo2.glade:4163
+#: config/Portes/portes.glade:4193
+#: config/gbnew/gbnew.glade:4201
+msgid " Supprimer la fiche "
+msgstr " Supprimer la fiche "
+
+#: config/demo2/demo2.glade:4175
+#: config/Portes/portes.glade:4205
+#: config/gbnew/gbnew.glade:4213
+msgid "Nouvelle fiche"
+msgstr "Nouvelle fiche"
+
+#: config/demo2/demo2.glade:4200
+#: config/Portes/portes.glade:4230
+#: config/gbnew/gbnew.glade:4238
+msgid "Afficher / Masquer le panneau de gauche"
+msgstr ""
+
+#: config/demo2/demo2.glade:4201
+#: config/Portes/portes.glade:4231
+#: config/gbnew/gbnew.glade:4239
+msgid "toolbutton5"
+msgstr ""
+
+#: config/demo2/demo2.glade:4214
+#: config/Portes/portes.glade:4244
+#: config/gbnew/gbnew.glade:4252
+msgid ""
+" Clic gauche :\\n"
+"       Afficher la liste en pleine hauteur / rétablir\n"
+"Clic droit :\n"
+"\tAfficher la zone détail en pleine hauteur / rétablir"
+msgstr ""
+
+#: config/demo2/demo2.glade:4224
+#: config/Portes/portes.glade:4254
+#: config/gbnew/gbnew.glade:4262
+msgid "Clic gauche : Afficher la liste en pleine hauteur / rétablir        Clic droit : Afficher la zone détail en pleine hauteur / Rétablir"
+msgstr ""
+
+#: config/demo2/demo2.glade:4239
+#: config/Portes/portes.glade:4269
+#: config/gbnew/gbnew.glade:4277
+msgid " Rafraîchir le résultat de la recherche  "
+msgstr ""
+
+#: config/demo2/demo2.glade:4251
+#: config/Portes/portes.glade:4281
+#: config/gbnew/gbnew.glade:4289
+msgid " Effacer le résultat ; nécessaire si on change de type de recherche "
+msgstr ""
+
+#: config/demo2/demo2.glade:4263
+#: config/Portes/portes.glade:4293
+#: config/gbnew/gbnew.glade:4301
+msgid "Trier les fiches"
+msgstr ""
+
+#: config/demo2/demo2.glade:4274
+#: config/Portes/portes.glade:4304
+#: config/gbnew/gbnew.glade:4312
+msgid "Afficher / masquer les colonnes"
+msgstr ""
+
+#: config/demo2/demo2.glade:4305
+#: config/Portes/portes.glade:4335
+#: config/gbnew/gbnew.glade:4343
+msgid " Actions diverses "
+msgstr ""
+
+#: config/demo2/demo2.glade:4313
+#: config/Portes/portes.glade:4343
+#: config/gbnew/gbnew.glade:4351
+msgid "Recherches complexes"
+msgstr ""
+
+#: config/demo2/demo2.glade:4314
+#: config/Portes/portes.glade:4344
+#: config/gbnew/gbnew.glade:4352
+msgid "Complex queries"
+msgstr "requête complexe"
+
+#: config/demo2/demo2.glade:4326
+#: config/Portes/portes.glade:4356
+#: config/gbnew/gbnew.glade:4364
+msgid "Recherches prédéfinies"
+msgstr ""
+
+#: config/demo2/demo2.glade:4327
+#: config/Portes/portes.glade:4357
+#: config/gbnew/gbnew.glade:4365
+msgid "Predef queries"
+msgstr "Requêtes prédéfinies"
+
+#: config/demo2/demo2.glade:4352
+#: config/Portes/portes.glade:4382
+#: config/gbnew/gbnew.glade:4390
+msgid " Enregistrer la sélection dans un fichier "
+msgstr ""
+
+#: config/demo2/demo2.glade:4388
+#: config/Portes/portes.glade:4418
+#: config/gbnew/gbnew.glade:4426
+msgid "Afficher les listes de recherche"
+msgstr "Afficher les listes de recherche"
+
+#: config/demo2/demo2.glade:4415
+#: config/Portes/portes.glade:4445
+#: config/gbnew/gbnew.glade:4453
+msgid "_Listes de recherche"
+msgstr "_Listes de recherche"
+
+#: config/demo2/demo2.glade:4485
+#: config/demo2/demo2.glade:4544
+#: config/demo2/demo2.glade:4738
+#: config/Portes/portes.glade:4515
+#: config/Portes/portes.glade:4574
+#: config/Portes/portes.glade:4768
+#: config/gbnew/gbnew.glade:4523
+#: config/gbnew/gbnew.glade:4582
+#: config/gbnew/gbnew.glade:4776
+msgid "<span background=\"orange\"><b>Tapez les premières lettres ici</b></span>"
+msgstr ""
+
+#: config/demo2/demo2.glade:4848
+#: config/Portes/portes.glade:4878
+#: config/gbnew/gbnew.glade:4886
+msgid "Section :"
+msgstr "Section :"
+
+#: config/demo2/demo2.glade:4858
+#: config/Portes/portes.glade:4888
+#: config/gbnew/gbnew.glade:4896
+msgid "Numéro : "
+msgstr ""
+
+#: config/demo2/demo2.glade:4870
+#: config/Portes/portes.glade:4900
+#: config/gbnew/gbnew.glade:4908
+msgid "Format : "
+msgstr "Format : "
+
+#: config/demo2/demo2.glade:4918
+#: config/Portes/portes.glade:4948
+#: config/gbnew/gbnew.glade:4956
+msgid "Rechercher"
+msgstr ""
+
+#: config/demo2/demo2.glade:4934
+#: config/Portes/portes.glade:4964
+#: config/gbnew/gbnew.glade:4972
+msgid "requete1"
+msgstr "requete1"
+
+#: config/demo2/demo2.glade:4950
+#: config/Portes/portes.glade:4980
+#: config/gbnew/gbnew.glade:4988
+msgid "requete2"
+msgstr "requete2"
+
+#: config/demo2/demo2.glade:4966
+#: config/Portes/portes.glade:4996
+#: config/gbnew/gbnew.glade:5004
+msgid "requete3"
+msgstr "requete3"
+
+#: config/demo2/demo2.glade:4982
+#: config/Portes/portes.glade:5012
+#: config/gbnew/gbnew.glade:5020
+msgid "requete4"
+msgstr "requete4"
+
+#: config/demo2/demo2.glade:4998
+#: config/Portes/portes.glade:5028
+#: config/gbnew/gbnew.glade:5036
+msgid "Afficher depuis..."
+msgstr ""
+
+#: config/demo2/demo2.glade:5014
+#: config/Portes/portes.glade:5044
+#: config/gbnew/gbnew.glade:5052
+msgid "Afficher $ et £"
+msgstr ""
+
+#: config/demo2/demo2.glade:5093
+#: config/Portes/portes.glade:5123
+#: config/gbnew/gbnew.glade:5131
+msgid "notebook2"
+msgstr ""
+
+#: config/demo2/demo2.glade:5137
+#: config/Portes/portes.glade:5167
+msgid "[section] [num] <sup>[exposant]</sup> [format] "
+msgstr ""
+
+#: config/demo2/demo2.glade:5150
+#: config/Portes/portes.glade:5180
+#: config/gbnew/gbnew.glade:5188
+msgid "<span foreground=\"red\"><span face=\"Arial Black\"  size=\"16384\" >lieu :[localisation]</span></span>"
+msgstr ""
+
+#: config/demo2/demo2.glade:5320
+#: config/demo2/demo2.glade:5346
+#: config/demo2/demo2.glade:5373
+#: config/Portes/portes.glade:5350
+#: config/Portes/portes.glade:5376
+#: config/Portes/portes.glade:5403
+#: config/gbnew/gbnew.glade:5417
+#: config/gbnew/gbnew.glade:5443
+#: config/gbnew/gbnew.glade:5470
+msgid "+++"
+msgstr ""
+
+#: config/demo2/demo2.glade:5441
+#: config/demo2/demo2.glade:5452
+#: config/Portes/portes.glade:5471
+#: config/Portes/portes.glade:5482
+#: config/gbnew/gbnew.glade:5538
+#: config/gbnew/gbnew.glade:5549
+msgid "   "
+msgstr "   "
+
+#: config/demo2/demo2.glade:5466
+#: config/Portes/portes.glade:5496
+#: config/gbnew/gbnew.glade:5563
+#: config/gbnew/gbnew.glade:5630
+msgid "Cote"
+msgstr "Cote"
+
+#: config/demo2/demo2.glade:5564
+#: config/Portes/portes.glade:5594
+#: config/gbnew/gbnew.glade:5672
+msgid "Local."
+msgstr "Local."
+
+#: config/demo2/demo2.glade:5603
+#: config/Portes/portes.glade:5633
+#: config/gbnew/gbnew.glade:5711
+msgid "Compteur"
+msgstr ""
+
+#: config/demo2/demo2.glade:5628
+#: config/Portes/portes.glade:5658
+#: config/gbnew/gbnew.glade:5736
+msgid "Temp."
+msgstr ""
+
+#: config/demo2/demo2.glade:5737
+#: config/Portes/portes.glade:5767
+#: config/gbnew/gbnew.glade:5845
+msgid "Valider"
+msgstr ""
+
+#: config/demo2/demo2.glade:5981
+#: config/Portes/portes.glade:6001
+#: config/gbnew/gbnew.glade:6089
+msgid "Numéro"
+msgstr ""
+
+#: config/demo2/demo2.glade:6034
+#: config/Portes/portes.glade:6181
+#: config/gbnew/gbnew.glade:6142
+msgid "Lieu"
+msgstr ""
+
+#: config/demo2/demo2.glade:6061
+#: config/Portes/portes.glade:6208
+#: config/gbnew/gbnew.glade:6169
+msgid "Éditeur"
+msgstr ""
+
+#: config/demo2/demo2.glade:6087
+#: config/Portes/portes.glade:6234
+#: config/gbnew/gbnew.glade:6195
+msgid "Date"
+msgstr "Date"
+
+#: config/demo2/demo2.glade:6125
+#: config/Portes/portes.glade:6064
+#: config/gbnew/gbnew.glade:6233
+msgid "Volumes"
+msgstr ""
+
+#: config/demo2/demo2.glade:6153
+#: config/Portes/portes.glade:6092
+#: config/gbnew/gbnew.glade:6261
+msgid "Pages"
+msgstr "Pages"
+
+#: config/demo2/demo2.glade:6179
+#: config/Portes/portes.glade:6118
+#: config/gbnew/gbnew.glade:6287
+msgid "Hauteur"
+msgstr ""
+
+#: config/demo2/demo2.glade:6207
+#: config/Portes/portes.glade:6146
+#: config/gbnew/gbnew.glade:6315
+msgid "Illustr."
+msgstr ""
+
+#: config/demo2/demo2.glade:6423
+#: config/Portes/portes.glade:6453
+#: config/gbnew/gbnew.glade:6531
+msgid "Erreur"
+msgstr ""
+
+#: config/demo2/demo2.glade:6557
+#: config/Portes/portes.glade:6587
+#: config/gbnew/gbnew.glade:6665
+msgid "Précédente"
+msgstr ""
+
+#: config/demo2/demo2.glade:6607
+#: config/Portes/portes.glade:6637
+#: config/gbnew/gbnew.glade:6715
+msgid "Suivante"
+msgstr ""
+
+#: config/demo2/demo2.glade:6658
+#: config/Portes/portes.glade:6688
+#: config/gbnew/gbnew.glade:6766
+msgid "_Dupliquer"
+msgstr ""
+
+#: config/demo2/demo2.glade:6709
+#: config/Portes/portes.glade:6739
+#: config/gbnew/gbnew.glade:6817
+msgid "_Nouvelle"
+msgstr ""
+
+#: config/demo2/demo2.glade:6760
+#: config/Portes/portes.glade:6790
+#: config/gbnew/gbnew.glade:6868
+msgid "_Valider"
+msgstr ""
+
+#: config/demo2/demo2.glade:6812
+#: config/Portes/portes.glade:6842
+#: config/gbnew/gbnew.glade:6920
+msgid "_Ferme_r"
+msgstr ""
+
+#: config/demo2/demo2.glade:6850
+#: config/Portes/portes.glade:6880
+#: config/gbnew/gbnew.glade:6958
+msgid "Fiche modifiée le"
+msgstr "Fiche modifiée le"
+
+#: config/demo2/demo2.glade:6884
+#: config/demo2/demo2.glade:6910
+#: config/demo2/demo2.glade:6937
+#: config/Portes/portes.glade:6914
+#: config/Portes/portes.glade:6940
+#: config/Portes/portes.glade:6967
+#: config/gbnew/gbnew.glade:6992
+#: config/gbnew/gbnew.glade:7018
+#: config/gbnew/gbnew.glade:7045
+msgid "---"
+msgstr "---"
+
+#: config/demo2/demo2.glade:6968
+#: config/Portes/portes.glade:6998
+msgid ""
+"[auteur,separator = --- ,  before =<i><b><span foreground=\"red\">Auteurs : </span></b></i>, after = ]\n"
+"[collaborateur, separator = --- , before =<i><b><span foreground=\"red\">Collaborateurs :</span> </b></i>]"
+msgstr ""
+
+#: config/demo2/demo2.glade:6972
+#: config/Portes/portes.glade:7002
+msgid ""
+"[titre, after= ][sous_titre, after = ][complement,after= ]\n"
+"[lieu], [editeur], [date], [g_collections]\n"
+" [volumes] vol.,  [pages] ,   [hauteur] ,    [illustrations]"
+msgstr ""
+
+#: config/demo2/demo2.glade:6977
+#: config/Portes/portes.glade:7007
+msgid ""
+"[g_themes, separator = --- ,  before = <i><b><span foreground=\"red\">Themes :</span> </b></i>] \n"
+"[g_langues, separator = --- , before = <i><b><span foreground=\"red\">Langues :</span> </b></i>]"
+msgstr ""
+
+#: config/demo2/demo2.glade:6981
+#: config/Portes/portes.glade:7011
+msgid ""
+"[vedette, separator = --- , before = <i><b><span foreground=\"red\">Vedette :</span> </b></i>, after= ]\n"
+"[biographie, separator = --- ,  before = <i><b><span foreground=\"red\">Biographie :</span> </b></i>, after= ]\n"
+"[g_chartreuses,separator = --- , before = <i><b><span foreground=\"red\">Chartreuses :</span> </b></i>]"
+msgstr ""
+
+#: config/demo2/demo2.glade:6986
+#: config/Portes/portes.glade:7016
+msgid ""
+"[complement, , after= \n"
+"][traduction, after= \n"
+"][contenu, after= \n"
+"][remarques]"
+msgstr ""
+
+#: config/Portes/portes.glade:374
+#: config/gbnew/gbnew.glade:382
+msgid "Switch GB"
+msgstr "fichier GC"
+
+#: config/Portes/portes.glade:392
+#: config/gbnew/gbnew.glade:400
+msgid "Switch Portes"
+msgstr "fichier Portes"
+
+#: config/gbnew/gbnew.glade:304
+msgid "About..."
+msgstr "A props de..."
+
+#~ msgid "Check Author"
+#~ msgstr "Vérifier l'auteur"
+
+#~ msgid "Skip"
+#~ msgstr "Sauter"
+
+#~ msgid "Processing finished\n"
+#~ msgstr "Le processus est terminé \n"
+
+#~ msgid "Database %s does not exist. Do you want to create it ?"
+#~ msgstr "La base de données %s n'existe pas. Voulez-vous la créer ?"
+
+#~ msgid "Database does not exist"
+#~ msgstr "La base n'existe pas"
+
+#~ msgid ""
+#~ "The database %s was created but is still empty. \n"
+#~ "Do you want to load data from a file ?"
+#~ msgstr ""
+#~ "La base de données %s a été créée mais est encore vide. \n"
+#~ "Voulez-vous la charger depuis un fichier ?"
+
+#~ msgid "Database empty"
+#~ msgstr "La base de donnée est vide"
+
+#~ msgid "Use original"
+#~ msgstr "Utiliser l'original"
+
+#, fuzzy
+#~ msgid "Importer"
+#~ msgstr "Importer"
+
+#, fuzzy
+#~ msgid "Sauvegarder la base"
+#~ msgstr ""
+#~ "  -d RÉPERTOIRE               répertoire de basede la hiérarchie des "
+#~ "classes de répertoires\n"
+
+#, fuzzy
+#~ msgid "Local :"
+#~ msgstr "Fichiers locaux"
+
+#, fuzzy
+#~ msgid "Base de données"
+#~ msgstr "_Supprimer le fichier"
+
+#~ msgid "Save project..."
+#~ msgstr "Enregistrer le projet..."
+
+#, fuzzy
+#~ msgid "load Portes"
+#~ msgstr "Charger le fichier %s"
+
+#, fuzzy
+#~ msgid "load gb"
+#~ msgstr "GB-2312"

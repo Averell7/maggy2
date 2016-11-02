@@ -1,20 +1,19 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
-# Version 2.0.0 build 47  07 février 2016
+
+# Version 2.0.0 build 50  9 octobre 2016
 
 
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
 
-maggy_version = "2.0.0.47"
+maggy_version = "2.0.0.50"
 print "Maggy Version : ", maggy_version
 """
 In this version :
 
-bug fix for supprimer_fiche  (commit was missing)
-Suppress ScriptPosix (no longer used)
-Add ScriptExcept
+fix bugs in predefined queries interface
 
 """
 
@@ -72,6 +71,7 @@ for letter in u"([<>…" :
 import os, sys
 import copy     # for deep copies (copy without reference)
 import re, glob
+from collections import OrderedDict
 
 import exceptions
 from optparse import OptionParser
@@ -83,7 +83,7 @@ import pickle       # serialize but unreadable
 import json         # serialize in a readable form
 import zipfile
 import StringIO
-from collections import OrderedDict
+#from collections import OrderedDict
 import pprint
 
 
@@ -98,12 +98,12 @@ import gio          #to inquire mime types information
 
 gtk.rc_parse("./gtkrc")
 
-try :
-    import _mysql
-    import MySQLdb
-    from MySQLdb import cursors
-except :
-    print("Mysql modules not installed.")
+##try :
+##    import _mysql
+##    import MySQLdb
+##    from MySQLdb import cursors
+##except :
+##    print("Mysql modules not installed.")
 
 ##try :
 ##    import pypyodbc         # for accdb tables
@@ -689,8 +689,10 @@ class SqliteUnicode :
             return data1
 
     def date2year(self,date1) :
+
         if date1 == None :
             return date1
+        date1 =date1.split(",")[0]  # Delete all after a comma
         date2 = date1.split("-")
         if len(date2) < 2 :
             date2 = date1.split("/")
@@ -698,6 +700,7 @@ class SqliteUnicode :
             return date2[2]
         else :
             return date1
+
 
     def date2ymd(self,date1) :
         # converts dmy format to ymd to allow sorting
@@ -1387,6 +1390,9 @@ class db_utilities :
 
     def db_compare(self, *params) :
 
+        central_table = "registre"      # TODO extraire de la config
+        primary_key = "idpersonne"
+
         chooser = gtk.FileChooserDialog(title=_('_Open Configuration'),
                 action=gtk.FILE_CHOOSER_ACTION_OPEN,
                 buttons=(gtk.STOCK_CANCEL,
@@ -1425,7 +1431,7 @@ class db_utilities :
 
         # create columns list
 
-        cursor.execute("select * from complete")
+        cursor.execute("select * from " + central_table)
         row = cursor.fetchone()
         list_cols = row.keys()
 
@@ -1437,15 +1443,15 @@ class db_utilities :
         treeview = mag.arw["s_compare_tree"]
         model1 = treeview.get_model()
 
-        cursor.execute("select * from complete")
+        cursor.execute("select * from " + central_table)
         #cursor2.execute("select * from complete")
         i = 0
 
         for row in cursor :
-            id1 = row["id_livre"]
+            id1 = row[primary_key]
             i += 1
 
-            cursor2.execute("select * from complete where id_livre = %s" % id1)
+            cursor2.execute("select * from %s where %s = %s" % (central_table, primary_key, id1))
             row2 = cursor2.fetchone()
 
             if row2 :
@@ -1473,10 +1479,10 @@ class db_utilities :
 
         # deleted records
         deleted_a = []
-        cursor2.execute("select * from complete")
+        cursor2.execute("select * from " + central_table)
         for row2 in cursor2 :
-            id2 = row2["id_livre"]
-            cursor.execute("select * from complete where id_livre = %s" % id2)
+            id2 = row2[primary_key]
+            cursor.execute("select * from %s where %s = %s" % (central_table, primary_key, id2))
             row = cursor.fetchone()
 
             if not row :
@@ -6384,24 +6390,18 @@ class edit() :
                         alert (_("Field " + val[1] + " not found in " + central_table ))
 
 
-
-
-
-
 ##        # titre de la fenêtre
 ##        # TODO 1 : pas bon, à rendre configurable
 ##        titre_fenetre=fiche["section"]+" "+fiche["num"]+" "+fiche["exposant"]+" "+fiche["format"]
 ##        titre_fenetre+="   "+mb_substr(fiche["auteur"],0,30)+"   "+mb_substr(fiche["titre"],0,70) #  $mem['window4']=$titre_fenetre;
 ##        #  $self.arw['window4']->set_title($titre_fenetre);
-        try :
+
+        if hasattr(mag.myfunctions, "after_load") :
             mag.myfunctions.after_load(id_fiche, table_config, saisieActive, saisieFlipActive)
-        except:
-        	print "after_load is not defined"
 
 
 
-
-##        # mémorisation des données pour rappel enregistrement
+        # mémorisation des données pour rappel enregistrement
         mem["saisie_avant"] = self.memoriser_fiche()
 
 
@@ -6759,8 +6759,10 @@ class edit() :
         mem["saisie_apres"] = self.memoriser_fiche()
 
         ar_tmp = array_diff(mem["saisie_apres"], mem["saisie_avant"])   # what was added
+        mem["added"] = ar_tmp
         zz1 = len(ar_tmp)
         ar_tmp = array_diff(mem["saisie_avant"], mem["saisie_apres"])   # what was suppressed
+        mem["suppressed"] = ar_tmp
         zz2 = len(ar_tmp)
         if (zz1 > 0) or (zz2 > 0) :
 
@@ -6854,12 +6856,9 @@ class edit() :
 
         link.commit()
 
-##        if function_exists("after_update") :
-##
-##            after_update(id_livre, set1)    #...        after_update(id_livre, &set1)
 
-
-
+        if hasattr(mag.myfunctions, "after_update") :
+            mag.myfunctions.after_update(id_livre, set1, mem)
 
 
         # Mise à jour des données inversées
@@ -8051,17 +8050,30 @@ class predef_queries :
         treeview.connect('cursor-changed', self.predef_query_detail)
         treeview.set_reorderable(True)
 
+
+        self.fields = { 0 : "name",
+                     1 : "query",
+                     2 : "parameters",
+                     3 : "comment",
+                     4 : "central_def",
+                     5 : "names",
+                     6 : "widths",
+                     7 : "details",
+                     8 : "result",
+                     9 : "config"}
+
         # mise à  jour
-        dict1 = {0 : "name", 5 : "details", 6 : "central_def", 7 : "result"}
-        for  key, name in dict1.iteritems()  :
+
+        for key in [0,4,7,8] :
+            name = self.fields[key]
             self.arw["s_" + name + "4"].connect("changed", self.predef_query_update, key, name)
 
-        dict1 = {1 : "query", 2 : "widths", 3 : "comment", 4 : "parameters"}
-        for  key, name  in dict1.iteritems() :
+        for key in [1,2,3,5,6] :
+            name = self.fields[key]
             buffer1 = self.arw["s_" + name + "4"].get_buffer()
             buffer1.connect("changed", self.predef_query_update, key, name)
 
-        self.arw["s_config4"].connect("toggled", self.predef_query_update, 8, "config")
+        self.arw["s_config4"].connect("toggled", self.predef_query_update, 4, "config")
 
         # chargement de la combobox details
 
@@ -8078,6 +8090,13 @@ class predef_queries :
         combo.pack_start(renderer)
         combo.set_attributes(renderer, text=0)
 
+
+        # chargement de la combobox "result"
+
+        combo = self.arw['s_result4']
+        combo.set_model(stores['result'])
+        combo.pack_start(renderer)
+        combo.set_attributes(renderer, text=0)
 
 
     def predef_query_load(self)  :
@@ -8096,23 +8115,41 @@ class predef_queries :
             data = f1.read()
             f1.close()
             try :
-                self.queries = eval(data)
+                self.queries1 = eval(data)
             except :
                 alert(_("The file queries.py is invalid"))
+
+##            # test OrderedDict
+##            f1 = open(os.path.join(configdir_u, u"queries-od.py"), "r")
+##            data = f1.read()
+##            f1.close()
+##            try :
+##                self.queries1 = eval(data)
+##            except :
+##                alert(_("The file queries-od.py is invalid"))
+
+            # Order keys
+            self.queries = OrderedDict()
+            keys = self.queries1.keys()
+            keys.sort()
+            for key in keys :
+                self.queries[key] = self.queries1[key]
         else :
             self.queries = OrderedDict()
+            #self.queries = {}
+
 
 
         model = self.arw['s_clist4'].get_model()
         model.clear()
 
-        fields = ["name", "query", "widths", "names", "comment", "parameters", "central_def", "details", "result", "config"]
+
         if self.queries :
 
             for  key in self.queries  :
                 data = self.queries[key]
                 data2 = []
-                for  name in fields  :
+                for  key, name in self.fields.iteritems()  :
                     if data.has_key(name) :
                         data2.append( data[name])
                     else :
@@ -8120,7 +8157,7 @@ class predef_queries :
 
                 append(model,data2)
 
-
+        t1 = 1 # debug
 
 
     def predef_query_detail(self, selection) :
@@ -8134,24 +8171,22 @@ class predef_queries :
             effacer = 0
             iter = model.get_iter(arPaths[0]) # première ligne sélectionnée
 
-        else :                  # s'il n'y a pas de sÃ©lection, on efface
+        else :                  # s'il n'y a pas de sélection, on efface
             effacer = 1
             iter = null
 
 
-        fields = ["name", "query", "widths", "names", "comment", "parameters", "details", "central_def", "result"]
-
-        for i  in range( 0, 8) :
+        for key, name in self.fields.iteritems() :
             if effacer == 1 :
                 texte =""
             else :
-                texte=model.get_value(iter, i)
-            widget = self.arw["s_"+ fields[i] + "4"]
+                texte=model.get_value(iter, key)
+            widget = self.arw["s_"+ self.fields[key] + "4"]
             set_text(widget,texte)
 
         # RadioButton
 
-        texte=model.get_value(iter, 8)
+        texte=model.get_value(iter, 9)
         if texte == '1' :
             self.arw["s_config4"].set_active(True)
         else :
@@ -8165,13 +8200,11 @@ class predef_queries :
 
 
     def predef_query_save(self, widget)  :
-        # Saves the data displayed in the self.quesries dictionary,
-        # and saves this dicrtionary in the queries.py file
+        # Saves the data displayed in the self.queries dictionary,
+        # and saves this dictionary in the queries.py file
 
         line_name = get_text(self.arw["s_name4"])       # name of active query
-        for option in ["query", "parameters", "comment",
-                        "central_def", "result", "details",
-                        "widths", "names", "config"] :
+        for key, option in self.fields.iteritems() :
             text = get_text(self.arw["s_" + option + "4"])
             self.queries[line_name][option] = text
 
@@ -8182,6 +8215,10 @@ class predef_queries :
         f1.write(data)
         f1.close()
 
+        f2 = open(os.path.join(configdir_u,u"queries-od.py"),"w")
+        data = utilities.dict_or_OrdDict_to_formatted_str(self.queries, mode='OD')
+        f2.write('OrderedDict([\n' + data + '])')
+        f2.close()
 
 
     def predef_query_new(self, widget)  :
@@ -8680,9 +8717,8 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
         self.widgets.connect_signals(self)
-        self.arw["s_window"].show()
 
-
+        # Build system windows
         self.widgets2 = gtk.Builder()
         self.widgets2.add_from_file('./data/maggy.glade')
         arWidgets2 = self.widgets2.get_objects()
@@ -8722,7 +8758,43 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             elif (type == "GtkButton"):
                 self.arButtons[key] = val;
 
+        # redimension the windows to the recorded value
 
+        if 'position' in config['ini'] :
+            for window in config['ini']['position'] :
+                if window in self.arw :
+                    self.arw[window].show()
+                    win=self.arw[window].window;        # get the GdkWindow
+                    if win :
+                        h = config['ini']['position'][window]["h"];
+                        w = config['ini']['position'][window]["w"];
+                        x = config['ini']['position'][window]["x"];
+                        y = config['ini']['position'][window]["y"];
+                        win.move_resize(x, y, w, h);
+##                    if window != "s_window" :
+##                        self.arw[window].hide()
+
+        # Wait until the window is resized before setting the Hpaned position, otherwise it will be changed when resizing
+        while (gtk. events_pending()) :
+            gtk.main_iteration();
+
+
+        # positionnement des Hpaned et Vpanes
+        if 'Hpaned' in config['ini'] :
+            for key in config['ini']['Hpaned'] :
+                val = config['ini']['Hpaned'][key]
+                if self.arw.has_key(key) :
+                    self.arw[key].set_position(val)
+
+        while (gtk. events_pending()) :
+            gtk.main_iteration();
+
+        # Hide the windows we have shown
+        for window in config['ini']['position'] :
+            self.arw[window].hide()
+
+        # show the main window
+        self.arw["s_window"].show()
 
         # charger les codes des zones détails à partir des widgets
 
@@ -9111,25 +9183,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             try :
                 self.myfunctions = myfunctions.UserFunctions(self, self.arw, link, cursor, config, mem)
             except :
-                alert(_("UserFunctions has errors. Impossible to load. \nPlease check your %s file" % "perso_xxx"))
-                utils.printExcept()       # Error not critical, the program must not stop
+                message = utils.printExcept()       # Error not critical, the program must not stop
+                alert(_("UserFunctions has errors. Impossible to load. \nPlease check your 'userfunctions.py' file. The error is :\n\n %s" % message))
+                print message
 
-
-
-
-        self.arw["s_window"].show()
-        self.montrer(self.arw["s_window"], resize = 1)
-        # Wait until the window is resized before setting the Hpaned position, otherwise it will be changed when resizing
-        while (gtk. events_pending()) :
-            gtk.main_iteration();
-
-
-        # positionnement des Hpaned et Vpanes
-        if 'Hpaned' in config['ini'] :
-            for key in config['ini']['Hpaned'] :
-                val = config['ini']['Hpaned'][key]
-                if self.arw.has_key(key) :
-                    self.arw[key].set_position(val)
 
         # show the tab defined in the configuration
         v2(config["ini"], "gui", "start_tab")
@@ -9750,7 +9807,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
     def detail(self, liste, *args) :
 
-        global main_field, config, affichage, mem;
+        global central_table, main_field, config, affichage, mem;
 
         page = mem['result_page'];
         nom_details = v(affichage,page,'details_def')
@@ -9785,17 +9842,20 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                             code = data['code'];
                             widget = self.arw[data['widget']]
                             #code = magutils.get_text(widget)
-                            (text,popups) = self.parse_code(f,code,id1);
+                            (text,popups) = self.parse_code(f,code,id1, table, field);
 
                             self.detail_text(widget,text,popups);
 
 
 
 
-    def parse_code(self, f, code, id = "", type = None) :
+    def parse_code(self, f, code, id = "", table = "", field = "", type = None) :
 
-##        global , buffers, config, central_table, main_field, TagTable,
+##        global buffers, config, TagTable, central_table, main_field
         global popup_condition
+
+        central_table = table
+        main_field = field
         params = {}
         text = ""
         popups = []
@@ -9863,10 +9923,11 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                     # Corps du texte, trois solutions :
                     # 1) clause select, 2) champ répétitif, 3) champ simple
                     if "select" in params :
-                        req = params["select"] + eval(php_string(" from $central_table where $main_field =id"))
+                        req = params["select"] + eval(php_string(" from $central_table where $main_field = $id"))
                         cursor.execute(req)
                         res = cursor.fetchone()
-                        out = cursor[0]     # TODO : out = mysql_result(res,0,0);
+                        if res :
+                            out = str(res[0])
                         text +=(out);
 
                     elif "function" in params :
@@ -10281,15 +10342,18 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                         if (extension == ".rtf") :      # corriger les fins de ligne, car \n est sans effet en Rtf et on perd les fins de ligne
                             text[0] = text[0].replace("\n", "\\\n")
 
-                        #  TODO : mettre en paramètre le choix de l'encodage ?
-                        # si on ne met rien, ça sort en utf8. Or RTF ne supporte pas directement utf8, ça s'affiche en utf8
+                        #  RTF ne supporte pas directement l'utf8
+                        # Les caractères non reconnus par cp1252 sont remplacés par leur code xml, écrit : &#xxx;
+                        # on remplace &# par \u, ce qui donne un code rtf valide pour unicode : \uxxx
 
                         try :
                             text2 = text[0].encode("cp1252")
                             f1.write(text2)
                         except :
-                            text2 = text[0].encode("utf8")
+                            text2 = text[0].encode("cp1252", "xmlcharrefreplace")
+                            text2 = text2.replace("&#", r"\u")
                             f1.write(text2)
+
 
 
 
@@ -11366,7 +11430,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             alert(_("You cannot overwrite your existing database.\nAborting"))
             return
 
-        try :                       
+        try :
             output = zipfile.ZipFile(filename_u, "w", zipfile.ZIP_DEFLATED)
             db_filename = os.path.split(db_file)[1]
             output.write(db_file, db_filename)
@@ -11559,7 +11623,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         self.montrer("s_aboutdialog1",3);
 
     def montrer(self, widget, mode = 0, resize = 0) :
-
+        # debug : resize était à 0. Ce mécanisme ne marche pas. Il devrait faire que le redimentionnement n'ait
+        #           lieu que la première fois, afin qu'ensuite si on redimentionne à l'intérieur d'une session
+        #       ce soit conservé. Avec 1, chaque fois qu'on ferme et rouvre, la taille enregistrée est rétablie.
+        #       Le plus simple serait de faire ce redimentionnement
         if isinstance(widget, str) :
             name = widget;
         else :
@@ -11596,24 +11663,20 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             self.arw[window].present();
 
 
-            win=self.arw[window].window;
-            # get the GdkWindow
+            win=self.arw[window].window;        # get the GdkWindow
 
-            if resize == 1 :
-                if 'position' in config['ini'] :
-                    if window in config['ini']['position'] :
-                        h = config['ini']['position'][window]["h"];
-                        w = config['ini']['position'][window]["w"];
-                        x = config['ini']['position'][window]["x"];
-                        y = config['ini']['position'][window]["y"];
-
-                        if win :
-                            win.move_resize(x, y, w, h);
-                            if mode == 3 :
-                                win.set_keep_above(True);
-
-
-                        #win.present();
+##            if resize == 1 :
+##                if 'position' in config['ini'] :
+##                    if window in config['ini']['position'] :
+##                        h = config['ini']['position'][window]["h"];
+##                        w = config['ini']['position'][window]["w"];
+##                        x = config['ini']['position'][window]["x"];
+##                        y = config['ini']['position'][window]["y"];
+##
+##                        if win :
+##                            win.move_resize(x, y, w, h);
+##                            if mode == 3 :
+##                                win.set_keep_above(True);
 
 
         """
@@ -11687,6 +11750,33 @@ class utilities () :
             return message_s
 
 
+    @staticmethod
+    def dict_or_OrdDict_to_formatted_str(OD, mode='dict', s="", indent=' '*4, level=0):
+        def is_number(s):
+            try:
+                float(s)
+                return True
+            except ValueError:
+                return False
+        def fstr(s):
+            return s if is_number(s) else '"%s"'%s
+        if mode != 'dict':
+            kv_tpl = '("%s", %s)'
+            ST = 'OrderedDict([\n'; END = '])'
+        else:
+            kv_tpl = '"%s": %s'
+            ST = '{\n'; END = '}'
+        for i,k in enumerate(OD.keys()):
+            if type(OD[k]) in [dict, OrderedDict]:
+                level += 1
+                s += (level-1)*indent+kv_tpl%(k,ST+utilities.dict_or_OrdDict_to_formatted_str(OD[k], mode=mode, indent=indent, level=level)+(level-1)*indent+END)
+                level -= 1
+            else:
+                s += level*indent+kv_tpl%(k,fstr(OD[k]))
+            if i!=len(OD)-1:
+                s += ","
+            s += "\n"
+        return s
 
 
 
@@ -12222,7 +12312,7 @@ if __name__ == '__main__' :
                 configname_u = unicode2(configname_s)
 
         tmp_u = unicode2(os.path.abspath("./"))
-        configdir_u = os.path.join(tmp_u, u"config", configname_u)        
+        configdir_u = os.path.join(tmp_u, u"config", configname_u)
 
 
         # Load plugins
@@ -12290,7 +12380,7 @@ if __name__ == '__main__' :
                 db_file_sqlite = os.path.join(configdir_u, configname_u + ".sqlite")
             else :
                 if not os.path.isfile(db_file_sqlite) :
-                    alert("Wrong file name in configuration for sqlite database :\n'%s'\nPlease correct.")
+                    alert(_("Wrong file name in configuration for sqlite database :\n'%s'\nPlease correct." % db_file_sqlite))
                     os.exit(0)
         else :
             db_file_sqlite = os.path.join(configdir_u, configname_u + ".sqlite")
@@ -12322,67 +12412,67 @@ if __name__ == '__main__' :
             (link,cursor,db_structure, db_active_file) = db_utils.load_sqlite(db_file)
             db_active[1] = (link,cursor,db_structure, db_active_file)
 
-        elif db_type == "accdb" :
-
+##        elif db_type == "accdb" :
+##
 ##            if not os.path.isfile(dbfile) :
 ##                pypyodbc.win_create_mdb(dbfile)
 ##                create_table = True
-
-            connection_string = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + db_file
-            #connection_string = 'Driver={Microsoft.ACE.OLEDB.12.0 (*.mdb, *.accdb)};DBQ=' + db_file
-
-            link = pypyodbc.connect(connection_string)
-            cursor = link.cursor()
-            db_structure = {}
-            # TODO !!!!!!!!
-            tables = ["tblArticle",
-                "tblArticleCoAuthor",
-                "tblAuthor",
-                "tblBook",
-                "tblBookCoAuthor",
-                "tblCirculation",
-                "tblCitation",
-                "tblCity",
-                "tblClass",
-                "tblClassification",
-                "tblCountry",
-                "tblDivision",
-                "tblKeyArticle",
-                "tblKeyArticle Query",
-                "tblKeyCitation",
-                "tblKeyCitation Query",
-                "tblKeyWord",
-                "tblKeyWord Query",
-                "tblLanguage",
-                "tblPatron",
-                "tblPeriodical",
-                "tblPeriodical Query",
-                "tblPrefix",
-                "tblPublisher",
-                "tblResponsibility",
-                "tblRoom",
-                "tblSection",
-                "tblSize",
-                "tblState",
-                "tblSubject",
-                "tblSuffix",
-                "tblTheme",
-                "tblTitle",
-                "tblTopic",
-                "zThemes2"]
-
-
-            for table in tables :
-                db_structure[table] = {}
-                req = "select * from " + table
-                try :
-                    cursor.execute(req)
-                    temp1 = cursor.description
-
-                    for line in temp1 :
-                        db_structure[table][line[0]] = line[1]
-                except :
-                    print "Could not find table ", table
+##
+##            connection_string = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=' + db_file
+##            #connection_string = 'Driver={Microsoft.ACE.OLEDB.12.0 (*.mdb, *.accdb)};DBQ=' + db_file
+##
+##            link = pypyodbc.connect(connection_string)
+##            cursor = link.cursor()
+##            db_structure = {}
+##            # TODO !!!!!!!!
+##            tables = ["tblArticle",
+##                "tblArticleCoAuthor",
+##                "tblAuthor",
+##                "tblBook",
+##                "tblBookCoAuthor",
+##                "tblCirculation",
+##                "tblCitation",
+##                "tblCity",
+##                "tblClass",
+##                "tblClassification",
+##                "tblCountry",
+##                "tblDivision",
+##                "tblKeyArticle",
+##                "tblKeyArticle Query",
+##                "tblKeyCitation",
+##                "tblKeyCitation Query",
+##                "tblKeyWord",
+##                "tblKeyWord Query",
+##                "tblLanguage",
+##                "tblPatron",
+##                "tblPeriodical",
+##                "tblPeriodical Query",
+##                "tblPrefix",
+##                "tblPublisher",
+##                "tblResponsibility",
+##                "tblRoom",
+##                "tblSection",
+##                "tblSize",
+##                "tblState",
+##                "tblSubject",
+##                "tblSuffix",
+##                "tblTheme",
+##                "tblTitle",
+##                "tblTopic",
+##                "zThemes2"]
+##
+##
+##            for table in tables :
+##                db_structure[table] = {}
+##                req = "select * from " + table
+##                try :
+##                    cursor.execute(req)
+##                    temp1 = cursor.description
+##
+##                    for line in temp1 :
+##                        db_structure[table][line[0]] = line[1]
+##                except :
+##                    print "Could not find table ", table
 
 
         else :      # mySql

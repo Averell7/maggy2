@@ -22,6 +22,12 @@ Pas entièrement, on sélectionne les résultats utilisés par cette table
 """
 TODO :
 Pour plusieurs champs (par exemple central tables, result), si on modifie à la main au lieu de sélectionner une valeur dans la liste, le changement n'est pas mémorisé.
+Il manque le champ "complement" pour xtabs (search) (voir oraisons, sources)
+quand on crée une config de table périphérique, les champs de base de gateway data (cols, gateway) ne sont pas créés,
+ce qui provoque des erreurs.
+
+Edit : Gateway data est construit avec cols = '' ce qui provoque une erreur dans treeview_add2
+
 
 """
 ###########################################################################
@@ -469,21 +475,21 @@ class ask_for_config:
     def __init__(self) :
         #dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
         self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL, buttons=("OK", 1, "Cancel", 0));
-    	self.combo = gtk.combo_box_new_text();
+        self.combo = gtk.combo_box_new_text();
         temp = glob.glob("config/*");
 
-    	for val in temp :
+        for val in temp :
             if os.path.isdir(val) :
                 dir_name = val[7:]
                 if dir_name[0:1] != "#" :
                     self.combo.append_text(dir_name);
-    	self.combo.set_active(0);
-    	self.dialog.vbox.pack_start(self.combo);
-    	self.dialog.show_all();
+        self.combo.set_active(0);
+        self.dialog.vbox.pack_start(self.combo);
+        self.dialog.show_all();
     def run(self) :
-    	result = self.dialog.run();
-    	reponse = self.combo.get_active_text();
-    	self.dialog.destroy();
+        result = self.dialog.run();
+        reponse = self.combo.get_active_text();
+        self.dialog.destroy();
         return reponse
 
 
@@ -491,15 +497,15 @@ class ask_for_input:
     def __init__(self) :
         #dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
         self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL, buttons=("OK", 1, "Cancel", 0));
-    	self.entry = gtk.Entry();
+        self.entry = gtk.Entry();
 
 
-    	self.dialog.vbox.pack_start(self.entry);
-    	self.dialog.show_all();
+        self.dialog.vbox.pack_start(self.entry);
+        self.dialog.show_all();
     def run(self) :
-    	result = self.dialog.run();
-    	reponse = self.entry.get_text();
-    	self.dialog.destroy();
+        result = self.dialog.run();
+        reponse = self.entry.get_text();
+        self.dialog.destroy();
         return reponse
 
 
@@ -508,18 +514,18 @@ class general_chooser_dialog:
     def __init__(self, data) :
         #dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
         self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL, buttons=("OK", 1, "Cancel", 0));
-    	self.combo = gtk.combo_box_new_text();
+        self.combo = gtk.combo_box_new_text();
 
 
-    	for val in data :
+        for val in data :
             self.combo.append_text(str(val));
-    	self.combo.set_active(0);
-    	self.dialog.vbox.pack_start(self.combo);
-    	self.dialog.show_all();
+        self.combo.set_active(0);
+        self.dialog.vbox.pack_start(self.combo);
+        self.dialog.show_all();
     def run(self) :
-    	result = self.dialog.run();
-    	reponse = self.combo.get_active_text();
-    	self.dialog.destroy();
+        result = self.dialog.run();
+        reponse = self.combo.get_active_text();
+        self.dialog.destroy();
         return reponse
 
 
@@ -1295,6 +1301,7 @@ class Restore(utilities, Treeview_handle) :
             ("database", "pass", ""),
             ("database", "database", ""),
             ("database", "order_field", ""),
+            ("database", "autobackup", ""),
 
             ("database", "sqlite", ""),
 
@@ -1389,8 +1396,12 @@ class Restore(utilities, Treeview_handle) :
 
 
         self.widgets2 = gtk.Builder()
-        self.widgets2.add_from_file(glade_file)
-        arWidgets2 = self.widgets2.get_objects()
+        try :
+            self.widgets2.add_from_file(glade_file)
+            arWidgets2 = self.widgets2.get_objects()
+        except :
+            print "Glade file could not be loaded by gtk.Builder"
+        arWidgets2 = {}
         self.ar_treeview = {}
         self.ar_entry = {}
         self.ar_textview = {}
@@ -1703,7 +1714,7 @@ class Restore(utilities, Treeview_handle) :
         for field in ["width"] :
             if not field in self.config["gateway_data"][name] :
                 self.config["gateway_data"][name][field] = ""
-            self.arw["gateway_data@" + field].set_text(self.config["gateway_data"][name][field])
+            self.arw["gateway_data@" + field].set_text(str(self.config["gateway_data"][name][field]))
 
         self.gateway_details_model.clear()
         v2(self.config["gateway_data"][name],"cols")
@@ -2329,7 +2340,7 @@ class Restore(utilities, Treeview_handle) :
         tempdict = {}
 
         for val in keys :
-            try :
+##            try :
                 # Create first level (list of central tables definitions)
                 data = val
                 central_table = self.config["central"][val]["table"]
@@ -2341,18 +2352,24 @@ class Restore(utilities, Treeview_handle) :
                 keys2 = self.config["peripheral"].keys()
                 keys2.sort()
                 for val2 in keys2 :
-                    if self.config["peripheral"][val2]["central_def"] == val :
-                        periph_id = self.config["peripheral"][val2]["id_type"]
-                        table = "<b>" + self.config["peripheral"][val2]["table"] + "</b> [" + periph_id + "]"
-                        if "gateway" in self.config["peripheral"][val2] :
-                            gateway = self.config["peripheral"][val2]["gateway"] # + " [" + central_id + " / " + periph_id + "]"
+                    if val2 in self.config["peripheral"] :
+                        if "central_def" in self.config["peripheral"][val2] :
+                            if self.config["peripheral"][val2]["central_def"] == val :
+                                periph_id = self.config["peripheral"][val2]["id_type"]
+                                table = "<b>" + self.config["peripheral"][val2]["table"] + "</b> [" + periph_id + "]"
+                                if "gateway" in self.config["peripheral"][val2] :
+                                    gateway = self.config["peripheral"][val2]["gateway"] # + " [" + central_id + " / " + periph_id + "]"
+                                else :
+                                    gateway = ""
+                                if gateway.strip() == "" :
+                                    node2 = config_store.append(node,[table,"blue",3 ,val2]);
+                                else :
+                                    node2 = config_store.append(node,[gateway,"green",2, val2]);
+                                    node3 = config_store.append(node2,[table,"blue",3 ,val2]);
                         else :
-                            gateway = ""
-                        if gateway.strip() == "" :
-                            node2 = config_store.append(node,[table,"blue",3 ,val2]);
-                        else :
-                            node2 = config_store.append(node,[gateway,"green",2, val2]);
-                            node3 = config_store.append(node2,[table,"blue",3 ,val2]);
+                            print "We don't find 'central_def' in peripheral/%s definition" % val2
+                    else :
+                        print "We don't find %s in the peripheral tables definition" % val2
 
                 # Create second level (Words tables)
                 keys3 = self.config["words"].keys()
@@ -2362,9 +2379,9 @@ class Restore(utilities, Treeview_handle) :
                         #periph_id = self.config["words"][val3]["id_type"]
                         table = "<b>" + self.config["words"][val3]["table"] + "</b>"
                         #gateway = self.config["words"][val3]["gateway"] # + " [" + central_id + " / " + periph_id + "]"
-                        node2 = config_store.append(node,[table,"orange",""]);
-            except:
-                    pass    # TODO
+                        node2 = config_store.append(node,[table,"orange",1, ""]);
+##            except:
+##                    print "We got a problem ..."
 
 
 
@@ -2866,11 +2883,11 @@ def find_in_dict(dictionary, string_s) :
                 element = dico[key]
                 if isinstance(element,str) :
                     if element.find(string_s) >= 0 :
-                        message += level + key + "/" + element + "\n"
+                        message += str(level) + str(key) + "/" + str(element) + "\n"
 
             if isinstance(key,str) :
                 if key.find(string_s) >= 0 :
-                    message += level + key + "/\n"
+                    message += str(level) + key + "/\n"
 
     return message
 

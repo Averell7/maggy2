@@ -68,6 +68,8 @@ def get_store_length(store) :
 # retourne l'array des iter d'un store. Pourrait être fait plus simplement en python.
 def array_iter(store) :
 
+    if store == None :
+        return
     iters = []
     i=0
     temp=store.get_iter_first()
@@ -237,7 +239,7 @@ def set_text(widget, text) :
     if type_s == "GtkTextView" :
 
         buf = widget.get_buffer();
-        buf.set_text(text);
+        buf.set_text(str(text));
 
 
     elif (type_s == "GtkEntry" or
@@ -247,17 +249,22 @@ def set_text(widget, text) :
 
     elif type_s == "GtkComboBox" :
         model = widget.get_model();
-        iters = array_iter(model)
-        i = 0
-        for iter1 in iters :
-            data = model.get_value(iter1,0)
-            if text == data :
-                widget.set_active(i)
-            i += 1
+        if model != None :
+            iters = array_iter(model)
+            i = 0
+            for iter1 in iters :
+                data = model.get_value(iter1,0)
+                if text == data :
+                    widget.set_active(i)
+                i += 1
+        else:
+            print "no model for ComboBox %s" % widget.name
 
 
     elif type_s == "GtkComboBoxEntry" :
         entry = widget.get_child()
+        if isinstance(text, int) :
+            text = str(text)
         entry.set_text(text)
 
 

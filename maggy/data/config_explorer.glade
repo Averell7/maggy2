@@ -1046,7 +1046,17 @@
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkCheckButton" id="database@autobackup">
+                            <property name="label" translatable="yes">Automatic backup</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="draw_indicator">True</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                          </packing>
                         </child>
                         <child>
                           <placeholder/>
@@ -3818,7 +3828,7 @@ concat_ws(select ...)</property>
                                   <object class="GtkHBox" id="hbox37">
                                     <property name="visible">True</property>
                                     <child>
-                                      <object class="GtkButton" id="add@xtabs@cols1">
+                                      <object class="GtkButton" id="add@gateway_data@cols">
                                         <property name="label" translatable="yes">Add</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
@@ -3832,7 +3842,7 @@ concat_ws(select ...)</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkButton" id="delete@xtabs@cols1">
+                                      <object class="GtkButton" id="delete@gateway_data@cols">
                                         <property name="label" translatable="yes">Delete</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>

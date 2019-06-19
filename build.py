@@ -83,7 +83,6 @@ except :
 print "\n\n ================ Creating debian package =======================\n\n"
 
 
-
 new_dir = "./maggy2-" + version + "/"
 os.system('sudo alien --generate --scripts ' + rpm_file)
 control_file = new_dir + "debian/control"

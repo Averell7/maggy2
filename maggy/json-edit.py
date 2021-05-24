@@ -277,7 +277,7 @@ class ViewModel(object):
 
     def tree_to_json(self, node_id=''):
         if not node_id:
-            node_id = self.view.treeview.get_children()[0] 
+            node_id = self.view.treeview.get_children()[0]
         type = self.item_type[node_id]
         tree = self.view.treeview
         if type == dict:
@@ -387,22 +387,22 @@ class ViewModel(object):
                 if parent_type == list:
                     menu.entryconfigure(i, state=tkinter.NORMAL)
                 else:
-                    menu.entryconfigure(i, state=tkinter.DISABLED) 
+                    menu.entryconfigure(i, state=tkinter.DISABLED)
             elif state == 4:
                 if parent_type == dict:
                     menu.entryconfigure(i, state=tkinter.NORMAL)
                 else:
-                    menu.entryconfigure(i, state=tkinter.DISABLED) 
+                    menu.entryconfigure(i, state=tkinter.DISABLED)
             elif state == 5:
                 if len(self.view.treeview.get_children(item_id)) > 0 and self.view.treeview.item(item_id,'open') == False:
                     menu.entryconfigure(i, state=tkinter.NORMAL)
                 else:
-                    menu.entryconfigure(i, state=tkinter.DISABLED) 
+                    menu.entryconfigure(i, state=tkinter.DISABLED)
             elif state == 6:
                 if len(self.view.treeview.get_children(item_id)) > 0 and self.view.treeview.item(item_id,'open'):
                     menu.entryconfigure(i, state=tkinter.NORMAL)
                 else:
-                    menu.entryconfigure(i, state=tkinter.DISABLED) 
+                    menu.entryconfigure(i, state=tkinter.DISABLED)
 
     def move_selected(self, offset):
         selected = self.selected()

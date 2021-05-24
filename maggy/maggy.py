@@ -12162,6 +12162,15 @@ def save_settings(widget = "") :
 
         global settings, config;
 
+        # Backup configuration in JSON
+        if os.path.exists(os.path.join(configdir_u, 'config.json')):
+            with open(os.path.join(configdir_u, 'config.json'), 'r') as f:
+                json_data = json.load(f)
+
+            if json_data:
+                with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
+                    f.write(json.dumps(OrderedDict(json_data), indent=3))
+
         #création d'un backup.
         # procédure un peu lourde mais qui évite l'enfer des " pour les commandes shell
         f1 = open(os.path.join(configdir_u, u"config.py"), "r")
@@ -12177,6 +12186,9 @@ def save_settings(widget = "") :
         f3 = open(os.path.join(configdir_u,u"config.py"),"w")
         f3.write(data1)
         f3.close()
+
+        with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
+            f.write(json.dumps(OrderedDict(config), indent=3))
 
 
 
@@ -12437,11 +12449,18 @@ if __name__ == '__main__' :
         # convert file
         # TODO : pas fini
         # magutils.php_array_to_py("config.php", "config.py")
-        f1 = open(os.path.join(configdir_u, "config.py"), "r")
-        data = f1.read()
-        f1.close()
+        #if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
+        #    # Load configuration via JSON
+        #    with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
+        #        config = json.load(f)
+        if False:
+            """"""
+        else:
+            f1 = open(os.path.join(configdir_u, "config.py"), "r")
+            data = f1.read()
+            f1.close()
+            config = eval(data)
 
-        config = eval(data)
         v2(config,"ini","input")
         v2(config,"lists")
         v2(config,"ini",'output')

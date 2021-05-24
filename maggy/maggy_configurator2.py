@@ -84,8 +84,11 @@ import datetime
 Windows = "ntx"
 osname = os.name
 
-
-#
+# python path
+if osname == "nt":
+    python_path = "c:/prog2/python27/python27.exe"
+else:
+    python_path = "python"
 
 
 def explode(separator, data):
@@ -2434,7 +2437,7 @@ class Restore(utilities, Treeview_handle):
 
     def advance_tab_switch_page(self, widget, page, page_num):
         """Handler for Advance tag switching"""
-        if page_num == 1:
+        if page_num == 0:
             # If the config page is loaded, load json-edit program
             json_path = os.path.join('./config', configname_u, 'config.json')
             if not os.path.exists(json_path):
@@ -2444,8 +2447,23 @@ class Restore(utilities, Treeview_handle):
 
             json_edit = os.path.join(os.path.dirname(__file__), 'json-edit.py')
             subprocess.call(
-                ['python', json_edit, json_path],
+                [python_path, json_edit, json_path],
             )
+
+    def advance_config_editor_clicked(self, widget):             
+        # load json-edit program
+        json_path = os.path.join('./config', configname_u, 'config.json')
+        if not os.path.exists(json_path):
+            # Create the json file
+            with open(json_path, 'w') as f:
+                f.write(json.dumps(OrderedDict(self.config), indent=3))
+
+        json_edit = os.path.join(os.path.dirname(__file__), 'json-edit.py')
+        subprocess.call(
+            [python_path, json_edit, json_path],
+        )
+
+
 
     def hide_options(self):
         self.arw['options'].hide()

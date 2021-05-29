@@ -13,6 +13,8 @@ def convert_if_unicode(value):
 def fix_encoding(items):
     result = {}
     for key, value in items:
+        if key.isdigit():
+            key = int(key)
         result[convert_if_unicode(key)] = convert_if_unicode(value)
     return result
 

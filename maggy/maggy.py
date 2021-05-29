@@ -12170,7 +12170,7 @@ def save_settings(widget = "") :
 
             if json_data:
                 with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
-                    f.write(json.dumps(OrderedDict(json_data), indent=3, encoding=json_decoder.encoding))
+                    f.write(json.dumps(json_data, indent=3, encoding=json_decoder.encoding, sort_keys=True))
 
         #création d'un backup.
         # procédure un peu lourde mais qui évite l'enfer des " pour les commandes shell
@@ -12189,7 +12189,7 @@ def save_settings(widget = "") :
         f3.close()
 
         with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
-            f.write(json.dumps(OrderedDict(config), indent=3, encoding=json_decoder.encoding))
+            f.write(json.dumps(OrderedDict(config), indent=3, encoding=json_decoder.encoding, sort_keys=True))
 
 
 

@@ -1,13 +1,23 @@
 import json
 
+encoding = 'utf-8'
+
+
+def convert_if_unicode(value):
+    if isinstance(value, unicode):
+        return value.encode(encoding)
+    else:
+        return value
+
+
+def fix_encoding(items):
+    result = {}
+    for key, value in items:
+        result[convert_if_unicode(key)] = convert_if_unicode(value)
+    return result
+
 
 class StringJSONDecoder(json.JSONDecoder):
-    def __init__(self):
-        json.JSONDecoder.__init__(self)
-
-    def default(self, o):
-        obj = json.JSONDecoder.decode(self, o)
-        if isinstance(obj, unicode):
-            return obj.decode()
-        else:
-            return obj
+    def __init__(self, **kwargs):
+        kwargs['object_pairs_hook'] = fix_encoding
+        json.JSONDecoder.__init__(self, **kwargs)

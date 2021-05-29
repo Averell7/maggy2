@@ -3,6 +3,9 @@
 # Simple JSON editor that allows strings to be edited with embedded new lines
 from __future__ import generators, unicode_literals, print_function
 import sys
+
+import json_decoder
+
 if sys.version_info[0] < 3:
     str = unicode
     import Tkinter as tkinter
@@ -47,7 +50,7 @@ class Model(object):
             filename = self.filename
         with open(filename, 'w') as file:
             json.dump(self.object, file, sort_keys=True, indent=4,
-            separators=(',', ': '))
+                separators=(',', ': '), encoding=json_decoder.encoding)
         self.filename = filename
 
 

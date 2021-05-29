@@ -22,6 +22,8 @@ import json
 import subprocess
 from collections import OrderedDict
 
+import json_decoder
+
 """
 TODO :
 Pour plusieurs champs (par exemple central tables, result), si on modifie à la main au lieu de sélectionner une valeur dans la liste, le changement n'est pas mémorisé.
@@ -951,7 +953,7 @@ class Restore(utilities, Treeview_handle):
         if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
             # Load configuration via JSON
             with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
-                self.load_ini(json_data=json.load(f))
+                self.load_ini(json_data=json.load(f, cls=json_decoder.StringJSONDecoder))
         else:
             # Load configuration via python file
             myinifile = os.path.join("./config", configname_u, "config.py")
@@ -1265,11 +1267,11 @@ class Restore(utilities, Treeview_handle):
         # Backup configuration in JSON
         if os.path.exists(os.path.join(configdir_u, 'config.json')):
             with open(os.path.join(configdir_u, 'config.json'), 'r') as f:
-                json_data = json.load(f)
+                json_data = json.load(f, cls=json_decoder.StringJSONDecoder)
 
             if json_data:
                 with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
-                    f.write(json.dumps(OrderedDict(json_data), indent=3))
+                    f.write(json.dumps(OrderedDict(json_data), indent=3, encoding=json_decoder.encoding))
 
         # crÃ©ation d'un backup.
         # procÃ©dure un peu lourde mais qui Ã©vite l'enfer des " pour les commandes shell
@@ -1290,7 +1292,7 @@ class Restore(utilities, Treeview_handle):
         f3.close()
 
         with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
-            f.write(json.dumps(OrderedDict(self.config), indent=3))
+            f.write(json.dumps(OrderedDict(self.config), indent=3, encoding=json_decoder.encoding))
 
     def update_settings(self, widget):
 
@@ -1586,6 +1588,8 @@ class Restore(utilities, Treeview_handle):
 
         sel = widget.get_selection()
         model, iter1 = sel.get_selected()
+        if not iter1:
+            return
         name = model.get_value(iter1, 0)
         self.search_active = name  # memorize the name, it will be used by update_field and treeview_add
         for field in ["table_def", "result_def", "details_def",
@@ -1610,9 +1614,9 @@ class Restore(utilities, Treeview_handle):
 
         sel = widget.get_selection()
         model, iter1 = sel.get_selected()
-        name = model.get_value(iter1, 0)
         if not iter1:
             return
+        name = model.get_value(iter1, 0)
         self.gateway_active = name  # memorize the name, it will be used by update_field and treeview_add
         for field in ["width"]:
             if not field in self.config["gateway_data"][name]:
@@ -2440,7 +2444,7 @@ class Restore(utilities, Treeview_handle):
             if not os.path.exists(json_path):
                 # Create the json file
                 with open(json_path, 'w') as f:
-                    f.write(json.dumps(OrderedDict(self.config), indent=3))
+                    f.write(json.dumps(OrderedDict(self.config), indent=3, encoding=json_decoder.encoding))
 
             json_edit = os.path.join(os.path.dirname(__file__), 'json-edit.py')
             subprocess.call(

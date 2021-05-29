@@ -7,6 +7,7 @@
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
+import json_decoder
 
 maggy_version = "2.0.0.52"
 print "Maggy Version : ", maggy_version
@@ -12165,11 +12166,11 @@ def save_settings(widget = "") :
         # Backup configuration in JSON
         if os.path.exists(os.path.join(configdir_u, 'config.json')):
             with open(os.path.join(configdir_u, 'config.json'), 'r') as f:
-                json_data = json.load(f)
+                json_data = json.load(f, cls=json_decoder.StringJSONDecoder)
 
             if json_data:
                 with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
-                    f.write(json.dumps(OrderedDict(json_data), indent=3))
+                    f.write(json.dumps(OrderedDict(json_data), indent=3, encoding=json_decoder.encoding))
 
         #création d'un backup.
         # procédure un peu lourde mais qui évite l'enfer des " pour les commandes shell
@@ -12188,7 +12189,7 @@ def save_settings(widget = "") :
         f3.close()
 
         with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
-            f.write(json.dumps(OrderedDict(config), indent=3))
+            f.write(json.dumps(OrderedDict(config), indent=3, encoding=json_decoder.encoding))
 
 
 
@@ -12449,12 +12450,10 @@ if __name__ == '__main__' :
         # convert file
         # TODO : pas fini
         # magutils.php_array_to_py("config.php", "config.py")
-        #if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
-        #    # Load configuration via JSON
-        #    with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
-        #        config = json.load(f)
-        if False:
-            """"""
+        if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
+            # Load configuration via JSON
+            with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
+                config = json.load(f, cls=json_decoder.StringJSONDecoder)
         else:
             f1 = open(os.path.join(configdir_u, "config.py"), "r")
             data = f1.read()

@@ -21,8 +21,6 @@ def fix_encoding(items):
         if key.isdigit():
             key = int(key)
         result[convert_if_unicode(key)] = convert_if_unicode(value)
-        if key == 'gateway_fields':
-            print(value, convert_if_unicode(value))
     return result
 
 

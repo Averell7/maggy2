@@ -4,7 +4,12 @@ encoding = 'utf-8'
 
 
 def convert_if_unicode(value):
-    if isinstance(value, unicode):
+    if isinstance(value, list):
+        values = []
+        for v in value:
+            values.append(convert_if_unicode(v))
+        return values
+    elif isinstance(value, unicode):
         return value.encode(encoding)
     else:
         return value
@@ -16,6 +21,8 @@ def fix_encoding(items):
         if key.isdigit():
             key = int(key)
         result[convert_if_unicode(key)] = convert_if_unicode(value)
+        if key == 'gateway_fields':
+            print(value, convert_if_unicode(value))
     return result
 
 

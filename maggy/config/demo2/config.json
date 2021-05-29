@@ -1,0 +1,1566 @@
+{
+   "xtabs": {
+      "collections2": {
+         "complement": "", 
+         "peripheral_table": "collections", 
+         "cols": {
+            "0": {
+               "field": "collection", 
+               "title": "Collection", 
+               "detail": "nom9", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "annotation", 
+               "title": "Annotation", 
+               "detail": "annotation9", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "2": {
+               "field": "#", 
+               "title": "", 
+               "detail": "", 
+               "width": "40", 
+               "options": ""
+            }
+         }, 
+         "table_def": "collections", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "collections2", 
+         "config_name": "collections2", 
+         "details_def": "normal", 
+         "entry": "sp_type_collections", 
+         "treeview": "sp_collections", 
+         "type": "list", 
+         "options": "n"
+      }, 
+      "words2": {
+         "complement": "", 
+         "peripheral_table": "mots", 
+         "cols": {
+            "0": {
+               "field": "id_mot"
+            }, 
+            "1": {
+               "field": "mot", 
+               "width": "150", 
+               "title": "Mot"
+            }, 
+            "2": {
+               "field": "#i_titre", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Titre"
+            }, 
+            "3": {
+               "field": "#i_complement", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Compl\u00e9ment"
+            }, 
+            "4": {
+               "field": "#i_traduction", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Traduction"
+            }, 
+            "5": {
+               "field": "#i_contenu", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Contenu"
+            }, 
+            "6": {
+               "field": "#i_remarques", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Remarques"
+            }
+         }, 
+         "table_def": "mots", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "words2", 
+         "config_name": "words2", 
+         "details_def": "normal", 
+         "entry": "sp_type_words", 
+         "treeview": "sp_words", 
+         "type": "list", 
+         "options": "n"
+      }, 
+      "themes_list": {
+         "complement": "and theme not like \"**%\"", 
+         "peripheral_table": "themes", 
+         "cols": {
+            "0": {
+               "field": "theme", 
+               "title": "Chartreuse", 
+               "detail": "nom7", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "#", 
+               "width": "30", 
+               "title": "Compte"
+            }, 
+            "2": {
+               "field": "observations", 
+               "title": "", 
+               "detail": "observations7", 
+               "width": "", 
+               "options": ""
+            }, 
+            "3": {
+               "field": "renvoi", 
+               "title": "", 
+               "detail": "renvoi7", 
+               "width": "", 
+               "options": ""
+            }, 
+            "4": {
+               "field": "notes", 
+               "title": "Notes", 
+               "detail": "notes7", 
+               "width": "100", 
+               "options": ""
+            }
+         }, 
+         "table_def": "themes", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "themes_list", 
+         "config_name": "themes_list", 
+         "details_def": "normal", 
+         "entry": "tapez7", 
+         "treeview": "clist7", 
+         "type": "list", 
+         "options": "r=3,n"
+      }, 
+      "chartreuses": {
+         "complement": "", 
+         "peripheral_table": "chartreuses", 
+         "cols": {
+            "0": {
+               "field": "chartreuse", 
+               "title": "Chartreusexx", 
+               "detail": "nom5", 
+               "width": "150", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "renvoi", 
+               "title": "", 
+               "detail": "renvoi5", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "2": {
+               "field": "historique", 
+               "title": "Historique", 
+               "detail": "historique5", 
+               "width": "", 
+               "options": ""
+            }, 
+            "3": {
+               "field": "#", 
+               "title": "", 
+               "detail": "", 
+               "width": "40", 
+               "options": ""
+            }
+         }, 
+         "table_def": "chartreuses", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "chartreuses", 
+         "config_name": "chartreuses", 
+         "details_def": "normal", 
+         "entry": "tapez5", 
+         "treeview": "clist5", 
+         "type": "list", 
+         "options": "r=1;n"
+      }, 
+      "langues2": {
+         "complement": "", 
+         "peripheral_table": "langues", 
+         "cols": {
+            "0": {
+               "field": "langue", 
+               "title": "Langue", 
+               "detail": "nom6", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "commentaire", 
+               "title": "Commentaire", 
+               "detail": "commentaire6", 
+               "width": "100", 
+               "options": ""
+            }, 
+            "2": {
+               "field": "#", 
+               "title": "", 
+               "detail": "", 
+               "width": "40", 
+               "options": ""
+            }
+         }, 
+         "table_def": "langues", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "langues2", 
+         "config_name": "langues2", 
+         "details_def": "normal", 
+         "entry": "sp_type_language", 
+         "treeview": "sp_language", 
+         "type": "list", 
+         "options": ""
+      }, 
+      "themes_tree2": {
+         "complement": "", 
+         "peripheral_table": "themes", 
+         "cols": {
+            "0": {
+               "field": "theme", 
+               "width": "400", 
+               "detail": "nom1", 
+               "title": "Langue"
+            }, 
+            "1": {
+               "field": "#", 
+               "width": "50", 
+               "title": "Compte"
+            }, 
+            "2": {
+               "field": "observations", 
+               "width": "", 
+               "detail": "observations1", 
+               "title": ""
+            }, 
+            "3": {
+               "field": "couleur", 
+               "title": "", 
+               "detail": "", 
+               "width": "", 
+               "options": ""
+            }
+         }, 
+         "table_def": "themes", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "themes_tree2", 
+         "config_name": "themes_tree2", 
+         "details_def": "normal", 
+         "entry": "", 
+         "treeview": "sp_themes_tree", 
+         "type": "tree", 
+         "options": "c=couleur;"
+      }, 
+      "words": {
+         "complement": "", 
+         "peripheral_table": "mots", 
+         "cols": {
+            "0": {
+               "field": "id_mot"
+            }, 
+            "1": {
+               "field": "mot", 
+               "width": "150", 
+               "title": "Mot"
+            }, 
+            "2": {
+               "field": "#i_titre", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Titre"
+            }, 
+            "3": {
+               "field": "#i_complement", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Compl\u00e9ment"
+            }, 
+            "4": {
+               "field": "#i_traduction", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Traduction"
+            }, 
+            "5": {
+               "field": "#i_contenu", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Contenu"
+            }, 
+            "6": {
+               "field": "#i_remarques", 
+               "width": "50", 
+               "detail": "", 
+               "title": "Remarques"
+            }, 
+            "7": {
+               "field": "#", 
+               "title": "T", 
+               "detail": "", 
+               "width": "50", 
+               "options": ""
+            }
+         }, 
+         "table_def": "mots", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "words", 
+         "config_name": "words", 
+         "details_def": "normal", 
+         "entry": "tapez8", 
+         "treeview": "clist8", 
+         "type": "list", 
+         "options": "n"
+      }, 
+      "persons": {
+         "complement": "", 
+         "peripheral_table": "personnes", 
+         "cols": {
+            "0": {
+               "field": "nom", 
+               "title": "Personne", 
+               "detail": "nom3", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "renvoi", 
+               "detail": "renvoi3"
+            }, 
+            "2": {
+               "field": "presentation", 
+               "title": "Pr\u00e9sentation", 
+               "detail": "presentation3", 
+               "width": "100", 
+               "options": ""
+            }, 
+            "3": {
+               "field": "#i_auteur", 
+               "width": "40", 
+               "title": "A"
+            }, 
+            "4": {
+               "field": "#i_collaborateur", 
+               "width": "40", 
+               "title": "C"
+            }, 
+            "5": {
+               "field": "#i_biographie", 
+               "width": "40", 
+               "title": "B"
+            }, 
+            "6": {
+               "field": "#i_vedette", 
+               "width": "40", 
+               "title": "V"
+            }, 
+            "7": {
+               "field": "#", 
+               "width": "40", 
+               "title": "T"
+            }
+         }, 
+         "table_def": "personnesx", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": {
+            "0": {
+               "field": "i_data_complete", 
+               "checkbox": "check_pers_all", 
+               "name": "tout"
+            }, 
+            "1": {
+               "field": "i_auteur", 
+               "checkbox": "check_pers_auteur", 
+               "name": "auteur"
+            }, 
+            "2": {
+               "field": "i_biographie", 
+               "checkbox": "check_pers_bio", 
+               "name": "biographie"
+            }, 
+            "3": {
+               "field": "i_vedette", 
+               "checkbox": "check_pers_etude", 
+               "name": "\u00e9tude"
+            }, 
+            "4": {
+               "field": "i_collaborateur", 
+               "checkbox": "check_pers_coll", 
+               "name": "collaborateur"
+            }
+         }, 
+         "name": "persons", 
+         "config_name": "persons", 
+         "details_def": "normal", 
+         "entry": "tapez3", 
+         "treeview": "clist3", 
+         "type": "list", 
+         "options": "r=renvoi,n"
+      }, 
+      "chartreuses2": {
+         "complement": "", 
+         "peripheral_table": "chartreuses", 
+         "cols": {
+            "0": {
+               "field": "chartreuse", 
+               "title": "Chartreuse", 
+               "detail": "nom5", 
+               "width": "150", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "renvoi", 
+               "title": "", 
+               "detail": "renvoi5", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "2": {
+               "field": "historique", 
+               "title": "Historique", 
+               "detail": "historique5", 
+               "width": "", 
+               "options": ""
+            }, 
+            "3": {
+               "field": "#", 
+               "title": "", 
+               "detail": "", 
+               "width": "40", 
+               "options": ""
+            }
+         }, 
+         "table_def": "chartreuses", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "chartreuses2", 
+         "config_name": "chartreuses2", 
+         "details_def": "normal", 
+         "entry": "sp_type_chartreuses", 
+         "treeview": "sp_chartreuses", 
+         "type": "list", 
+         "options": "r=1;"
+      }, 
+      "themes_list2": {
+         "complement": "and theme not like \"**%\"", 
+         "peripheral_table": "themes", 
+         "cols": {
+            "0": {
+               "field": "theme", 
+               "width": "250", 
+               "detail": "themes_name", 
+               "title": "Chartreuse"
+            }, 
+            "1": {
+               "field": "#", 
+               "width": "30", 
+               "title": "Compte"
+            }, 
+            "2": {
+               "field": "observations", 
+               "width": "", 
+               "detail": "themes_observations", 
+               "title": ""
+            }, 
+            "3": {
+               "field": "renvoi", 
+               "width": "", 
+               "detail": "themes_renvoi", 
+               "title": ""
+            }, 
+            "4": {
+               "field": "notes", 
+               "width": "100", 
+               "detail": "themes_notes", 
+               "title": "Notes"
+            }
+         }, 
+         "table_def": "themes", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "themes_list2", 
+         "config_name": "themes_list2", 
+         "details_def": "normal", 
+         "entry": "sp_type_themes", 
+         "treeview": "sp_themes", 
+         "type": "list", 
+         "options": "r=3,n"
+      }, 
+      "themes_tree": {
+         "complement": "", 
+         "peripheral_table": "themes", 
+         "cols": {
+            "0": {
+               "field": "theme", 
+               "width": "400", 
+               "detail": "nom1", 
+               "title": "Langue"
+            }, 
+            "1": {
+               "field": "#", 
+               "width": "50", 
+               "title": "Compte"
+            }, 
+            "2": {
+               "field": "observations", 
+               "width": "", 
+               "detail": "observations1", 
+               "title": ""
+            }, 
+            "3": {
+               "field": "couleur", 
+               "title": "", 
+               "detail": "", 
+               "width": "", 
+               "options": ""
+            }
+         }, 
+         "table_def": "themes", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "themes_tree", 
+         "config_name": "themes_tree", 
+         "details_def": "normal", 
+         "entry": "", 
+         "treeview": "clist1", 
+         "type": "tree", 
+         "options": "c=couleur;"
+      }, 
+      "collections": {
+         "complement": "", 
+         "peripheral_table": "collections", 
+         "cols": {
+            "0": {
+               "field": "collection", 
+               "title": "Collection", 
+               "detail": "nom9", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "annotation", 
+               "title": "Annotation", 
+               "detail": "annotation9", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "2": {
+               "field": "#", 
+               "title": "", 
+               "detail": "", 
+               "width": "40", 
+               "options": ""
+            }
+         }, 
+         "table_def": "collections", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "collections", 
+         "config_name": "collections", 
+         "details_def": "normal", 
+         "entry": "tapez9", 
+         "treeview": "clist9", 
+         "type": "list", 
+         "options": "n"
+      }, 
+      "persons2": {
+         "complement": "", 
+         "peripheral_table": "personnes", 
+         "cols": {
+            "0": {
+               "field": "nom", 
+               "width": "250", 
+               "detail": "person_name", 
+               "title": "Personne"
+            }, 
+            "1": {
+               "field": "renvoi", 
+               "detail": "renvoi3"
+            }, 
+            "2": {
+               "field": "presentation", 
+               "width": "100", 
+               "detail": "person_presentation", 
+               "title": "Pr\u00e9sentation"
+            }, 
+            "3": {
+               "field": "#i_auteur", 
+               "width": "40", 
+               "title": "A"
+            }, 
+            "4": {
+               "field": "#i_collaborateur", 
+               "width": "40", 
+               "title": "C"
+            }, 
+            "5": {
+               "field": "#i_biographie", 
+               "width": "40", 
+               "title": "B"
+            }, 
+            "6": {
+               "field": "#i_vedette", 
+               "width": "40", 
+               "title": "V"
+            }, 
+            "7": {
+               "field": "#", 
+               "width": "40", 
+               "title": "T"
+            }
+         }, 
+         "table_def": "personnesx", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "persons2", 
+         "config_name": "persons2", 
+         "details_def": "normal", 
+         "entry": "sp_type_persons", 
+         "treeview": "sp_persons", 
+         "type": "list", 
+         "options": "r=renvoi,n"
+      }, 
+      "langues": {
+         "complement": "", 
+         "peripheral_table": "langues", 
+         "cols": {
+            "0": {
+               "field": "langue", 
+               "title": "Langue", 
+               "detail": "nom6", 
+               "width": "250", 
+               "options": ""
+            }, 
+            "1": {
+               "field": "commentaire", 
+               "title": "Commentaire", 
+               "detail": "commentaire6", 
+               "width": "100", 
+               "options": ""
+            }, 
+            "2": {
+               "field": "#", 
+               "title": "#", 
+               "detail": "", 
+               "width": "40", 
+               "options": ""
+            }
+         }, 
+         "table_def": "langues", 
+         "result_def": "complete", 
+         "central_table": "complete", 
+         "check": null, 
+         "name": "langues", 
+         "config_name": "langues", 
+         "details_def": "normal", 
+         "entry": "tapez6", 
+         "treeview": "clist6", 
+         "type": "list", 
+         "options": ""
+      }
+   }, 
+   "popup": {
+      "chartreuses": {
+         "query": "", 
+         "code": "[historique]", 
+         "type": "text", 
+         "condition": "select chartreuse from chartreuses where historique is not null", 
+         "table_def": "chartreuses"
+      }, 
+      "photo": {
+         "query": "images", 
+         "code": "", 
+         "type": "photo", 
+         "condition": ""
+      }, 
+      "personnes": {
+         "query": "", 
+         "code": "[presentation]", 
+         "type": "text", 
+         "condition": "select nom from personnes where presentation is not null", 
+         "table_def": "personnesx"
+      }
+   }, 
+   "periph_tables": {
+      "0": "personnes", 
+      "1": "chartreuses", 
+      "2": "langues", 
+      "3": "themes", 
+      "4": "mots", 
+      "5": "requetes"
+   }, 
+   "peripheral": {
+      "themes": {
+         "central_def": "completex", 
+         "table_type": "peripheral2", 
+         "main_field": "theme", 
+         "cols": null, 
+         "id_type": "id_theme", 
+         "table": "themes", 
+         "gateway": "sujet", 
+         "info": null, 
+         "config_name": "themes", 
+         "search_lists": "clist7", 
+         "gateway_fields": []
+      }, 
+      "s_predef_queries": {
+         "central_def": {}, 
+         "table_type": "peripheral1", 
+         "main_field": "nom", 
+         "cols": null, 
+         "edit tab": "", 
+         "id_type": "id_requete", 
+         "table": "requetes", 
+         "gateway": "", 
+         "config_name": "s_predef_queries", 
+         "edit": "", 
+         "id_main": ""
+      }, 
+      "personnesx": {
+         "central_def": "completex", 
+         "table_type": "peripheral2", 
+         "main_field": "nom", 
+         "cols": {
+            "0": {
+               "width": "120"
+            }, 
+            "1": {
+               "field": "fonction", 
+               "type": "list", 
+               "width": "60", 
+               "title": "fonction"
+            }, 
+            "2": {
+               "field": "anonyme", 
+               "type": "list", 
+               "width": "25", 
+               "title": "anonyme"
+            }
+         }, 
+         "id_type": "id_personne", 
+         "table": "personnes", 
+         "gateway": "concerne", 
+         "info": null, 
+         "config_name": "personnesx", 
+         "search_lists": "clist3", 
+         "gateway_fields": [
+            "fonction", 
+            "anonyme"
+         ]
+      }, 
+      "chartreuses": {
+         "central_def": "completex", 
+         "table_type": "peripheral2", 
+         "main_field": "chartreuse", 
+         "cols": "", 
+         "id_type": "id_chartreuse", 
+         "table": "chartreuses", 
+         "gateway": "maison", 
+         "info": "", 
+         "config_name": "chartreuses", 
+         "search_lists": "clist5", 
+         "gateway_fields": []
+      }, 
+      "collections": {
+         "central_def": "completex", 
+         "table_type": "peripheral2", 
+         "main_field": "collection", 
+         "cols": "", 
+         "id_type": "id_collection", 
+         "table": "collections", 
+         "gateway": "serie", 
+         "info": "", 
+         "config_name": "collections", 
+         "search_lists": "sp_collections", 
+         "gateway_fields": [
+            "numero"
+         ]
+      }, 
+      "langues": {
+         "central_def": "completex", 
+         "table_type": "peripheral2", 
+         "main_field": "langue", 
+         "cols": null, 
+         "id_type": "id_langue", 
+         "table": "langues", 
+         "gateway": "parle", 
+         "info": null, 
+         "config_name": "langues", 
+         "search_lists": "sp_language", 
+         "gateway_fields": []
+      }
+   }, 
+   "edit_lists": {
+      "test1": {
+         "periph_def": "personnesx", 
+         "width": "200", 
+         "cols": {
+            "0": {
+               "field": "fonction", 
+               "width": "100", 
+               "title": "fonction"
+            }
+         }, 
+         "details": "[presentation]"
+      }
+   }, 
+   "ini": {
+      "position": {
+         "s_window0": {
+            "y": -4, 
+            "h": 671, 
+            "w": 1024, 
+            "x": -4
+         }, 
+         "s_options": {
+            "y": 100, 
+            "h": 600, 
+            "w": 800, 
+            "x": 197
+         }, 
+         "s_requetes": {
+            "y": 100, 
+            "h": 514, 
+            "w": 730, 
+            "x": 181
+         }, 
+         "s_columns": {
+            "y": 233, 
+            "h": 391, 
+            "w": 158, 
+            "x": 1084
+         }, 
+         "s_window": {
+            "y": -8, 
+            "h": 746, 
+            "w": 1275, 
+            "x": 83
+         }, 
+         "s_combine": {
+            "y": 176, 
+            "h": 420, 
+            "w": 392, 
+            "x": 176
+         }, 
+         "window1": {
+            "y": -4, 
+            "h": 671, 
+            "w": 1024, 
+            "x": -4
+         }, 
+         "window0": {
+            "y": 0, 
+            "h": 602, 
+            "w": 51, 
+            "x": 0
+         }, 
+         "s_tri": {
+            "y": 75, 
+            "h": 484, 
+            "w": 342, 
+            "x": 161
+         }, 
+         "null": {
+            "y": 101, 
+            "h": 582, 
+            "w": 277, 
+            "x": 842
+         }, 
+         "s_history": {
+            "y": 286, 
+            "h": 251, 
+            "w": 467, 
+            "x": 528
+         }
+      }, 
+      "database": {
+         "sqlite": "", 
+         "order_field": "ordre", 
+         "modified_field": "datemodification", 
+         "mysql": "C:\\Prog2\\Mysql\\Mysql corrige", 
+         "main_field": null, 
+         "deleted_records": "fichessuppr", 
+         "host": "192.168.1.4", 
+         "user": "dysmas", 
+         "pass": "", 
+         "central_table": null, 
+         "from": null, 
+         "database": "maggy", 
+         "autobackup": ""
+      }, 
+      "zoom2": {
+         "y": 742, 
+         "h": 144, 
+         "w": 1008, 
+         "x": 8
+      }, 
+      "input": {
+         "field_indicator": "@", 
+         "container": null, 
+         "separator": "#"
+      }, 
+      "gui": {
+         "start_tab": "2", 
+         "language": null
+      }, 
+      "zoom1": {
+         "y": 0, 
+         "h": 644, 
+         "w": 990, 
+         "x": 0
+      }, 
+      "Hpaned": {
+         "hpaned9": 623, 
+         "hpaned8": 747, 
+         "hpaned10": 494, 
+         "hpaned1": 446, 
+         "s_hpaned4": 302, 
+         "hpaned3": 481, 
+         "hpaned5": 690, 
+         "s_vpaned1": 398, 
+         "hpaned7": 454, 
+         "hpaned6": 623
+      }, 
+      "lists": {
+         "type_delay": "1000", 
+         "font": "Arial", 
+         "font_size": "10", 
+         "line_height": "18", 
+         "max_lines": "150"
+      }, 
+      "output": {
+         "field_separator": " ;"
+      }
+   }, 
+   "words": {
+      "mots": {
+         "config_name": "mots", 
+         "id_type": "id_mot", 
+         "table": "mots", 
+         "fields": {
+            "0": {
+               "field": "titre"
+            }, 
+            "1": {
+               "field": "remarques"
+            }, 
+            "2": {
+               "field": "traduction"
+            }, 
+            "3": {
+               "field": "sous_titre"
+            }, 
+            "4": {
+               "field": "complement"
+            }
+         }, 
+         "central_def": "completex", 
+         "Exclude": "", 
+         "table_type": "words", 
+         "main_field": "mot"
+      }
+   }, 
+   "inversion": {
+      "collaborateur": {
+         "content": "", 
+         "table_def": "personnesx", 
+         "invert_field": "i_collaborateur", 
+         "condition": "fonction like \"collaborateur%\"", 
+         "central_field": "collaborateur"
+      }, 
+      "vedette": {
+         "content": "", 
+         "table_def": "personnesx", 
+         "invert_field": "i_vedette", 
+         "condition": "fonction like \"vedette%\"", 
+         "central_field": "vedette"
+      }, 
+      "biographie": {
+         "content": "", 
+         "table_def": "personnesx", 
+         "invert_field": "i_biographie", 
+         "condition": "fonction like \"biographie%\"", 
+         "central_field": "biographie"
+      }, 
+      "auteur": {
+         "content": "", 
+         "table_def": "personnesx", 
+         "invert_field": "i_auteur", 
+         "condition": "fonction like \"auteur%\"", 
+         "central_field": "auteur"
+      }
+   }, 
+   "central": {
+      "completex": {
+         "edit tab": "1", 
+         "id_main": "id_livre", 
+         "from": "complete     ", 
+         "details": "normal", 
+         "words": "mots,", 
+         "edit": "vbox_saisie1", 
+         "table": "complete", 
+         "cols": {}, 
+         "result": "complete"
+      }
+   }, 
+   "gateway_data": {
+      "chartreuses": {
+         "width": "", 
+         "cols": {}, 
+         "gateway": {}
+      }, 
+      "themes": {
+         "cols": {}, 
+         "gateway": {}
+      }, 
+      "collections": {
+         "cols": {
+            "0": {
+               "field": "numero", 
+               "type": "list", 
+               "width": 80, 
+               "title": "Num\u00e9ro"
+            }
+         }, 
+         "gateway": "serie"
+      }, 
+      "personnes": {
+         "width": "200", 
+         "cols": {
+            "0": {
+               "field": "fonction", 
+               "type": "list", 
+               "width": "150", 
+               "title": "fonction"
+            }, 
+            "1": {
+               "field": "anonyme", 
+               "type": "list", 
+               "width": "80", 
+               "title": "Ano"
+            }
+         }, 
+         "gateway": "concerne"
+      }, 
+      "langues": {
+         "cols": {}, 
+         "gateway": {}
+      }
+   }, 
+   "combobox": {
+      "notes": {
+         "combobox": "combo_notes", 
+         "group": "cotes", 
+         "query": "select distinct notes from complete"
+      }, 
+      "Local": {
+         "combobox": "combo_localisation", 
+         "query": "select distinct localisation from complete", 
+         "group": "cotes", 
+         "entry": ""
+      }, 
+      "section": {
+         "combobox": "combo_section", 
+         "query": "select distinct section from complete", 
+         "group": "cotes", 
+         "entry": ""
+      }, 
+      "num\u00e9ro": {
+         "combobox": "entry_num", 
+         "group": "cotes"
+      }, 
+      "format": {
+         "combobox": "combo_format", 
+         "query": "select distinct format from complete", 
+         "group": "cotes", 
+         "entry": ""
+      }
+   }, 
+   "version": 2001, 
+   "details": {
+      "normal": {
+         "container": "vbox2", 
+         "details_tab": "1"
+      }
+   }, 
+   "print": {
+      "texte pur": {
+         "code": "[section] [num] [format]\t[auteur, after=;] [titre] [date]  ", 
+         "after": "", 
+         "type": "", 
+         "extension": "", 
+         "before": ""
+      }, 
+      "fiche compl\u00e8te html": {
+         "code": "    <tr>       <td colspan=\"1\" rowspan=\"2\">[section]<br> [num] <font size=\"-2\">[exposant]<br>       </font>[format]</td>       <td>[g_personnes]</td>     </tr>     <tr>       <td>[titre, after=<br> ][sous_titre, after =<br> ][complement,after=<br> ]<br>       </td>     </tr>     <tr>       <td colspan=\"2\" rowspan=\"1\">[lieu], [editeur], [date], [volumes] vol.,&nbsp; [pages] ,&nbsp;&nbsp; [hauteur] ,&nbsp;&nbsp;&nbsp; [illustrations]</td>     </tr>     <tr>       <td colspan=\"2\" rowspan=\"1\">[traduction, after=<br> ][contenu, after=<br> ][remarques]</td>     </tr> ", 
+         "after": "  </tbody> </table> <br> </body> </html> ", 
+         "type": "", 
+         "extension": "html  ", 
+         "before": "<html> <head>   <meta content=\"text/html; charset=UTF-8\"  http-equiv=\"content-type\">   <title>fiches completes</title> </head> <body> <table style=\"text-align: left; width: 100%;\" border=\"1\"  cellpadding=\"2\" cellspacing=\"2\">   <tbody> "
+      }, 
+      "test rtf": {
+         "code": "\\trowd\\trgaph70\\cellx1500\\cellx5000\\cellx11000\\cellx12000\\cellx13500\\cellx15000 \\pard\\intbl [section] [num] [format]\\cell [auteur]\\cell [titre]\\cell \\cell \\cell [siecle] \\cell \\pard\\intbl\\row\\pard ", 
+         "after": "}        ", 
+         "type": "", 
+         "extension": "rtf", 
+         "before": "{\\rtf1 "
+      }
+   }, 
+   "result": {
+      "complete_aut_ord": {
+         "sort": {
+            "0": {
+               "sort1": "auteur", 
+               "sort2": "titre__etc", 
+               "name": "si\u00e8cle nd"
+            }, 
+            "1": {
+               "name": "tri_cote"
+            }, 
+            "2": {
+               "sort1": "titre__etc", 
+               "sort2": "ann\u00e9e dn", 
+               "name": "auteur"
+            }, 
+            "3": {
+               "sort1": "ann\u00e9e nd", 
+               "sort2": "id_livre", 
+               "name": "titre__etc"
+            }, 
+            "4": {
+               "sort1": "auteur", 
+               "sort2": "titre__etc", 
+               "name": "ann\u00e9e nd"
+            }, 
+            "5": null
+         }, 
+         "from": "complete         left join concerne c1 on (complete.id_livre=c1.id_livre and c1.fonction='auteur') left join personnes p1 using (id_personne)  ", 
+         "cols": {
+            "0": {
+               "field": "complete.id_livre", 
+               "width": 40, 
+               "visible": 0
+            }, 
+            "1": {
+               "alias": "", 
+               "width": "80", 
+               "visible": "1", 
+               "options": "", 
+               "field": "section"
+            }, 
+            "2": {
+               "field": "section", 
+               "width": 20, 
+               "visible": 0
+            }, 
+            "3": {
+               "field": "num", 
+               "width": 40, 
+               "visible": 0
+            }, 
+            "4": {
+               "field": "exposant", 
+               "width": 25, 
+               "visible": 0
+            }, 
+            "5": {
+               "field": "format", 
+               "width": 20, 
+               "visible": 0
+            }, 
+            "6": {
+               "field": "notes", 
+               "width": 40, 
+               "visible": 1
+            }, 
+            "7": {
+               "field": "localisation as local", 
+               "width": 25, 
+               "visible": 1
+            }, 
+            "8": {
+               "field": "group_concat(distinct p1.nom) as auteur", 
+               "width": 280, 
+               "visible": 1
+            }, 
+            "9": {
+               "field": "titre", 
+               "width": 100, 
+               "visible": 0
+            }, 
+            "10": {
+               "field": "sous_titre", 
+               "width": 50, 
+               "visible": 0
+            }, 
+            "11": {
+               "field": "complement", 
+               "width": 50, 
+               "visible": 0
+            }, 
+            "12": {
+               "field": "titre", 
+               "width": 750, 
+               "visible": 1
+            }, 
+            "13": {
+               "field": "traduction", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "14": {
+               "field": "collaborateur", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "15": {
+               "field": "vedette", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "16": {
+               "field": "biographie", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "17": {
+               "field": "complete.lieu", 
+               "width": 40, 
+               "visible": 0
+            }, 
+            "18": {
+               "field": "editeur as \u00e9diteur", 
+               "width": 40, 
+               "visible": 1
+            }, 
+            "19": {
+               "field": "annee", 
+               "width": 20, 
+               "visible": 0
+            }, 
+            "20": {
+               "field": "volumes", 
+               "width": 40, 
+               "visible": 0
+            }, 
+            "21": {
+               "field": "pages", 
+               "width": 40, 
+               "visible": 0
+            }, 
+            "22": {
+               "field": "hauteur", 
+               "width": 40, 
+               "visible": 0
+            }, 
+            "23": {
+               "field": "illustrations", 
+               "width": 70, 
+               "visible": 0
+            }, 
+            "24": {
+               "field": "langue", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "25": {
+               "field": "theme as th\u00e8me", 
+               "width": 100, 
+               "visible": 0
+            }, 
+            "26": {
+               "field": "chartreuse", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "27": {
+               "field": "contenu", 
+               "width": 200, 
+               "visible": 0
+            }, 
+            "28": {
+               "field": "complete.remarques", 
+               "width": 100, 
+               "visible": 0
+            }, 
+            "29": {
+               "field": "erreur", 
+               "width": 50, 
+               "visible": 0
+            }, 
+            "30": {
+               "field": "temp as temporaire", 
+               "width": 100, 
+               "visible": 0
+            }, 
+            "31": {
+               "field": "date", 
+               "width": 30, 
+               "visible": 0
+            }, 
+            "32": {
+               "field": "annee as ann\u00e9e", 
+               "width": 20, 
+               "visible": 0
+            }, 
+            "33": {
+               "field": "siecle as si\u00e8cle", 
+               "width": 30, 
+               "visible": 0
+            }, 
+            "34": {
+               "field": "tri_cote", 
+               "width": 70, 
+               "visible": 0
+            }, 
+            "35": {
+               "field": "compteur", 
+               "width": 70, 
+               "visible": 0
+            }, 
+            "36": {
+               "field": "datemodification", 
+               "width": 10, 
+               "visible": 0
+            }
+         }
+      }, 
+      "complete": {
+         "sort": null, 
+         "from": "complete", 
+         "cols": {
+            "0": {
+               "field": "complete.id_livre", 
+               "width": "40", 
+               "visible": "0", 
+               "options": "", 
+               "title": "id_livre"
+            }, 
+            "1": {
+               "field": "section", 
+               "title": "sectionx", 
+               "visible": "1", 
+               "alias": "", 
+               "width": "80", 
+               "options": "pango"
+            }, 
+            "2": {
+               "field": "numero", 
+               "width": 70, 
+               "visible": "1", 
+               "options": "", 
+               "title": "numero"
+            }, 
+            "3": {
+               "field": "exposant", 
+               "width": "40", 
+               "visible": "0", 
+               "options": "", 
+               "title": "exposant"
+            }, 
+            "4": {
+               "field": "notes", 
+               "title": "notes", 
+               "visible": "1", 
+               "alias": "", 
+               "width": "80", 
+               "options": ""
+            }, 
+            "5": {
+               "field": "localisation as local", 
+               "width": "25", 
+               "visible": "0", 
+               "options": "", 
+               "title": "local"
+            }, 
+            "6": {
+               "field": "g_personnes", 
+               "width": "280", 
+               "visible": "1", 
+               "options": "", 
+               "title": "personnes"
+            }, 
+            "7": {
+               "field": "titre", 
+               "title": "titre", 
+               "visible": "1", 
+               "alias": "", 
+               "width": "500", 
+               "options": ""
+            }, 
+            "8": {
+               "field": "traduction", 
+               "width": 200, 
+               "visible": 0, 
+               "options": "", 
+               "title": "traduction"
+            }, 
+            "9": {
+               "field": "collaborateur", 
+               "width": 200, 
+               "visible": 0, 
+               "options": "", 
+               "title": "collaborateur"
+            }, 
+            "10": {
+               "field": "vedette", 
+               "width": 200, 
+               "visible": 0, 
+               "options": "", 
+               "title": "vedette"
+            }, 
+            "11": {
+               "field": "biographie", 
+               "width": 200, 
+               "visible": 0, 
+               "options": "", 
+               "title": "biographie"
+            }, 
+            "12": {
+               "field": "lieu", 
+               "title": "lieu", 
+               "visible": 0, 
+               "alias": "", 
+               "width": 30, 
+               "options": ""
+            }, 
+            "13": {
+               "field": "editeur as \u00e9diteur", 
+               "width": 40, 
+               "visible": 0, 
+               "options": "", 
+               "title": "\u00e9diteur"
+            }, 
+            "14": {
+               "field": "annee", 
+               "title": "annee", 
+               "visible": "1", 
+               "alias": "", 
+               "width": "80", 
+               "options": ""
+            }, 
+            "15": {
+               "field": "volumes", 
+               "title": "volumes", 
+               "visible": "0", 
+               "alias": "", 
+               "width": "30", 
+               "options": ""
+            }, 
+            "16": {
+               "field": "pages", 
+               "width": 20, 
+               "visible": 0, 
+               "options": "", 
+               "title": "pages"
+            }, 
+            "17": {
+               "field": "illustrations", 
+               "width": 40, 
+               "visible": 0, 
+               "options": "", 
+               "title": "illustrations"
+            }, 
+            "18": {
+               "field": "hauteur", 
+               "width": 40, 
+               "visible": 0, 
+               "options": "", 
+               "title": "hauteur"
+            }, 
+            "19": {
+               "field": "g_langues as langues", 
+               "title": "langues", 
+               "visible": "0", 
+               "alias": "", 
+               "width": "40", 
+               "options": ""
+            }, 
+            "20": {
+               "field": "g_themes", 
+               "title": "th\u00e8me", 
+               "visible": "0", 
+               "alias": "", 
+               "width": "70", 
+               "options": ""
+            }, 
+            "21": {
+               "field": "g_chartreuses", 
+               "title": "chartreuses", 
+               "visible": "0", 
+               "alias": "", 
+               "width": "200", 
+               "options": ""
+            }, 
+            "22": {
+               "field": "contenu", 
+               "width": 100, 
+               "visible": 0, 
+               "options": "", 
+               "title": "contenu"
+            }, 
+            "23": {
+               "field": "remarques", 
+               "width": "40", 
+               "visible": "1", 
+               "options": "", 
+               "title": "remarques"
+            }, 
+            "25": {
+               "field": "format", 
+               "title": "ann\u00e9e", 
+               "visible": 0, 
+               "alias": "", 
+               "width": 50, 
+               "options": ""
+            }, 
+            "27": {
+               "field": "format", 
+               "width": "20", 
+               "visible": "1", 
+               "options": "", 
+               "title": "format"
+            }, 
+            "28": {
+               "field": "siecle as si\u00e8cle", 
+               "title": "si\u00e8cle", 
+               "visible": 0, 
+               "alias": "siecle = si\u00e8cle", 
+               "width": 30, 
+               "options": ""
+            }, 
+            "29": {
+               "field": "datemodification", 
+               "width": 70, 
+               "visible": 0, 
+               "options": "", 
+               "title": "datemodification"
+            }, 
+            "30": {}
+         }
+      }
+   }
+}

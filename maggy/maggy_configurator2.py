@@ -1,5 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
+
+# Version 2.1.0.2   - May 2021
 # Version 2.0.0.48  - April 2016
 # Version 2.0.0     - Averell - GTK GUI - May 17th, 2012
 # Version 1.9.6     - Gaston - Sept 03th, 2011 - Cosmetic enhancements (title, background color)
@@ -1276,15 +1278,17 @@ class Restore(utilities, Treeview_handle):
                 with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
                     f.write(json.dumps(OrderedDict(json_data), indent=3, encoding=json_decoder.encoding))
 
-        # crÃ©ation d'un backup.
-        # procÃ©dure un peu lourde mais qui Ã©vite l'enfer des " pour les commandes shell
-        f1 = open(os.path.join(configdir_u, "config.py"), "r")
-        backup = f1.read()
-        f1.close()
 
-        f2 = open(os.path.join(configdir_u, "config.bak"), "w")
-        f2.write(backup)
-        f2.close()
+        # Backup configuration in config.py
+        # procÃ©dure un peu lourde mais qui Ã©vite l'enfer des " pour les commandes shell
+        if os.path.exists(os.path.join(configdir_u, 'config.py')):
+            f1 = open(os.path.join(configdir_u, "config.py"), "r")
+            backup = f1.read()
+            f1.close()
+
+            f2 = open(os.path.join(configdir_u, "config.bak"), "w")
+            f2.write(backup)
+            f2.close()
 
         pp = pprint.PrettyPrinter(indent=4, width=100)
         out = pp.pformat(self.config)

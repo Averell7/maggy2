@@ -3559,6 +3559,7 @@ concat_ws(select ...)</property>
                                   <object class="GtkTextView" id="result@from">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+				    <property name="wrap_mode">word</property>
                                     <signal name="key-release-event" handler="entry_update" swapped="no"/>
                                   </object>
                                 </child>

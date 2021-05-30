@@ -2924,7 +2924,7 @@ concat_ws(select ...)</property>
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkEntry" id="xtabs@details_def1">
+                                          <object class="GtkEntry" id="checkbox@name">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="editable">False</property>
@@ -2942,7 +2942,7 @@ concat_ws(select ...)</property>
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkEntry" id="xtabs@result_def1">
+                                          <object class="GtkEntry" id="checkbox@checkbox">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">●</property>
@@ -2950,6 +2950,7 @@ concat_ws(select ...)</property>
                                             <property name="secondary_icon_activatable">False</property>
                                             <property name="primary_icon_sensitive">True</property>
                                             <property name="secondary_icon_sensitive">True</property>
+                                            <signal name="button-press-event" handler="general_chooser" swapped="no"/>
                                           </object>
                                           <packing>
                                             <property name="left_attach">1</property>
@@ -2966,7 +2967,7 @@ concat_ws(select ...)</property>
                                           </object>
                                         </child>
                                         <child>
-                                          <object class="GtkEntry" id="xtabs@table_def1">
+                                          <object class="GtkEntry" id="checkbox@field">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">●</property>
@@ -2974,6 +2975,7 @@ concat_ws(select ...)</property>
                                             <property name="secondary_icon_activatable">False</property>
                                             <property name="primary_icon_sensitive">True</property>
                                             <property name="secondary_icon_sensitive">True</property>
+                                            <signal name="button-press-event" handler="general_chooser" swapped="no"/>
                                           </object>
                                           <packing>
                                             <property name="left_attach">1</property>

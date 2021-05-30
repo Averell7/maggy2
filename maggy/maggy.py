@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
+# version 2.1.0 - mai 2021
 # Version 2.0.0 build 52  16 janvier 2016
 
 
@@ -9,7 +10,7 @@
 ###########################################################################
 import json_decoder
 
-maggy_version = "2.0.0.52"
+maggy_version = "2.1.0.2"
 print "Maggy Version : ", maggy_version
 """
 In this version :
@@ -1091,16 +1092,22 @@ class Import_csv :
 
     def insert_in_concerne(self, mydata, fonction) :
 
+        print len(mydata)
+        i = 0
         for data1 in mydata :
+            i += 1
+            if i % 10 == 0:
+                print ".",
             auteur = data1[1]
             id_livre = data1[0]
             if auteur :
                 auteur = auteur.encode("utf8")
-                sep = auteur.split(";")
+                separator  = config["ini"]["output"]["field_separator"]
+                sep = auteur.split(separator)
                 for myauteur in sep :
                     myauteur = myauteur.strip()
                     myauteur = myauteur.replace("'", "''")
-                    query = "select id_personne from personnes where nom like '%" + myauteur + "%' "
+                    query = "select id_personne from personnes where nom like '" + myauteur + "' "
                     try :
                         cursor.execute(query)
                         result = cursor.fetchone()
@@ -1118,13 +1125,15 @@ class Import_csv :
                             query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, fonction)
                             #print query
                             cursor.execute(query)
-                            #print ".",
-                            link.commit()
+                            if i % 100 == 0:
+                                print i,
+
 
                         else :
                             print "This should not happen. myauteur is : ", myauteur
                     except Exception as error:
                         print("Didn't work:", error)
+        link.commit()
 
 
 
@@ -1274,6 +1283,12 @@ class db_utilities :
     # connexion à  la base de données
     # If a proper sqlite file is found, load it
 
+    @staticmethod
+    def sqlite_escape_quotes(string):
+        value = string.replace("'", "''")        # escape single quotes
+        value = value.replace('"', '""')        # escape double quotes
+        return value
+
 
     def load_sqlite(self, db_file_s) :
 
@@ -1291,7 +1306,7 @@ class db_utilities :
 
         link.create_collation("france", extension.collate)
         link.create_function("regexp", 2, extension.regexp)
-        link.create_function("like", 2, extension.like)
+        #link.create_function("like", 2, extension.like)
         link.create_function("concat_ws", -1, extension.concat_ws)
         link.create_function("clean_commas", 1, extension.clean_commas)
         link.create_function("date2year", 1, extension.date2year)
@@ -1525,44 +1540,68 @@ class db_utilities :
 
 
 class explode_db :
+    # this version works in sqlite only
     def __init__(self) :
-        pass
+        global config, separaor
+        self.separator  = config["ini"]["output"]["field_separator"]
+
+    @staticmethod
+    def escape_quotes(string):
+        value = string.replace("'", "''")        # escape single quotes
+        value = value.replace('"', '""')        # escape double quotes
+        return value
 
     def explode_insert_in_concerne(self, list_noms, fonction) :
+        print "insert in concerne : %d records" % len(list_noms)
+        i = 0
         for data in list_noms :
-            auteur = data[1]
+            i += 1
+            if i % 100 == 0:
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                print i,
+            auteur = data[1].encode("utf-8")
+            auteur = self.escape_quotes(auteur)
             id_livre = data[0]
             if auteur == None :
                 return
-            sep = auteur.split(";")
+            sep = auteur.split(self.separator)
             for myauteur in sep :
+                if myauteur.strip() == "":
+                    continue
                 myauteur = myauteur.strip()
-                myauteur = myauteur.replace("'", "''")
                 # try if there is an exact match
                 query = "select id_personne, nom from personnes where nom like '" + myauteur + "' "       # TODO generic (et en dessous)
                 cursor.execute(query)
                 result = cursor.fetchone()
                 if result :
                     id_personne = result[0]
-                    query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, fonction)
-                    cursor.execute(query)
+                    myfonction = self.escape_quotes(fonction).encode("utf-8")
+                    query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, myfonction)
+                    #print query
+                    try:
+                        cursor.execute(query)
+                    except:
+                        print "Error for query :", query
+
                 else :
                     query = "select id_personne, nom from personnes where nom like '%" + myauteur + "%' "       # TODO generic (et en dessous)
                     choice = None
                     cursor.execute(query)
                     result = cursor.fetchall()
-                    dialog = mag.arw["s_import_dialog"]
-                    treeview = mag.arw["s_import_treeview2"]
-                    mag.arw["s_import_label"].set_text(myauteur)
-                    model = treeview.get_model()
-                    model.clear()
-                    for row in result :
-                        model.append([str(row[0]), str(row[1])])
+##                    dialog = mag.arw["s_import_dialog"]
+##                    treeview = mag.arw["s_import_treeview2"]
+##                    mag.arw["s_import_label"].set_text(myauteur)
+##                    model = treeview.get_model()
+##                    model.clear()
+##                    for row in result :
+##                        model.append([str(row[0]), str(row[1])])
 
 
 
 
-                    choice = dialog.run()
+##                    choice = dialog.run()
+                    choice = 2
 
                     if choice == 1 :
                         id_personne = get_sel_row_data(treeview, 0, 0)
@@ -1579,34 +1618,41 @@ class explode_db :
                     else :
                         continue
 
-
-                    query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, fonction)
-
+                    myfonction = self.escape_quotes(fonction).encode("utf-8")
+                    query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, myfonction)
+                    #print query
                     cursor.execute(query)
-                    link.commit()
+                    #
                     # update central
                     query = "select nom from personnes where id_personne =" + str(id_personne)
                     cursor.execute(query)
                     result = cursor.fetchone()
-                    selected_name = result[0]
-                    query = "update complete set auteur = '%s' where id_livre = %s" % (selected_name, id_livre)
+                    selected_name = self.escape_quotes(result[0])
+                    query = "update complete set auteur = '%s' where id_livre = %s" % (selected_name.encode("utf-8"), id_livre)
                     cursor.execute(query)
-                    dialog.hide();
+##                    dialog.hide();
 
-
+        link.commit()
 ##                except Exception as error:
 ##                    print("Didn't work:", error)
 
 
     def explode_insert_in_chartreuse(self, list_noms) :
+        print "insert in chartreuse : %d records" % len(list_noms)
+        i = 0
         for data in list_noms :
+            i += 1
+            if i % 100 == 0:
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                print i,
             auteur = data[1]
             id_livre = data[0]
-            auteur = auteur.encode("utf8")
-            sep = auteur.split(";")
-            for myauteur in sep :
-                myauteur = myauteur.strip()
-                mychartreuse = myauteur.replace("'", "''")
+            auteur = auteur
+            sep = auteur.split(self.separator)
+            for mychartreuse in sep :
+                mychartreuse = mychartreuse.strip()
+                mychartreuse = mychartreuse.replace("'", "''").encode("utf-8")
                 query = "select id_chartreuse from chartreuses where chartreuse like '%" + mychartreuse + "%' "
                 try :
                     cursor.execute(query)
@@ -1618,21 +1664,28 @@ class explode_db :
 
 
                     else :
-                        print myauteur
+                        print mychartreuse
                 except Exception as error:
                     print("Didn't work:", error)
-
+        link.commit()
 
     def explode_insert_in_collection(self, list_noms) :
+        print "insert in collections : %d records" % len(list_noms)
+        i = 0
         for data in list_noms :
-            auteur = data[1]
+            i += 1
+            if i % 100 == 0:
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                print i,
+            collection = data[1]
             id_livre = data[0]
-            auteur = auteur.encode("utf8")
-            sep = auteur.split(";")
-            for myauteur in sep :
-                myauteur = myauteur.strip()
-                mycollection = myauteur.split(",")[0]  # 1 contient le numéro
-                mycollection = mycollection.replace("'", "''")
+            collection = collection.encode("utf8")
+            sep = collection.split(self.separator)
+            for mycollection in sep :
+                mycollection = mycollection.strip()
+                mycollection = mycollection.split(",")[0]  # 1 contient le numéro
+                mycollection = mycollection.replace("'", "''").encode("utf-8")
                 query = "select id_collection from collections where collection like '%" + mycollection + "%' "
                 try :
                     cursor.execute(query)
@@ -1640,8 +1693,6 @@ class explode_db :
                     if result == None :
                         query = "insert into collections (collection) values ('%s')" % mycollection
                         cursor.execute(query)
-                        link.commit()
-
                         query = "select id_collection from collections where collection like '%" + mycollection + "%' "
                         cursor.execute(query)
                         result = cursor.fetchone()
@@ -1649,22 +1700,28 @@ class explode_db :
                         id_collection = result[0]
                         query = "insert into serie (id_livre, id_collection) values (%s,%s)" % (id_livre, id_collection)
                         cursor.execute(query)
-                        print ".",
 
                     else :
-                        print myauteur
+                        print "\nError for ", mycollection
                 except Exception as error:
-                    print("\nDidn't work:", error)
+                    print "\nDidn't work:", error, "Query was : \n", query
+        link.commit()
 
     def explode_insert_in_theme(self, list_noms) :
+        print "insert in theme : %d records" % len(list_noms)
+        i = 0
         for data in list_noms :
-            auteur = data[1]
+            i += 1
+            if i % 100 == 0:
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                print i,
+            theme = data[1].encode("utf8")
             id_livre = data[0]
-            auteur = auteur.encode("utf8")
-            sep = auteur.split(";")
-            for myauteur in sep :
-                myauteur = myauteur.strip()
-                mytheme = myauteur.replace("'", "''")
+            sep = theme.split(self.separator)
+            for mytheme in sep :
+                mytheme = mytheme.strip()
+                mytheme = mytheme.replace("'", "''")
                 query = "select id_theme from themes where theme like '%" + mytheme + "%' "
                 try :
                     cursor.execute(query)
@@ -1672,7 +1729,6 @@ class explode_db :
                     if result == None :
                         query = "insert into themes (theme) values ('%s')" % mytheme
                         cursor.execute(query)
-                        link.commit()
 
                         query = "select id_theme from themes where theme like '%" + mytheme + "%' "
                         cursor.execute(query)
@@ -1682,38 +1738,53 @@ class explode_db :
                         id_theme = result[0]
                         query = "insert into sujet (id_livre, id_theme) values (%s,%s)" % (id_livre, id_theme)
                         cursor.execute(query)
-                        print ".",
+                        #print ".",
 
                     else :
-                        print myauteur
+                        print "\n ===========> Error for ", mytheme
                 except Exception as error:
-                    print("Didn't work:", error)
+                    print "\nDidn't work:", error, "Query was : \n", query
+        link.commit()
 
 
     def explode_insert_in_langue(self, list_noms) :
+        print "insert in langue : %d records" % len(list_noms)
+        i = 0
         for data in list_noms :
-            auteur = data[1]
+            i += 1
+            if i % 100 == 0:
+                while gtk.events_pending():
+                    gtk.main_iteration()
+                print i,
+            langue = data[1]
             id_livre = data[0]
-            auteur = auteur.encode("utf8")
-            sep = auteur.split(";")
-            for myauteur in sep :
-                myauteur = myauteur.strip()
-                query = "select id_langue from langues where langue like '%" + myauteur + "%' "
+            langue = langue.encode("utf8")
+            sep = langue.split(";")
+            for mylangue in sep :
+                mylangue = mylangue.strip().encode("utf-8")
+                query = "select id_langue from langues where langue like '%" + mylangue + "%' "
                 try :
                     cursor.execute(query)
                     result = cursor.fetchone()
+                    if result == None :
+                        query = "insert into langues (langue) values ('%s')" % mylangue
+                        cursor.execute(query)
+                        query = "select id_langue from langues where langue like '%" + mylangue + "%' "
+                        cursor.execute(query)
+                        result = cursor.fetchone()
                     if result :
                         id_langue = result[0]
                         query = "insert into parle (id_livre, id_langue) values (%s,%s)" % (id_livre, id_langue)
                         cursor.execute(query)
-                        print ".",
+                        #print ".",
 
                     else :
-                        print myauteur
+                        print "\nError for ", mylangue
                 except Exception as error:
-                    print("Didn't work:", error)
+                    print "\nDidn't work:", error, "Query was : \n", query
+        link.commit()
 
-    def explode_full_db(self) :
+    def explode_full_db(self, widget = None) :
 
         query = "select id_livre, auteur, collaborateur, biographie, vedette, theme, chartreuse, collection, langue  from complete"
         cursor.execute(query)
@@ -1741,16 +1812,16 @@ class explode_db :
 
         print ""
         print "auteur"
-        self.insert_in_concerne(self.auteur, "auteur")
+        self.explode_insert_in_concerne(self.auteur, "auteur")
         print ""
         print "collaborateurs"
-        self.insert_in_concerne(self.collaborateur, "collaborateur")
+        self.explode_insert_in_concerne(self.collaborateur, "collaborateur")
         print ""
         print "biographie"
-        self.insert_in_concerne(self.biographie, "biographie")
+        self.explode_insert_in_concerne(self.biographie, "biographie")
         print ""
         print "vedette"
-        self.insert_in_concerne(self.vedette, "vedette")
+        self.explode_insert_in_concerne(self.vedette, "vedette")
 
 
         query = "delete from maison"
@@ -1764,19 +1835,21 @@ class explode_db :
 
         query = "delete from parle"
         cursor.execute(query)
+        link.commit()
 
         print ""
         print "chartreuse"
-        self.insert_in_chartreuse(self.chartreuse)
+        self.explode_insert_in_chartreuse(self.chartreuse)
         print ""
         print "collection"
-        self.insert_in_collection(self.collection)
+        self.explode_insert_in_collection(self.collection)
         print ""
         print "theme"
-        self.insert_in_theme(self.theme)
+        self.explode_insert_in_theme(self.theme)
         print ""
         print "langue"
-        self.insert_in_langue(self.langue)
+        self.explode_insert_in_langue(self.langue)
+        link.commit()
 
 
     def explode_field(self, field, gateway, peripheral) :
@@ -3741,7 +3814,10 @@ class maglist() :
             values[19]=groupe;
             if not db_type == "accdb" :          # TODO : with accdb, error : Row object has no attribute 'keys'
                 if primary_key in fiche.keys() :
-                    values[20]=fiche[primary_key];
+                    try:
+                        values[20]=fiche[primary_key]
+                    except:
+                        print "Error for list, primary_key ", liste, primary_key
             if not db_type == "accdb" :          # TODO : with accdb, error : Row object has no attribute 'keys'
                 if ('i_data_' + central_table) in fiche.keys() :
                     values[21]=fiche['i_data_' + central_table];
@@ -4426,12 +4502,16 @@ class maglist() :
             fiche=data[i];
             values = {};
             values = array_pad(values,24,"");
-            id = fiche[primary_key];
+            try:
+                id = fiche[primary_key];
+            except:
+                print "Error for primary_key ", primary_key
 
             if isset(coldef) :
 
                 for key  in coldef :
                     val = coldef[key ]
+                    key = int(key)
 
                     # todo 00 : optimiser pour accélérer
                     field = val['field'];
@@ -8688,6 +8768,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         global stores, affichage, configdir_u
         self.colonnes_resultat = {}
         self.configdir_u = configdir_u
+        self.separator  = config["ini"]["output"]["field_separator"]
 
         self.colors = {}
         for a in [0, 1, 2, 3, 's_reference'] :
@@ -12397,6 +12478,7 @@ if __name__ == '__main__' :
     t1 = time.time()
 
     mem["elements_req"] = ""
+    mem["update_query"] = 0
 
 
     global selector, utils

@@ -1323,12 +1323,12 @@ class Restore(utilities, Treeview_handle):
         # creates arrays of the objects names
 
         self.widgets2 = gtk.Builder()
+        arWidgets2 = {}
         try:
             self.widgets2.add_from_file(glade_file)
             arWidgets2 = self.widgets2.get_objects()
         except:
             print "Glade file could not be loaded by gtk.Builder"
-        arWidgets2 = {}
         self.ar_treeview = {}
         self.ar_entry = {}
         self.ar_textview = {}
@@ -1346,8 +1346,8 @@ class Restore(utilities, Treeview_handle):
                     self.ar_textview[name] = z
                 if magutils.widget_type(z) == "GtkEntry":
                     self.ar_entry[name] = z
-                if magutils.widget_type(z) == "GtkheckButton":
-                    self.ar_entry[name] = z
+                if magutils.widget_type(z) == "GtkCheckButton" and name.startswith('check'):
+                    self.ar_check[name] = z
                 if magutils.widget_type(z) == "GtkComboBoxEntry":
                     self.ar_comboboxentry[name] = z
 
@@ -1382,6 +1382,8 @@ class Restore(utilities, Treeview_handle):
         db_tree = self.arw["database_tree"]
         sel = db_tree.get_selection()
         model, iter1 = sel.get_selected()
+        if not iter1:
+            return
 
         key2 = model.get_value(iter1, 2)  # level
         key3 = model.get_value(iter1, 3)  # configuration name
@@ -1905,6 +1907,23 @@ class Restore(utilities, Treeview_handle):
             elif widget.name in ["combobox@combobox"]:
                 data = self.ar_comboboxentry.keys()
 
+            elif widget.name == 'checkbox@checkbox':
+                data = self.ar_check.keys()
+
+            elif widget.name == 'checkbox@field':
+                data = []
+                table = None
+                conf = self.arw["xtabs@table_def"].get_text()
+                if conf in self.config['peripheral']:
+                    table = self.config["peripheral"][conf]["table"]
+                elif conf in self.config["words"]:
+                    table = self.config["words"][conf]["table"]
+                else:
+                    # Error in config. Clear the chooser
+                    self.general_chooser(self.arw["treeview5"], data=data)
+
+                if table:
+                    data = table_def[table].keys()
 
             elif widget.name in ["details@container"]:  # list of containers of the tabs of s_notebook3
                 y = self.arw2["s_notebook3"].children()
@@ -1956,6 +1975,12 @@ class Restore(utilities, Treeview_handle):
             elif category_s == "combobox":
                 configuration = self.combobox_active
                 self.config["combobox"][configuration][field_s] = response
+
+            elif category_s == "checkbox":
+                configuration = self.search_active
+                if self.config['xtabs'][configuration]['check'] is None:
+                    self.config['xtabs'][configuration]['check'] = {}
+                self.config['xtabs'][configuration]['check'][field_s] = response
 
             elif category_s == "details":
                 configuration = self.details_active

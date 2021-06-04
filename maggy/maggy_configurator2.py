@@ -25,6 +25,7 @@ import subprocess
 from collections import OrderedDict
 
 import json_decoder
+from tools import nested_dict_search
 
 """
 TODO :
@@ -791,12 +792,24 @@ class Restore(utilities, Treeview_handle):
         view2.set_model(self.model2)
 
         # treeview3 - presently unused
-        self.model3 = gtk.TreeStore(str, str)
         view3 = self.arw['treeview3']
         # view3.set_size_request(400, 620);
-        view3.append_column(gtk.TreeViewColumn('Folders / Files', cell_renderer, text=0))
-        view3.append_column(gtk.TreeViewColumn('Folders / Files', cell_renderer, text=1))
-        view3.set_model(self.model3)
+
+        # Selected
+        bool_renderer = gtk.CellRendererToggle()
+        bool_renderer.connect('toggled', self.toggle_find_name)
+        view3.get_column(0).pack_start(bool_renderer)
+        view3.get_column(0).add_attribute(bool_renderer, 'active', 3)
+
+        # Path
+        text_render = gtk.CellRendererText()
+        text_render.set_property('wrap-width', 200)
+        view3.get_column(1).pack_start(text_render)
+        view3.get_column(1).add_attribute(text_render, 'text', 0)
+
+        # Result
+        view3.get_column(2).pack_start(text_render, expand=True)
+        view3.get_column(2).add_attribute(text_render, 'text', 1)
 
         # Advanced search
         self.model4 = gtk.ListStore(str, str, str, str)
@@ -1572,6 +1585,8 @@ class Restore(utilities, Treeview_handle):
         db_tree = self.arw["details_list"]
         sel = db_tree.get_selection()
         model, iter1 = sel.get_selected()
+        if not iter1:
+            return
 
         key = model.get_value(iter1, 0)  # configuration name
 
@@ -2485,12 +2500,50 @@ class Restore(utilities, Treeview_handle):
         )
 
 
-
     def hide_options(self):
         self.arw['options'].hide()
         self.arw['window1'].hide()
         gtk.main_quit()
 
+
+    def search_names(self, widget=None):
+        name = self.arw['search_names_text'].get_text()
+        name_type = self.arw['replace_names_combo'].get_active()
+        self.search_results = nested_dict_search(self.config, name)
+
+        # Clear the results
+        self.arw['search_results_model'].clear()
+        # column 0 - path
+        # column 1 - result
+        # column 2 - index
+        # column 3 - selected
+
+        for n, result in enumerate(self.search_results):
+            self.arw['search_results_model'].append([
+                '/'.join([str(s) for s in result[0]]),
+                result[1],
+                n,
+                False
+            ])
+
+    def toggle_find_name(self, widget, path):
+        model_iter = self.arw['search_results_model'].get_iter(path)
+        value = self.arw['search_results_model'].get_value(model_iter, 3)
+        self.arw['search_results_model'].set_value(model_iter, 3, not value)
+
+    def replace_names(self, widget):
+        old_name = self.arw['search_names_text'].get_text()
+        new_name = self.arw['replace_name_text'].get_text()
+        for row in self.arw['search_results_model']:
+            if not row[3]:
+                continue
+
+            path = self.search_results[row[2]][0]
+            obj = self.config
+            for p in path[:-1]:
+                obj = obj[p]
+            obj[path[-1]] = obj[path[-1]].replace(old_name, new_name)
+        self.search_names()
 
 
 def readable_repr(data0):

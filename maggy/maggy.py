@@ -10018,7 +10018,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         params = {}
         text = ""
         popups = []
-        #popup_condition = {}
+        popup_condition = {}
 
         field_separator = config['ini']['output']['field_separator'];
 
@@ -10182,14 +10182,14 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             match_end = buffer_copy.get_end_iter();
 
 
-            if isset(popups) :
+            if popups:
                 for val in popups :                                 # traitement des liens
                     start_iter = buffer_copy.get_start_iter();      # rechercher la position dans le buffer
                     (match_start,match_end) = start_iter.forward_search(val[0], 0, None);     # kksou 148
                     buffer_copy.place_cursor(match_end);
                     buffer_copy.delete(match_start,match_end);      # effacer le texte
                     val2 = str_replace(["[","]"],["",""],val[0])
-                    self.ajouter_lien(widget,val2,val[1]);               # remplacer par le lien
+                    self.ajouter_lien(widget,val2,val[1])              # remplacer par le lien
 
 
 
@@ -10213,8 +10213,24 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             print( "popup " + model + " is not configured")
             return
 
+        _nom = nom.strip()
+        _nom = _nom.replace("'", "''")        # échapper les '
+        type1 = config['popup'][model]['type']
+        code = config['popup'][model]['code']
+        table_def = config['popup'][model]['table_def']
+        table = config['peripheral'][table_def]['table']
+        field = periph_tables[table]['main_field']
+        req =  eval(php_string("SELECT * FROM $table WHERE $field = '$_nom'"))
+
         buffer1 = textview.get_buffer();
         iter1 = buffer1.get_iter_at_mark(buffer1.get_insert());
+
+        cursor.execute(req)
+        fiches = cursor.fetchone()
+        (text, popups) = self.parse_code(fiches,code,"")
+        if not text or not text.strip():
+            buffer1.insert(iter1, nom)
+            return
 
         anchor = buffer1.create_child_anchor(iter1);
         iter2 = buffer1.get_iter_at_mark(buffer1.get_insert());
@@ -10230,19 +10246,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             textview.add_child_at_anchor(link_button1,anchor);
 
         # Add tooltip
-        nom = nom.strip()
-        nom = nom.replace("'", "''")        # échapper les '
-        type1 = config['popup'][model]['type'];
-        code = config['popup'][model]['code'];
-        table_def = config['popup'][model]['table_def'];
-        table = config['peripheral'][table_def]['table'];
-        field = periph_tables[table]['main_field'];
-        req =  eval(php_string("SELECT * FROM $table WHERE $field = '$nom'"))
-
-        cursor.execute(req);
-        fiches = cursor.fetchone()
-
-        (text,popups) = self.parse_code(fiches,code,"");
         link_button1.set_tooltip_markup(text)
 
     def on_linkbutton(self, linkbutton, url, model) :

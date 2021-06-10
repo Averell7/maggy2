@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.1.0 - mai 2021
+# version 2.1.0.2 - mai 2021
 # Version 2.0.0 build 52  16 janvier 2016
 
 
@@ -21,7 +21,7 @@ fix bugs in predefined queries interface
 TODO : dans cree_listes : ordre by a été supprimé de la version sqlite. Ce ne serait pas mal de le rétablir
 mais il faudrait le faire aussi dans le configurateur
 
-cnofigurateur : Complement manque
+configurateur : Complement manque
 
 """
 
@@ -34,7 +34,7 @@ Necessary index in the database :
 
 on words tables, an index Unique is necessary on the column of words. Otherwise there will be multiple entries for the same word
 
-
+In peripheral tables, an index is necessary on the main field, otherwise inversion will take a very long time.
 
 """
 
@@ -97,7 +97,7 @@ import pprint
 
 import pygtk
 import gtk
-import gobject
+
 import pango
 import gio          #to inquire mime types information
 
@@ -141,7 +141,6 @@ sys.path.append(os.getenv("PYLIB"))
 
 from ScriptExcept import *
 import time, datetime
-import gobject
 #
 Windows ="ntx"
 osname = os.name
@@ -274,7 +273,9 @@ def sql_error(link, req = "", message = "") :
 
     error_s = utils.printExcept()
     if error_s :
-        alert (message + "\nsql_error : " + req + "\n" + error_s)
+        message2 = message + "\nsql_error : " + req + "\n" + error_s
+        alert(message2)
+        print "Error for : ", message2
     e = sqlite.Error()
 
     # TODO : verify how all this functions
@@ -3553,7 +3554,7 @@ class maglist() :
         # TODO IMPORTANT  sélection des tables de mots
         if not config_table in config['peripheral'] :
             if not config_table in config['words'] :
-                print (_("WARNING : table %s to exist, or information missing for this table") % config_table)
+                print (_("WARNING : table %s does not seem to exist, or information missing for this table") % config_table)
                 return
             else :
                 table = config['words'][config_table]['table'];
@@ -3730,7 +3731,7 @@ class maglist() :
             print "Erreur SQL dans cree_listes"
             sql_error(link,req);
 
-            #return
+            return
 
         result = cursor.fetchall()
         num = len(result)
@@ -5241,10 +5242,10 @@ class maglist() :
                 t1 = time.time()
 
                 # TODO DEBUG !!
-##                try :
-                result = cursor.execute(req1);
-##                except :
-##                    sql_error(link, req1)
+                try :
+                    result = cursor.execute(req1);
+                except :
+                    sql_error(link, req1)
 
                 if db_type == "accdb" :     # Access dose not support group_concat, so we must finish the job...
 
@@ -6097,13 +6098,11 @@ class maglist() :
             sql_error(link,req);
 
 
-
-
-
-
-
     def choisir_affichage(self, display = None, details = None) :
-
+        # this important function updates the "affichage" dictionnary
+        # which will be used to know what are the parameters for the active page
+        # to use to display the data (affichage = display in French)
+        # TODO : this function could be improved.
         global affichage, tris_predefinis, config, d_from, mem, alias;
 
         temp0 = []
@@ -6120,6 +6119,7 @@ class maglist() :
         columns = config['result'][display]['cols'];
         tris_predefinis = config['result'][display]['sort'];
 
+        # TODO : this programming could be improved. What will happen if a parameter is missing ? the lists will not be coherent
         for key in columns :
             z = columns[key]
             if 'field' in z :
@@ -7845,34 +7845,22 @@ class complex_queries :
             mem["combine_active"] = ""
         if mem['combine_active'] != table :
             for  key  in config_info['search_lists']  :
-                val = config_info['search_lists'] [ key ]
+                val = config_info['search_lists'][key]
                 if val['peripheral_table'] == table :
                     listes['combine'].append([val['name'],key,1,1,0,0])
 
-
-
             # critères multiples
             # vérifier la sélection actuelle
-
             central_def = get_text(self.arw['s_central_table_combo'])
-            combi_table = config['central'][central_def]['table']
-            if combi_table == table :
-
-                # si la table est la même
-
-
-                for  z in [1,2,3]  :
-                    listes['combine'].append([_("complex query") + str(z),"s_complex" + str(z),0,1,0,0])
-
-
+            if central_def in config['central']:
+                combi_table = config['central'][central_def]['table']
+                if combi_table == table :
+                    # si la table est la même
+                    for  z in [1,2,3]  :
+                        listes['combine'].append([_("complex query") + str(z),"s_complex" + str(z),0,1,0,0])
 
         mem['combine_active'] = table
-
-
         self.montrer('s_combine',3)
-
-
-
 
 
     def combi_logic_toggled(self, renderer, row, column)  :
@@ -10004,6 +9992,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                             (text,popups) = self.parse_code(f,code,id1, table, field);
 
                             self.detail_text(widget,text,popups);
+                        if hasattr(mag.myfunctions, "after_details") :
+                            mag.myfunctions.after_details(id1)
+
 
 
 

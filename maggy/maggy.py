@@ -4073,7 +4073,7 @@ class maglist() :
     ==============================================================================
     """
 
-    def ok_liste(self, treeview, option = None, dummy = None) :
+    def ok_liste(self, treeview, option = 'combine', dummy = None) :
 
         global mem, config, config_info, popup_saisie, listes, query
         global tab_conversion, periph_tables, treeview_data, affichage;
@@ -4150,11 +4150,13 @@ class maglist() :
 
                 if nom_liste2 in ["s_complex1", "s_complex2", "s_complex3"] :
                     z = substr(nom_liste2,-1);
-                    mem ['critere'.i] = self.lancerRecherche(z)      # s'il s'agit des requêtes complexes, c'est lancerRecherche qui est utilisée
+                    mem ['critere' + str(i)] = self.lancerRecherche(z)      # s'il s'agit des requêtes complexes, c'est lancerRecherche qui est utilisée
 
                 else :                                          # s'il s'agit des listes, la fonction ok_liste_b est utilisée
                     in_liste = self.ok_liste_b(treeview,nom_liste2);
                     mem ['critere' + str(i)] = in_liste
+
+                print(i, mem['critere' + str(i)])
 
                 i+= 1;
 
@@ -7836,31 +7838,42 @@ class complex_queries :
         elif type == "GtkComboBox" :
             table_def = get_text(widget)     # bouton des recherches complexes
             table = config['central'][table_def]['table']
-
         else :
             alert (_("Your button is misconfigured, \nyou must select a list as parameter."))
             return
 
         if not "combine_active" in mem :
-            mem["combine_active"] = ""
-        if mem['combine_active'] != table :
-            for  key  in config_info['search_lists']  :
-                val = config_info['search_lists'][key]
-                if val['peripheral_table'] == table :
-                    listes['combine'].append([val['name'],key,1,1,0,0])
+            mem["combine_active"] = []
 
-            # critères multiples
-            # vérifier la sélection actuelle
-            central_def = get_text(self.arw['s_central_table_combo'])
-            if central_def in config['central']:
-                combi_table = config['central'][central_def]['table']
-                if combi_table == table :
-                    # si la table est la même
-                    for  z in [1,2,3]  :
-                        listes['combine'].append([_("complex query") + str(z),"s_complex" + str(z),0,1,0,0])
+        page = self.arw['s_notebook1'].get_nth_page(self.arw['s_notebook1'].get_current_page())
+        label = self.arw['s_notebook1'].get_tab_label(page)
 
-        mem['combine_active'] = table
-        self.montrer('s_combine',3)
+        if table not in mem['combine_active']:
+            mem['combine_active'].append(table)
+            label.set_markup('<b><span foreground="red">' + label.get_text() + "</span></b>")
+        elif table in mem['combine_active']:
+            mem['combine_active'].remove(table)
+            label.set_markup(label.get_text())
+
+        listes['combine'].clear()
+        for  key  in config_info['search_lists']  :
+            val = config_info['search_lists'][key]
+            if val['peripheral_table'] in mem['combine_active']:
+                listes['combine'].append([val['name'],key,1,1,0,0])
+
+        # critères multiples
+        # vérifier la sélection actuelle
+        central_def = get_text(self.arw['s_central_table_combo'])
+        if central_def in config['central']:
+            combi_table = config['central'][central_def]['table']
+            if combi_table in mem['combine_active']:
+                # si la table est la même
+                for  z in [1,2,3]  :
+                    listes['combine'].append([_("complex query") + str(z),"s_complex" + str(z),0,1,0,0])
+
+        if len(mem['combine_active']) > 1:
+            # Show the dialog if there is more than one active
+            self.montrer('s_combine',3)
 
 
     def combi_logic_toggled(self, renderer, row, column)  :
@@ -8807,7 +8820,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 pass
         self.arw = arw
 
-
         self.widgets.connect_signals(self)
 
         # Build system windows
@@ -9241,7 +9253,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
                         table = periph_config["table"]
                         arTreeView.append( {'config' : val[1], 'table' : table, 'widget' : val[0]})
-                    except :
+                    except:
                         print "Configuration of edit interface %s is probably incomplete" % val[1]
 
 
@@ -9992,7 +10004,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                             (text,popups) = self.parse_code(f,code,id1, table, field);
 
                             self.detail_text(widget,text,popups);
-                        if hasattr(mag.myfunctions, "after_details") :
+                        if hasattr(mag, 'myfunctions') and hasattr(mag.myfunctions, "after_details") :
                             mag.myfunctions.after_details(id1)
 
 

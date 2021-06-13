@@ -760,6 +760,7 @@ class Treeview_handle:
 class Restore(utilities, Treeview_handle):
 
     # parameters :
+    block_signals = False
 
     def __init__(self):
 
@@ -781,6 +782,21 @@ class Restore(utilities, Treeview_handle):
                 pass
 
         self.widgets.connect_signals(self)
+
+        # Create stores for the combo boxes
+        for field in ["table_def", "type", "result_def", "details_def", "treeview", "entry"]:
+            self.arw['xtabs@' + field].set_model(gtk.ListStore(str))
+
+        for field in [
+            'checkbox@field', 'checkbox@checkbox', 'combobox@combobox', 'central@table',
+            'central@id_main', 'central@result', 'central@details', 'central@edit',
+            'peripheral@central_def', 'peripheral@gateway', 'peripheral@linked_field',
+            'peripheral@main_field', 'peripheral@id_type', 'peripheral@table',
+            'inversion@table_def', 'inversion@invert_field', 'inversion@central_field',
+            'details@central_def', 'details@container',
+            'popup@table_def', 'popup@type'
+        ]:
+            self.arw[field].set_model(gtk.ListStore(str))
 
         # Advanced - Treeview for db structure tab
         cell_renderer = gtk.CellRendererText()
@@ -1416,33 +1432,41 @@ class Restore(utilities, Treeview_handle):
 
         self.database_structure_active = [key2, key3]  # used by the function "general_chooser_answer"
 
+        self.block_signals = True
+
         level = key2
         # clear text
-
         for widget in ["central@table",
                        "central@id_main",
                        "central@result",
                        "central@details",
                        "central@edit",
-                       "central@edit_tab",
-                       "central@from",
-
-                       "peripheral@config_name",
                        "peripheral@table",
                        "peripheral@id_type",
                        "peripheral@main_field",
                        "peripheral@gateway",
                        "peripheral@linked_field",
                        "peripheral@central_def"]:
+            self.arw[widget].get_model().clear()
+
+        for widget in [
+                       "central@edit_tab",
+                       "central@from",
+                       "peripheral@config_name"]:
             magutils.set_text(self.arw[widget], "")
 
         if level == 1:  # central table
+            for field in ["table", "id_main", "result", "details", "edit"]:
+                value = None
+                if key3 in self.config["central"]:
+                    if field in self.config["central"][key3]:
+                        value = self.config["central"][key3][field]
+                self.load_chooser_store(
+                    widget=self.arw['central@' + field],
+                    active=value
+                )
+
             for field in [
-                "table",
-                "id_main",
-                "result",
-                "details",
-                "edit",
                 "edit_tab",
                 "from"
             ]:
@@ -1451,12 +1475,20 @@ class Restore(utilities, Treeview_handle):
                         magutils.set_text(self.arw["central@" + field], self.config["central"][key3][field])
 
         elif level > 1:  # peripheral table
-            for field in ["config_name", "table", "id_type",
-                          "main_field", "gateway", "linked_field", "central_def"]:
+            try:
+                self.arw["peripheral@config_name"].set_text(self.config["peripheral"][key3][field])
+            except:
+                pass
+            for field in ["table", "id_type", "main_field", "gateway", "linked_field", "central_def"]:
                 try:
-                    self.arw["peripheral@" + field].set_text(self.config["peripheral"][key3][field])
+                    self.load_chooser_store(
+                        widget=self.arw['peripheral@' + field],
+                        active=self.config["peripheral"][key3][field]
+                    )
                 except:
                     pass
+
+        self.block_signals = False
 
     def show_inversion_details(self, widget):
         # show details when a line of the inversion list is selected
@@ -1464,27 +1496,41 @@ class Restore(utilities, Treeview_handle):
         db_tree = self.arw["inversion_treeview"]
         sel = db_tree.get_selection()
         model, iter1 = sel.get_selected()
+        if not iter1:
+            return
 
         key = model.get_value(iter1, 0)  # configuration name
 
         self.inversion_active = key  # used by the function "general_chooser_answer"
-
+        self.block_signals = True
         for widget in ["inversion@table_def",
                        "inversion@invert_field",
-                       "inversion@central_field",
-                       "inversion@content",
+                       "inversion@central_field"]:
+            self.arw[widget].get_model().clear()
+
+        for widget in ["inversion@content",
                        "inversion@condition"]:
             self.arw[widget].set_text("")
 
         for field in ["table_def",
                       "invert_field",
-                      "central_field",
-                      "content",
-                      "condition",
-                      ]:
+                      "central_field"]:
+            value = None
+            if key in self.config["inversion"]:
+                if field in self.config["inversion"][key]:
+                    value = self.config["inversion"][key][field]
+            self.load_chooser_store(
+                widget=self.arw['inversion@' + field],
+                active=value
+            )
+
+        for field in ["content",
+                      "condition"]:
             if key in self.config["inversion"]:
                 if field in self.config["inversion"][key]:
                     self.arw["inversion@" + field].set_text(self.config["inversion"][key][field])
+
+        self.block_signals = False
 
     def show_combobox_details(self, widget):
         # show details when a line of the combobox list is selected
@@ -1500,17 +1546,22 @@ class Restore(utilities, Treeview_handle):
         self.combobox_active = key  # used by the function "general_chooser_answer"
 
         group = "combobox"
-        fields = ["combobox", "group", "query"]
+        fields = ["group", "query", "combobox"]
 
         for field_s in fields:
-            self.arw[group + "@" + field_s].set_text("")
+            if field_s != "combobox":
+                self.arw[group + "@" + field_s].set_text("")
 
+            text_s = ''
             if key in self.config[group]:
                 if field_s in self.config[group][key]:
                     text_s = self.config[group][key][field_s]
                     if not isinstance(text_s, str):  # migration security
                         text_s = ""
-                    self.arw[group + "@" + field_s].set_text(text_s)
+                    if field_s != "combobox":
+                        self.arw[group + "@" + field_s].set_text(text_s)
+
+            self.load_chooser_store(widget=self.arw['combobox@combobox'], active=text_s)
 
     def show_popup_details(self, widget):
         # show details when a line of the popup list is selected
@@ -1519,13 +1570,32 @@ class Restore(utilities, Treeview_handle):
         sel = db_tree.get_selection()
         model, iter1 = sel.get_selected()
 
+        if not iter1:
+            return
+
         key = model.get_value(iter1, 0)  # configuration name
 
         self.popup_active = key  # used by the function "general_chooser_answer"
 
         group = "popup"
-        fields = ["table_def", "type", "code", "condition", "query"]
 
+        self.block_signals = True
+        for field_s in ["table_def", "type"]:
+            text_s = ''
+
+            if key in self.config[group]:
+                if field_s in self.config[group][key]:
+                    text_s = self.config[group][key][field_s]
+                    if not isinstance(text_s, str):  # migration security
+                        text_s = ""
+            self.load_chooser_store(
+                widget=self.arw[group + "@" + field_s],
+                active=text_s
+            )
+
+        self.block_signals = False
+
+        fields = ["code", "condition", "query"]
         for field_s in fields:
             magutils.set_text(self.arw[group + "@" + field_s], "")
 
@@ -1595,9 +1665,14 @@ class Restore(utilities, Treeview_handle):
         group = "details"
         fields = ["central_def", "container", "details_tab"]
 
+        self.block_signals = True
         for field_s in fields:
-            self.arw[group + "@" + field_s].set_text("")
+            if field_s == 'details_tab':
+                self.arw[group + "@" + field_s].set_text("")
+            else:
+                self.arw[group + '@' + field_s].get_model().clear()
 
+            text_s = ''
             if key in self.config[group]:
                 if field_s in self.config[group][key]:
                     text_s = self.config[group][key][field_s]
@@ -1606,7 +1681,15 @@ class Restore(utilities, Treeview_handle):
                             text_s = str(text_s)
                         except:
                             text_s = ""
-                    self.arw[group + "@" + field_s].set_text(text_s)
+            if field_s == 'details_tab':
+                self.arw[group + "@" + field_s].set_text(text_s)
+            else:
+                self.load_chooser_store(
+                    widget=self.arw[group + "@" + field_s],
+                    active=text_s
+                )
+
+        self.block_signals = False
 
     def show_search_details(self, widget):
 
@@ -1618,9 +1701,21 @@ class Restore(utilities, Treeview_handle):
         self.search_active = name  # memorize the name, it will be used by update_field and treeview_add
         for field in ["table_def", "result_def", "details_def",
                       "treeview", "entry", "type", "options"]:
+
             if not field in self.config["xtabs"][name]:
                 self.config["xtabs"][name][field] = ""
-            self.arw["xtabs@" + field].set_text(self.config["xtabs"][name][field])
+
+            if isinstance(self.arw["xtabs@" + field], gtk.ComboBox):
+                self.load_chooser_store(
+                    widget=self.arw["xtabs@" + field],
+                    active=self.config['xtabs'][name][field]
+                )
+            else:
+                self.arw["xtabs@" + field].set_text(self.config["xtabs"][name][field])
+
+        self.arw['checkbox@field'].set_sensitive(False)
+        self.arw['checkbox@name'].set_sensitive(False)
+        self.load_chooser_store(widget=self.arw['checkbox@checkbox'], active='')
 
         self.model6.clear()
         v2(self.config["xtabs"][name], "cols")
@@ -1780,7 +1875,11 @@ class Restore(utilities, Treeview_handle):
 
         if treeview == "treeview6":  # Search lists
             data = []
-            conf = self.arw["xtabs@table_def"].get_text()
+            iter = self.arw['xtabs@table_def'].get_active_iter()
+            if not iter:
+                conf = None
+            else:
+                conf = self.arw['xtabs@table_def'].get_model().get_value(iter, 0)
             if conf in self.config['peripheral']:
                 table = self.config["peripheral"][conf]["table"]
             elif conf in self.config["words"]:
@@ -1843,114 +1942,162 @@ class Restore(utilities, Treeview_handle):
         buf1 = self.arw['find_TV'].get_buffer()
         buf1.set_text(message)
 
+    def load_chooser_store(self, widget, data=None, active=None):
+        self.block_signals = True
+        if data == None:
+            data = self.get_data_for_widget(widget.name)
+
+        model = widget.get_model()
+        model.clear()
+
+        if data != None:
+            data.sort()
+            model.append([""])
+            for line in data:
+                model.append([line])
+
+        if active is not None:
+            for item in model:
+                if item[0] == active:
+                    widget.set_active_iter(item.iter)
+
+        self.block_signals = False
+
+    def get_data_for_widget(self, widget_name):
+        data = None
+
+        # liste des tables de la base de données
+        if widget_name in ["peripheral@table",
+                           "central@table",
+                           "peripheral@gateway",
+                           ]:
+            data = table_def.keys()
+
+        # champs d'une table
+        elif widget_name in ["central@id_main"]:
+            model = self.arw["central@table"].get_model()
+            table_iter = self.arw["central@table"].get_active_iter()
+            if table_iter:
+                table_s = model.get_value(table_iter, 0)
+                data = table_def[table_s].keys()
+
+        elif widget_name in ["peripheral@linked_field"]:
+            model = self.arw["peripheral@central_def"].get_model()
+            table_iter = self.arw["peripheral@central_def"].get_active_iter()
+            if table_iter:
+                central_config_s = model.get_value(table_iter, 0)
+                table_s = self.config['central'][central_config_s]['table']
+                data = table_def[table_s].keys()
+
+        elif widget_name in ["inversion@invert_field", "inversion@content", "inversion@condition"]:
+            model = self.arw["inversion@table_def"].get_model()
+            table_iter = self.arw["inversion@table_def"].get_active_iter()
+            if table_iter:
+                table_config_s = model.get_value(table_iter, 0)
+                table_s = self.config['peripheral'][table_config_s]['table']
+                data = table_def[table_s].keys()
+
+        elif widget_name in ["inversion@central_field"]:
+            model = self.arw["inversion@table_def"].get_model()
+            table_iter = self.arw["inversion@table_def"].get_active_iter()
+            if table_iter:
+                table_config_s = model.get_value(table_iter, 0)
+                central_def_s = self.config['peripheral'][table_config_s]['central_def']
+                if central_def_s:
+                    table_s = self.config['central'][central_def_s]['table']
+                    data = table_def[table_s].keys()
+
+        elif widget_name in ["peripheral@id_type", "peripheral@main_field"]:
+            model = self.arw["peripheral@table"].get_model()
+            table_iter = self.arw["peripheral@table"].get_active_iter()
+            if table_iter:
+                table_s = model.get_value(table_iter, 0)
+                data = table_def[table_s].keys()
+
+        # result definitions
+        elif widget_name in ["central@result", "xtabs@result_def"]:
+            data = self.config["result"].keys()
+
+        # details definitions
+        elif widget_name in ["central@details", "xtabs@details_def"]:
+            data = self.config["details"].keys()
+
+        # central tables definitions
+        elif widget_name in ["peripheral@central_def", "details@central_def"]:
+            data = self.config["central"].keys()
+
+        # peripheral and words table definitions
+        elif widget_name in ["xtabs@table_def"]:
+            data = self.config["peripheral"].keys()
+            data += self.config["words"].keys()
+
+        # peripheral table definitions
+        elif widget_name in ["inversion@table_def"]:
+            data = self.config["peripheral"].keys()
+
+        # central and peripheral table definitions
+        elif widget_name in ["popup@table_def"]:
+            data = self.config["peripheral"].keys()
+            data += self.config["central"].keys()
+
+        elif widget_name == "xtabs@type":
+            data = ["list", "tree"]
+
+        elif widget_name == "popup@type":
+            data = ["text", "photo"]  # TODO
+
+        elif widget_name in ["xtabs@treeview"]:
+            data = self.ar_treeview.keys()
+
+        elif widget_name in ["xtabs@entry"]:
+            data = self.ar_entry.keys()
+
+        elif widget_name in ["combobox@combobox"]:
+            data = self.ar_comboboxentry.keys()
+
+        elif widget_name == 'checkbox@checkbox':
+            data = self.ar_check.keys()
+
+        elif widget_name == 'checkbox@field':
+            data = []
+            table = None
+            iter = self.arw['xtabs@table_def'].get_active_iter()
+            if not iter:
+                conf = None
+            else:
+                conf = self.arw['xtabs@table_def'].get_model().get_value(iter, 0)
+            if conf in self.config['peripheral']:
+                table = self.config["peripheral"][conf]["table"]
+            elif conf in self.config["words"]:
+                table = self.config["words"][conf]["table"]
+            else:
+                # Error in config. Clear the chooser
+                self.general_chooser(self.arw["treeview5"], data=data)
+
+            if table:
+                data = table_def[table].keys()
+
+        elif widget_name in ["details@container"]:  # list of containers of the tabs of s_notebook3
+            y = self.arw2["s_notebook3"].children()
+            data = []
+            for a in y:
+                data.append(a.name)
+
+        elif widget_name in ["central@edit"]:  # list of containers of the tabs of s_notebook3
+            y = self.arw2["s_notebook4"].children()
+            data = []
+            for a in y:
+                data.append(a.name)
+
+        return data
+
+
     def general_chooser(self, widget, event=None, data=None):
 
         self.chooser_widget_source = widget
 
         if data == None:
-
-            # liste des tables de la base de données
-            if widget.name in ["peripheral@table",
-                               "central@table",
-                               "peripheral@gateway",
-                               ]:
-                data = table_def.keys()
-
-            # champs d'une table
-            elif widget.name in ["central@id_main"]:
-                table_s = self.arw["central@table"].get_text()
-                data = table_def[table_s].keys()
-
-            elif widget.name in ["peripheral@linked_field"]:
-                central_config_s = self.arw["peripheral@central_def"].get_text()
-                table_s = self.config['central'][central_config_s]['table']
-                data = table_def[table_s].keys()
-
-            elif widget.name in ["inversion@invert_field", "inversion@content", "inversion@condition"]:
-                table_config_s = self.arw["inversion@table_def"].get_text()
-                table_s = self.config['peripheral'][table_config_s]['table']
-                data = table_def[table_s].keys()
-
-            elif widget.name in ["inversion@central_field"]:
-                table_config_s = self.arw["inversion@table_def"].get_text()
-                central_def_s = self.config['peripheral'][table_config_s]['central_def']
-                table_s = self.config['central'][central_def_s]['table']
-                data = table_def[table_s].keys()
-
-            elif widget.name in ["peripheral@id_type", "peripheral@main_field"]:
-                table_s = self.arw["peripheral@table"].get_text()
-                data = table_def[table_s].keys()
-
-            # result definitions
-            elif widget.name in ["central@result", "xtabs@result_def"]:
-                data = self.config["result"].keys()
-
-            # details definitions
-            elif widget.name in ["central@details", "xtabs@details_def"]:
-                data = self.config["details"].keys()
-
-            # central tables definitions
-            elif widget.name in ["peripheral@central_def", "details@central_def"]:
-                data = self.config["central"].keys()
-
-            # peripheral and words table definitions
-            elif widget.name in ["xtabs@table_def"]:
-                data = self.config["peripheral"].keys()
-                data += self.config["words"].keys()
-
-            # peripheral table definitions
-            elif widget.name in ["inversion@table_def"]:
-                data = self.config["peripheral"].keys()
-
-            # central and peripheral table definitions
-            elif widget.name in ["popup@table_def"]:
-                data = self.config["peripheral"].keys()
-                data += self.config["central"].keys()
-
-            elif widget.name == "xtabs@type":
-                data = ["list", "tree"]
-
-            elif widget.name == "popup@type":
-                data = ["text", "photo"]  # TODO
-
-            elif widget.name in ["xtabs@treeview"]:
-                data = self.ar_treeview.keys()
-
-            elif widget.name in ["xtabs@entry"]:
-                data = self.ar_entry.keys()
-
-            elif widget.name in ["combobox@combobox"]:
-                data = self.ar_comboboxentry.keys()
-
-            elif widget.name == 'checkbox@checkbox':
-                data = self.ar_check.keys()
-
-            elif widget.name == 'checkbox@field':
-                data = []
-                table = None
-                conf = self.arw["xtabs@table_def"].get_text()
-                if conf in self.config['peripheral']:
-                    table = self.config["peripheral"][conf]["table"]
-                elif conf in self.config["words"]:
-                    table = self.config["words"][conf]["table"]
-                else:
-                    # Error in config. Clear the chooser
-                    self.general_chooser(self.arw["treeview5"], data=data)
-
-                if table:
-                    data = table_def[table].keys()
-
-            elif widget.name in ["details@container"]:  # list of containers of the tabs of s_notebook3
-                y = self.arw2["s_notebook3"].children()
-                data = []
-                for a in y:
-                    data.append(a.name)
-
-            elif widget.name in ["central@edit"]:  # list of containers of the tabs of s_notebook3
-                y = self.arw2["s_notebook4"].children()
-                data = []
-                for a in y:
-                    data.append(a.name)
+            data = self.get_data_for_widget(widget.name)
 
         model = self.arw["treeview8"].get_model()
         model.clear()
@@ -1961,12 +2108,90 @@ class Restore(utilities, Treeview_handle):
             for line in data:
                 model.append([line])
 
-    def general_chooser_answer(self, *params):
+    def general_chooser_answer(self, widget=None, *params):
+        if self.block_signals:
+            return
 
-        widget = self.chooser_widget_source
-        widget_type = magutils.widget_type(widget)
+        if widget:
+            widget_type = magutils.widget_type(widget)
+            if widget_type != 'GtkComboBox':
+                widget = self.chooser_widget_source
+                widget_type = magutils.widget_type(widget)
+        else:
+            widget = self.chooser_widget_source
+            widget_type = magutils.widget_type(widget)
 
-        if widget_type == "GtkEntry":
+        if widget_type == "GtkComboBox":
+            active_iter = widget.get_active_iter()
+            if not active_iter:
+                response = None
+            else:
+                response = widget.get_model().get_value(active_iter, 0)
+
+            temp1 = widget.name.split("@")
+            category_s = temp1[0]
+            field_s = temp1[1]
+            if category_s in ['xtabs']:
+                configuration = self.search_active
+                self.config["xtabs"][configuration][field_s] = response
+            elif category_s == "checkbox":
+                configuration = self.search_active
+                if not self.config['xtabs'][configuration].get('check'):
+                    self.config['xtabs'][configuration]['check'] = {}
+                n = self.arw['checkbox@checkbox'].get_active() - 1
+                if n < 0:
+                    self.arw['checkbox@field'].set_sensitive(False)
+                    self.arw['checkbox@name'].set_sensitive(False)
+                    return
+                self.arw['checkbox@field'].set_sensitive(True)
+                self.arw['checkbox@name'].set_sensitive(True)
+                if n not in self.config['xtabs'][configuration]['check']:
+                    self.config['xtabs'][configuration]['check'][n] = {}
+                if field_s == "checkbox":
+                    self.load_chooser_store(
+                        self.arw['checkbox@field'],
+                        active=self.config['xtabs'][configuration]['check'][n].get('field')
+                    )
+                    self.arw['checkbox@name'].set_text(
+                        self.config['xtabs'][configuration]['check'][n].get('name', '')
+                    )
+                self.config['xtabs'][configuration]['check'][n][field_s] = response
+            elif category_s == 'combobox':
+                configuration = self.combobox_active
+                self.config["combobox"][configuration][field_s] = response
+            elif category_s in ['central', 'peripheral']:
+                configuration = self.database_structure_active[1]
+                self.config[category_s][configuration][field_s] = response
+                db_tree = self.arw["database_tree"]
+                sel = db_tree.get_selection()
+                model, iter1 = sel.get_selected()
+                path = None
+                if iter1:
+                    path = model.get_path(iter1)
+                self.load_database_tree()
+                if path:
+                    sel.select_iter(model.get_iter(path))
+                    self.show_database_details(widget=None)
+            elif category_s == 'inversion':
+                configuration = self.inversion_active
+                self.config["inversion"][configuration][field_s] = response
+                db_tree = self.arw["inversion_treeview"]
+                sel = db_tree.get_selection()
+                model, iter1 = sel.get_selected()
+                path = None
+                if iter1:
+                    path = model.get_path(iter1)
+                self.load_database_tree()
+                if path:
+                    sel.select_iter(model.get_iter(path))
+                self.show_inversion_details(widget=None)
+            elif category_s == 'details':
+                configuration = self.details_active
+                self.config["details"][configuration][field_s] = response
+            elif category_s == "popup":
+                configuration = self.popup_active
+                self.config["popup"][configuration][field_s] = response
+        elif widget_type == "GtkEntry":
             response = get_sel_row_data(self.arw["treeview8"], 0, 0)
             widget.set_text(response)
 
@@ -1990,12 +2215,6 @@ class Restore(utilities, Treeview_handle):
             elif category_s == "combobox":
                 configuration = self.combobox_active
                 self.config["combobox"][configuration][field_s] = response
-
-            elif category_s == "checkbox":
-                configuration = self.search_active
-                if self.config['xtabs'][configuration]['check'] is None:
-                    self.config['xtabs'][configuration]['check'] = {}
-                self.config['xtabs'][configuration]['check'][field_s] = response
 
             elif category_s == "details":
                 configuration = self.details_active

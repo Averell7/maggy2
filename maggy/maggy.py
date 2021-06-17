@@ -7829,36 +7829,45 @@ class complex_queries :
         self.arw['s_combine_status'].set_text("")
         type = widget_type(widget)
 
-        if type == "GtkTreeView" :
+        if type == "GtkTreeView":
 
             # bouton de l'interface utilisateur
-            list = widget.name
-            table = config_info['search_lists'][list]['peripheral_table']
+            list_name = widget.name
+            table = config_info['search_lists'][list_name]['peripheral_table']
 
         elif type == "GtkComboBox" :
-            table_def = get_text(widget)     # bouton des recherches complexes
-            table = config['central'][table_def]['table']
+            list_name = get_text(widget)     # bouton des recherches complexes
+            table = config['central'][list_name]['table']
         else :
             alert (_("Your button is misconfigured, \nyou must select a list as parameter."))
             return
 
-        if not "combine_active" in mem :
-            mem["combine_active"] = []
+        if list_name.startswith('sp_'):
+            if 'combine_active_sp' not in mem:
+                mem['combine_active_sp'] = []
+            active_mem = mem['combine_active_sp']
+        else:
+            if "combine_active" not in mem:
+                mem["combine_active"] = []
+            active_mem = mem['combine_active']
 
         page = self.arw['s_notebook1'].get_nth_page(self.arw['s_notebook1'].get_current_page())
         label = self.arw['s_notebook1'].get_tab_label(page)
+        active_key = (table, list_name)
 
-        if table not in mem['combine_active']:
-            mem['combine_active'].append(table)
-            label.set_markup('<b><span foreground="red">' + label.get_text() + "</span></b>")
-        elif table in mem['combine_active']:
-            mem['combine_active'].remove(table)
-            label.set_markup(label.get_text())
+        if active_key not in active_mem:
+            active_mem.append(active_key)
+            if not list_name.startswith('sp_'):
+                label.set_markup('<b><span foreground="red">' + label.get_text() + "</span></b>")
+        else:
+            active_mem.remove(active_key)
+            if not list_name.startswith('sp_'):
+                label.set_markup(label.get_text())
 
         listes['combine'].clear()
-        for  key  in config_info['search_lists']  :
+        for key in config_info['search_lists']  :
             val = config_info['search_lists'][key]
-            if val['peripheral_table'] in mem['combine_active']:
+            if (val['peripheral_table'], val['treeview']) in active_mem:
                 listes['combine'].append([val['name'],key,1,1,0,0])
 
         # critères multiples
@@ -7866,12 +7875,13 @@ class complex_queries :
         central_def = get_text(self.arw['s_central_table_combo'])
         if central_def in config['central']:
             combi_table = config['central'][central_def]['table']
-            if combi_table in mem['combine_active']:
-                # si la table est la même
-                for  z in [1,2,3]  :
-                    listes['combine'].append([_("complex query") + str(z),"s_complex" + str(z),0,1,0,0])
+            for active in active_mem:
+                if active[0] == combi_table:
+                    # si la table est la même
+                    for  z in [1,2,3]  :
+                        listes['combine'].append([_("complex query") + str(z),"s_complex" + str(z),0,1,0,0])
 
-        if len(mem['combine_active']) > 1:
+        if len(active_mem) > 1:
             # Show the dialog if there is more than one active
             self.montrer('s_combine',3)
 

@@ -1749,9 +1749,6 @@ class explode_db :
                     else :
                         print "\n ===========> Error for ", mytheme
                 except Exception as error:
-                    if "UNIQUE constraint failed:" in error:
-                        pass
-                    else:
                     print "\nDidn't work:", error, "Query was : \n", query
         link.commit()
 
@@ -1768,7 +1765,7 @@ class explode_db :
             langue = data[1]
             id_livre = data[0]
             langue = langue           
-            sep = langue.split(self.separator)
+            sep = langue.split(";")
             for mylangue in sep :
                 mylangue = mylangue.strip()
                 query = "select id_langue from langues where langue like '%" + mylangue + "%' "
@@ -6499,7 +6496,7 @@ class edit() :
                 mag.myfunctions.after_load(id_fiche, table_config, saisieActive, saisieFlipActive)
             except:                               # TODO : this does not work, alert message is not shown
                 error_text =  utils.printExcept()
-                alert("Error in function after_load in your userfunctions.py file\n" + error_text)
+                alert("Error in function after_load in your userfunctions.py file\n" + error_test)
 
 
 

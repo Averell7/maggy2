@@ -58,6 +58,7 @@ if os.path.isfile(tar64_file) :
 else :
     print ("NOT found tar", tar64_file)
 
+"""
 if os.path.isfile(deb_file) :
   print ("found deb", deb_file)
 else :
@@ -67,6 +68,7 @@ if os.path.isfile(pyinstaller_file) :
   print ("found pyinstaller", pyinstaller_file)
 else :
     print ("NOT found pyinstaller", pyinstaller_file)
+"""
 
 os.system('ls')
 

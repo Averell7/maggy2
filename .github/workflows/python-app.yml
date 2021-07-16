@@ -18,10 +18,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python 2.7
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 2.7
     - name: Install dependencies
       run: |
         # sudo apt-get install libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-3.0 --yes

@@ -2,7 +2,7 @@
 # coding: utf-8
 
 #
-# PdfBooklet 2.3.0 - GTK+ based utility to create booklets and other layouts 
+# Maggy 2.0 - GTK+ based utility to create booklets and other layouts 
 # from PDF documents.
 # Copyright (C) 2008-2012 GAF Software
 # <https://sourceforge.net/projects/pdfbooklet>
@@ -25,7 +25,7 @@
 import os
 import re
 import glob
-from ftplib import FTP
+
 
 
 version = "2.0.0.50"
@@ -40,46 +40,38 @@ rpm_file = "./dist/maggy2-" + version + "-1.noarch.rpm"
 tar_file = "./dist/maggy2-" + version + ".tar.gz"
 tar64_file = "./dist/maggy2-" + version + ".linux-x86_64.tar.gz"
 
+  
+
+
 if os.path.isfile(rpm_file) :
-  print "found rpm", rpm_file
+  print ("found rpm", rpm_file)
 else :
-    print "NOT found rpm", rpm_file
-  
+    print ("NOT found rpm", rpm_file)
+
 if os.path.isfile(tar_file) :
-  print "found tar", tar_file
+  print ("found tar", tar_file)
 else :
-    print "NOT found tar", tar_file
-  
-os.system("ls ./dist")
+    print ("NOT found tar", tar_file)
+
+if os.path.isfile(tar64_file) :
+  print ("found tar", tar64_file)
+else :
+    print ("NOT found tar", tar64_file)
+
+if os.path.isfile(deb_file) :
+  print ("found deb", deb_file)
+else :
+    print ("NOT found deb", deb_file)
+
+if os.path.isfile(pyinstaller_file) :
+  print ("found pyinstaller", pyinstaller_file)
+else :
+    print ("NOT found pyinstaller", pyinstaller_file)
+
+os.system('ls')
 
 
-print "\n\n ================ Uploading tar.gz =======================\n\n"
-
-ftp = FTP('perso-ftp.orange.fr')     # connect to host, default port
-x = ftp.login('dysmas1956@wanadoo.fr', '4ua7x9x')                     # user anonymous, passwd anonymous@
-print "Connect to Ftp : " + x
-ftp.cwd('maggy')               # change into "debian" directory
-#ftp.retrlines('LIST')           # list directory contents
-#ftp.retrbinary('RETR Archeotes.sqlite', open('Archeotes.sqlite', 'wb').write)
-try :
-    command = 'STOR ' + tar_file[7:]
-    x = ftp.storbinary(command, open(tar_file, 'rb'))    
-except :    
-    print "tar file error :", command
-
-try :
-    command = 'STOR ' + tar64_file[7:] 
-    x = ftp.storbinary(command, open(tar64_file, 'rb'))
-except :
-    print "tar64 file error :", command
-    
-try :
-    command = 'STOR ' + rpm_file[7:]
-    x = ftp.storbinary(command, open(rpm_file, 'rb'))
-except :
-    print "rpm file error :", command
-
-
+"""
 # generate Debian package
 print "\n\n ================ Creating debian package =======================\n\n"
 
@@ -121,19 +113,12 @@ print "\n\n ================ Installing debian package =========================
 os.system("sudo dpkg -i " + deb_file)
 os.system("sudo apt-get -f -y install")
 
+"""
+
+
 print "\n\n ================ build.py terminated =============================\n\n"
 
 
-
-
-
-x = ftp.storbinary('STOR ' + deb_file[2:], open(deb_file, 'rb'))
-print x
-ftp.quit()
-
-
-
-  
 
 
 

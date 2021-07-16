@@ -68,9 +68,9 @@ setup(name='maggy2',
       description='A gui generator for Sqlite and MySQL',
       url = 'https://sourceforge.net/projects/maggy',
       license='GNU GPL-3',
-      ##scripts=['bin/maggy'],
+      scripts=['bin/maggy'],
       packages=['maggy'],
-      ##data_files=data_files,
+      data_files=data_files,
       #requires=['python-poppler'],          # for distutils
       #install_requires=['python-poppler']   # for setuptools
      )

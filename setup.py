@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
 #
-# PdfBooklet 2.3.2 - GTK+ based utility to create booklets and other layouts 
+# maggy 2.3.2 - GTK+ based utility to create booklets and other layouts 
 # from PDF documents.
 # Copyright (C) 2008-2012 GAF Software
-# <https://sourceforge.net/projects/pdfbooklet>
+# <https://sourceforge.net/projects/maggy>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,15 +36,16 @@ from distutils.core import setup
 
 
 
-"""
-data_files=[('share/pdfbooklet/data', glob.glob('data/*.*')),
-            ('share/pdfbooklet/documentation', glob.glob('documentation/*.*')),          
-            ('/usr/share/applications', ['data/pdfbooklet.desktop']),
-            ('/usr/share/locale/fr/LC_MESSAGES', glob.glob('locale/fr/LC_MESSAGES/*.*')),
-            ('share/pixmaps', ['data/pdfbooklet.png']),
-            ('share/pdfbooklet/icons/hicolor/scalable', ['data/pdfbooklet.svg'])]
 
-"""
+data_files=[('share/maggy/data', glob.glob('maggy/data/*.*')),
+            ('share/maggy/config', glob.glob('maggy/config/*.*')),
+            ('share/maggy/documentation', glob.glob('maggy/documentation/*.*')),          
+            ('/usr/share/applications', ['data/maggy.desktop']),
+            ('/usr/share/locale/fr/LC_MESSAGES', glob.glob('locale/fr/LC_MESSAGES/*.*')),
+            ('share/pixmaps', ['data/maggy.png']),
+            ('share/maggy/icons/hicolor/scalable', ['data/maggy.svg'])]
+
+
 """
 # Freshly generate .mo from .po, add to data_files:
 if os.path.isdir('mo/'):
@@ -67,7 +68,7 @@ setup(name='maggy2',
       description='A gui generator for Sqlite and MySQL',
       url = 'https://sourceforge.net/projects/maggy',
       license='GNU GPL-3',
-      ##scripts=['bin/pdfbooklet'],
+      ##scripts=['bin/maggy'],
       packages=['maggy'],
       ##data_files=data_files,
       #requires=['python-poppler'],          # for distutils

@@ -59,4 +59,4 @@ jobs:
       uses: actions/upload-artifact@v2      
       with:
         name: deb 
-        path: deb_dist
+        path: lsdebian.txt

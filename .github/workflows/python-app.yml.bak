@@ -24,13 +24,11 @@ jobs:
         python-version: 2.7
     - name: Install dependencies
       run: |
-        # sudo apt-get install libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-3.0 --yes
-        python -m pip install --upgrade pip
-        python -m pip install wheel
-        python -m pip install flake8 pytest         
+     
         sudo apt-get install python-stdeb  
-        # python -m pip install PyGObject
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        print "=======================>"
+        sudo apt-get install python-gtk2  --yes
+        # python -m pip install flake8 pytest         
         
     - name: Lint with flake8
       run: |

@@ -24,14 +24,11 @@ jobs:
         python-version: 2.7
     - name: Install dependencies
       run: |
-        # sudo apt-get install libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-3.0 --yes
-        python -m pip install --upgrade pip
-        python -m pip install wheel
-        #pip install python3-all
-        python -m pip install flake8 pytest         
-        # python -m pip install stdeb debhelper 
-        # python -m pip install PyGObject
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+     
+        sudo apt-get install python-stdeb  
+        print "=======================>"
+        sudo apt-get install python-gtk2  --yes
+        # python -m pip install flake8 pytest         
         
     - name: Lint with flake8
       run: |
@@ -46,29 +43,17 @@ jobs:
     - name: Create package
       run: |        
         python build.py
-        find . -iname *.pyc -delete
-        python3 setup.py --command-packages=stdeb.command bdist_deb
+        ls -lR ./ > lsdebian.txt
+        python setup.py --command-packages=stdeb.command bdist_deb
         
-    - name: builds
+    - name: builds 1
       uses: actions/upload-artifact@v2
       with:
-        name: PyInstaller Archive
-        path: dist/pyinstaller-*.zip
+        name: builds1
+        path: dist
      
-    - name: source
+    - name: deb 
       uses: actions/upload-artifact@v2      
       with:
-        name: Source Packages
-        path: dist/confix-*.tar.gz
-
-    - name: rpm
-      uses: actions/upload-artifact@v2
-      with:
-        name: RPM Packages
-        path: dist/confix-*.rpm
-
-    - name: deb
-      uses: actions/upload-artifact@v2
-      with:
-        name: Debian Packages
-        path: deb_dist/python3-confix_*.deb
+        name: deb 
+        path: lsdebian.txt

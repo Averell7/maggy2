@@ -25,7 +25,7 @@ jobs:
     - name: Install dependencies
       run: |
      
-        sudo apt-get install python-stdeb  
+        sudo apt-get install python3-stdeb  
         print "=======================>"
         sudo apt-get install python-gtk2  --yes
         # python -m pip install flake8 pytest         
@@ -43,8 +43,8 @@ jobs:
     - name: Create package
       run: |        
         python build.py
-        ls -lR ./ > lsdebian.txt
-        python setup.py --command-packages=stdeb.command bdist_deb
+        find . -iname *.pyc -delete
+        python3 setup.py --command-packages=stdeb.command bdist_deb
         
     - name: builds 1
       uses: actions/upload-artifact@v2

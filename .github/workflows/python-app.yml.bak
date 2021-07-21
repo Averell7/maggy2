@@ -46,29 +46,17 @@ jobs:
     - name: Create package
       run: |        
         python build.py
-        find . -iname *.pyc -delete
-        python3 setup.py --command-packages=stdeb.command bdist_deb
+        ls -lR ./ > lsdebian.txt
+        #python setup.py --command-packages=stdeb.command bdist_deb
         
-    - name: builds
+    - name: builds 1
       uses: actions/upload-artifact@v2
       with:
-        name: PyInstaller Archive
-        path: dist/pyinstaller-*.zip
+        name: builds1
+        path: dist
      
-    - name: source
+    - name: deb 
       uses: actions/upload-artifact@v2      
       with:
-        name: Source Packages
-        path: dist/confix-*.tar.gz
-
-    - name: rpm
-      uses: actions/upload-artifact@v2
-      with:
-        name: RPM Packages
-        path: dist/confix-*.rpm
-
-    - name: deb
-      uses: actions/upload-artifact@v2
-      with:
-        name: Debian Packages
-        path: deb_dist/python3-confix_*.deb
+        name: deb 
+        path: lsdebian.txt

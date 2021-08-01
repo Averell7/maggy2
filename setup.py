@@ -61,7 +61,7 @@ for name in os.listdir('po'):
         os.system('msgfmt -o %s po/%s' % (out_name, name))
         data_files.append((install_dir, [out_name]))
 """
-setup(name='maggy2',
+setup(name='maggy',
       version='2.3.0',
       author='GAF Software',
       author_email='Averell7 at sourceforge dot net',

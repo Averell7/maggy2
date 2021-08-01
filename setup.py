@@ -62,7 +62,7 @@ for name in os.listdir('po'):
         data_files.append((install_dir, [out_name]))
 """
 setup(name='maggy2',
-      version='2.0.0.50',
+      version='2.3.0',
       author='GAF Software',
       author_email='Averell7 at sourceforge dot net',
       description='A gui generator for Sqlite and MySQL',

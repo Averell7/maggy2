@@ -44,7 +44,7 @@ def fix_bin_file(file1):
 
 pyinstaller_file = ""
 
-version = "2.5.4"
+version = "2.3.0"
 print ("\n\n ================ start bdist =============================\n\n")
 # creates maggy-3.x.x.linux-[system].tar.gz
 os.system('python3 setup.py bdist')

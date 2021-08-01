@@ -37,9 +37,9 @@ from distutils.core import setup
 
 
 
-data_files=[('share/maggy/data', glob.glob('maggy/data/*.*')),
-            ('share/maggy/config', glob.glob('maggy/config/*.*')),
-            ('share/maggy/documentation', glob.glob('maggy/documentation/*.*')),          
+data_files=[('share/maggy/data', glob.glob('maggy2.3/data/*.*')),
+            ('share/maggy/config', glob.glob('maggy2.3/config/*.*')),
+            ('share/maggy/documentation', glob.glob('maggy2.3/documentation/*.*')),          
             ('/usr/share/applications', ['data/maggy.desktop']),
             ('/usr/share/locale/fr/LC_MESSAGES', glob.glob('locale/fr/LC_MESSAGES/*.*')),
             ('share/pixmaps', ['data/maggy.png']),
@@ -69,7 +69,7 @@ setup(name='maggy2',
       url = 'https://sourceforge.net/projects/maggy',
       license='GNU GPL-3',
       scripts=['bin/maggy'],
-      packages=['maggy'],
+      packages=['maggy2.3'],
       data_files=data_files,
       #requires=['python-poppler'],          # for distutils
       #install_requires=['python-poppler']   # for setuptools

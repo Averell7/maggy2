@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 #
-# confix 2.5.1 - GTK+ based utility to create booklets and other layouts
+# maggy 2.5.1 - GTK+ based utility to create booklets and other layouts
 # from PDF documents.
 # Copyright (C) 2008-2012 GAF Software
-# <https://sourceforge.net/projects/confix>
+# <https://sourceforge.net/projects/maggy>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,10 +46,10 @@ pyinstaller_file = ""
 
 version = "2.5.4"
 print ("\n\n ================ start bdist =============================\n\n")
-# creates confix-3.x.x.linux-[system].tar.gz
+# creates maggy-3.x.x.linux-[system].tar.gz
 os.system('python3 setup.py bdist')
 print ("\n\n ================ end bdist - start sdist =================\n\n")
-# creates confix-3.x.x.tar.gz
+# creates maggy-3.x.x.tar.gz
 os.system('python3 setup.py sdist')
 print ("\n\n ================ end sdist - start bdist_rpm =============\n\n")
 os.system('python3 setup.py bdist_rpm')
@@ -60,8 +60,8 @@ print ("\n\n ================ end bdist_rpm ===========================\n\n")
 print ("\n\n ================ Generate pyinstaller file =======================\n\n" )
 
 
-os.chdir('./confix')
-os.system('pyinstaller confix.py -y > /dev/null')
+os.chdir('./maggy')
+os.system('pyinstaller maggy3.py -y > /dev/null')
 
 pyinstaller_file = "pyinstaller-" + version + ".zip"
 zipfile1 = zipfile.ZipFile("../dist/" + pyinstaller_file, "w")
@@ -79,11 +79,11 @@ os.chdir("..")
 #os.system("tree -d")               # option -d will print directories only
 #os.chdir("dist")
 
-rpm_file =   "confix-" + version + "-1.noarch.rpm"
-tar_file =   "confix-" + version + ".tar.gz"
-tar64_file = "./confix-" + version + ".linux-x86_64.tar.gz"
-corr_tar64_file = "./confix-" + version + "-all_64_corr.tar.gz"
-deb_file = "./confix_" + version + "-2_all.deb"
+rpm_file =   "maggy-" + version + "-1.noarch.rpm"
+tar_file =   "maggy-" + version + ".tar.gz"
+tar64_file = "./maggy-" + version + ".linux-x86_64.tar.gz"
+corr_tar64_file = "./maggy-" + version + "-all_64_corr.tar.gz"
+deb_file = "./maggy_" + version + "-2_all.deb"
 
 # ###### to restore normalement ############################
 """
@@ -100,7 +100,7 @@ for name in names:
     member = input1.getmember(name)
     member.name = member.name.replace(original_package,"./usr/lib/python3/dist-packages")
     file1 = input1.extractfile(member)
-    if name == "./usr/bin/confix" :
+    if name == "./usr/bin/maggy" :
         (file2, size) = fix_bin_file(file1)
         file2.seek(0)
         member.size = size
@@ -120,7 +120,7 @@ print ("\n\n ================ Creating debian package =======================\n\
 
 #os.system('alien --generate --scripts ' + rpm_file) 
 os.system('sudo alien --generate ' + corr_tar64_file) 
-new_dir = "./confix-" + version + "/"
+new_dir = "./maggy-" + version + "/"
 
 os.chdir(new_dir)
 
@@ -143,10 +143,10 @@ else :
     print ("============> ERROR : control NOT found.")
 
 # post installation commands
-# correct confix.cfg
+# correct maggy.cfg
 """
 """
-pb_dir = "./usr/share/confix/"
+pb_dir = "./usr/share/maggy/"
 text = "chmod 777 " + pb_dir
 # I am unsure of the right place of this file, so let us put it in both places
 os.system(" echo " + text + "> ./postinst")

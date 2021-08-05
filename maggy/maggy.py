@@ -287,7 +287,7 @@ def sql_error(link, req = "", message = "") :
     if len(e3) > 0 :
         print e3
 
-
+    sys.exc_clear()
 
 
     return

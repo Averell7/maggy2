@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 #
-# PdfBooklet 2.3.0 - GTK+ based utility to create booklets and other layouts 
+# maggy 2.5.1 - GTK+ based utility to create booklets and other layouts
 # from PDF documents.
 # Copyright (C) 2008-2012 GAF Software
-# <https://sourceforge.net/projects/pdfbooklet>
+# <https://sourceforge.net/projects/maggy>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,132 +19,177 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
+
+# =====>  Version number must be changed in setup.py (in the comment, line 4, and in the code) and build.py (in the code)
 
 import os
+import io
 import re
 import glob
+import ftplib
 from ftplib import FTP
+# import pysftp
+import zipfile
+import tarfile
+
+def fix_bin_file(file1):
+    data1 = b"#!/usr/bin/python3\n"
+    data1b = file1.readline()
+    data2 = file1.read()
+    data3 = data1 + data2
+    x = len(data3)
+    out = io.BytesIO()
+    out.write(data3)
+    return (out, x)
+
+pyinstaller_file = ""
+
+version = "2.3.0"
+print ("\n\n ================ start bdist =============================\n\n")
+# creates maggy-3.x.x.linux-[system].tar.gz
+os.system('python3 setup.py bdist')
+print ("\n\n ================ end bdist - start sdist =================\n\n")
+# creates maggy-3.x.x.tar.gz
+os.system('python3 setup.py sdist')
+print ("\n\n ================ end sdist - start bdist_rpm =============\n\n")
+os.system('python3 setup.py bdist_rpm')
+# dependencies are set in the setup.cfg file
+print ("\n\n ================ end bdist_rpm ===========================\n\n")
 
 
-version = "2.0.0.50"
-print "\n\n ================ start bdist =============================\n\n"
-os.system('sudo python setup.py bdist')
-print "\n\n ================ end bdist - start sdist =================\n\n"
-os.system('sudo python setup.py sdist')
-print "\n\n ================ end sdist - start bdist_rpm =============\n\n"
-os.system('sudo python setup.py bdist_rpm')
-print "\n\n ================ end bdist_rpm ===========================\n\n"
-rpm_file = "./dist/maggy2-" + version + "-1.noarch.rpm"
-tar_file = "./dist/maggy2-" + version + ".tar.gz"
-tar64_file = "./dist/maggy2-" + version + ".linux-x86_64.tar.gz"
-
-if os.path.isfile(rpm_file) :
-  print "found rpm", rpm_file
-else :
-    print "NOT found rpm", rpm_file
-  
-if os.path.isfile(tar_file) :
-  print "found tar", tar_file
-else :
-    print "NOT found tar", tar_file
-  
-os.system("ls ./dist")
+print ("\n\n ================ Generate pyinstaller file =======================\n\n" )
 
 
-print "\n\n ================ Uploading tar.gz =======================\n\n"
+os.chdir('./maggy')
+os.system('pyinstaller maggy3.py -y > /dev/null')
 
-ftp = FTP('perso-ftp.orange.fr')     # connect to host, default port
-x = ftp.login('dysmas1956@wanadoo.fr', '4ua7x9x')                     # user anonymous, passwd anonymous@
-print "Connect to Ftp : " + x
-ftp.cwd('maggy')               # change into "debian" directory
-#ftp.retrlines('LIST')           # list directory contents
-#ftp.retrbinary('RETR Archeotes.sqlite', open('Archeotes.sqlite', 'wb').write)
-try :
-    command = 'STOR ' + tar_file[7:]
-    x = ftp.storbinary(command, open(tar_file, 'rb'))    
-except :    
-    print "tar file error :", command
+pyinstaller_file = "pyinstaller-" + version + ".zip"
+zipfile1 = zipfile.ZipFile("../dist/" + pyinstaller_file, "w")
+os.system('ls -l /home/')
+for mydir in os.walk("./dist/") :
+    for myfile in mydir[2] :
+        path = os.path.join(mydir[0], myfile)
+        if os.path.isfile(path) :
+            zipfile1.write(path)
+zipfile1.close()
 
-try :
-    command = 'STOR ' + tar64_file[7:] 
-    x = ftp.storbinary(command, open(tar64_file, 'rb'))
-except :
-    print "tar64 file error :", command
-    
-try :
-    command = 'STOR ' + rpm_file[7:]
-    x = ftp.storbinary(command, open(rpm_file, 'rb'))
-except :
-    print "rpm file error :", command
+os.chdir("..")
+
+
+#os.system("tree -d")               # option -d will print directories only
+#os.chdir("dist")
+
+rpm_file =   "maggy-" + version + "-1.noarch.rpm"
+tar_file =   "maggy-" + version + ".tar.gz"
+tar64_file = "./maggy-" + version + ".linux-x86_64.tar.gz"
+corr_tar64_file = "./maggy-" + version + "-all_64_corr.tar.gz"
+deb_file = "./maggy_" + version + "-2_all.deb"
+
+# ###### to restore normalement ############################
+"""
+input1 = tarfile.open(tar64_file, "r")
+output = tarfile.open(corr_tar64_file, "w")
+names = input1.getnames()
+for name in names:    
+    x = re.search(r"\./usr/lib/python.*?packages", name)
+    if x:
+        original_package = x.group(0)
+        break
+
+for name in names:
+    member = input1.getmember(name)
+    member.name = member.name.replace(original_package,"./usr/lib/python3/dist-packages")
+    file1 = input1.extractfile(member)
+    if name == "./usr/bin/maggy" :
+        (file2, size) = fix_bin_file(file1)
+        file2.seek(0)
+        member.size = size
+        output.addfile(member, file2)
+        continue
+    if file1:
+        output.addfile(member, file1)
+
+input1.close()
+output.close()
+
+""""""
 
 
 # generate Debian package
-print "\n\n ================ Creating debian package =======================\n\n"
+print ("\n\n ================ Creating debian package =======================\n\n")
+
+#os.system('alien --generate --scripts ' + rpm_file) 
+os.system('sudo alien --generate ' + corr_tar64_file) 
+new_dir = "./maggy-" + version + "/"
+
+os.chdir(new_dir)
 
 
-new_dir = "./maggy2-" + version + "/"
-os.system('sudo alien --generate --scripts ' + rpm_file)
-control_file = new_dir + "debian/control"
+control_file = "./debian/control"
 if os.path.isfile(control_file) :
-  print "control found"
-else :
-    print "control NOT found. See log.txt"
-    # walkdirectory
-    f1 = open("./log.txt", "w")
-    for data in os.walk("./") :
-        f1.write(repr(data))
+    print ("control found")
+    f1 = open(control_file, "r")
+
+    data1 = f1.read()
+    data1 = data1.replace("${shlibs:Depends}", "python (>= 2.7), python-gi, python-gi-cairo, python3-gi, python3-gi-cairo, python3-cairo, gir1.2-gtk-3.0, gir1.2-poppler-0.18")
+    # above dependencies are for Debian. Unsure if python3-cairo is necessary. 
+    # for rpm, something like that will be necessary, but unsufficient : python-gobject, python-gobject-2, pypoppler|python-poppler\n")
+
     f1.close()
-    
-    command = 'STOR ' + "./log.txt"
-    x = ftp.storbinary(command, open("./log.txt", 'rb'))
+    f1 = open(control_file, "w")
+    f1.write(data1)
+    f1.close()
+else :
+    print ("============> ERROR : control NOT found.")
 
-f1 = open(control_file, "r")
+# post installation commands
+# correct maggy.cfg
+"""
+"""
+pb_dir = "./usr/share/maggy/"
+text = "chmod 777 " + pb_dir
+# I am unsure of the right place of this file, so let us put it in both places
+os.system(" echo " + text + "> ./postinst")
+os.system(" echo " + text + "> ./debian/postinst")
 
-data1 = f1.read()
-data1 = data1.replace("${shlibs:Depends}", "pygtk2|python-gtk2, pypoppler|python-poppler")
-f1.close()
-f1 = open(control_file, "w")
-f1.write(data1)
-f1.close()
+# Build debian package
+os.system("dpkg-buildpackage")
+os.chdir("..")
+"""
 
-os.system("cd " + new_dir + "; sudo dpkg-buildpackage")
+if os.path.isfile("dist/" + rpm_file) :
+  print ("found rpm", rpm_file)
+else :
+    print ("NOT found rpm", rpm_file)
 
-deb_file = "./maggy2_" + version + "-2_all.deb"
-if not os.path.isfile(deb_file) :
-    deb_file = "./maggy2-" + version + "-2_all.deb"
-    print "=========> file is : ", deb_file
+if os.path.isfile("dist/" + tar_file) :
+  print ("found tar", tar_file)
+else :
+    print ("NOT found tar", tar_file)
+
+if os.path.isfile("dist/" + tar64_file) :
+  print ("found tar", tar64_file)
+else :
+    print ("NOT found tar", tar64_file)
+
+if os.path.isfile("dist/" + deb_file) :
+  print ("found deb", deb_file)
+else :
+    print ("NOT found deb", deb_file)
+
+if os.path.isfile("dist/" + pyinstaller_file) :
+  print ("found pyinstaller", pyinstaller_file)
+else :
+    print ("NOT found pyinstaller", pyinstaller_file)
+
+os.system('ls')
 
 # install package
-print "\n\n ================ Installing debian package =============================\n\n"
+"""
+print ("\n\n ================ Installing debian package =============================\n\n")
 os.system("sudo dpkg -i " + deb_file)
 os.system("sudo apt-get -f -y install")
-
-print "\n\n ================ build.py terminated =============================\n\n"
-
-
-
-
-
-x = ftp.storbinary('STOR ' + deb_file[2:], open(deb_file, 'rb'))
-print x
-ftp.quit()
-
-
-
-  
-
-
-
-
-
-#os.system('rpmrebuild -b -R --change-spec-requires rebuild.py -p ' + new_file )
-
-
 """
-# Clean up temporary files
-if os.path.isdir('mo/'):
-    os.system ('rm -r mo/')
-if os.path.isdir('build/'):
-    os.system ('rm -r build/')
-"""
+
+print("\n\n ================ End of build.py =======================\n\n")
+

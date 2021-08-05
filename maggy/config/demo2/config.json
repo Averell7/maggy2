@@ -57,7 +57,7 @@
             }
          }, 
          "details": "[presentation]", 
-         "periph_def": "personnesx", 
+         "periph_def": "personnes", 
          "width": "200"
       }
    }, 
@@ -114,7 +114,7 @@
          "hpaned7": 454, 
          "hpaned8": 747, 
          "hpaned9": 623, 
-         "s_hpaned4": 302, 
+         "s_hpaned4": 505, 
          "s_vpaned1": 398
       }, 
       "database": {
@@ -183,10 +183,10 @@
             "y": 100
          }, 
          "s_requetes": {
-            "h": 514, 
-            "w": 730, 
-            "x": 181, 
-            "y": 100
+            "h": 508, 
+            "w": 826, 
+            "x": 172, 
+            "y": 50
          }, 
          "s_tri": {
             "h": 484, 
@@ -201,18 +201,6 @@
             "y": -8
          }, 
          "s_window0": {
-            "h": 671, 
-            "w": 1024, 
-            "x": -4, 
-            "y": -4
-         }, 
-         "window0": {
-            "h": 602, 
-            "w": 51, 
-            "x": 0, 
-            "y": 0
-         }, 
-         "window1": {
             "h": 671, 
             "w": 1024, 
             "x": -4, 
@@ -238,28 +226,28 @@
          "condition": "fonction like \"auteur%\"", 
          "content": "", 
          "invert_field": "i_auteur", 
-         "table_def": "personnesx"
+         "table_def": "personnes"
       }, 
       "biographie": {
          "central_field": "biographie", 
          "condition": "fonction like \"biographie%\"", 
          "content": "", 
          "invert_field": "i_biographie", 
-         "table_def": "personnesx"
+         "table_def": "personnes"
       }, 
       "collaborateur": {
          "central_field": "collaborateur", 
          "condition": "fonction like \"collaborateur%\"", 
          "content": "", 
          "invert_field": "i_collaborateur", 
-         "table_def": "personnesx"
+         "table_def": "personnes"
       }, 
       "vedette": {
          "central_field": "vedette", 
          "condition": "fonction like \"vedette%\"", 
          "content": "", 
          "invert_field": "i_vedette", 
-         "table_def": "personnesx"
+         "table_def": "personnes"
       }
    }, 
    "periph_tables": {
@@ -312,7 +300,7 @@
          "table": "langues", 
          "table_type": "peripheral2"
       }, 
-      "personnesx": {
+      "personnes": {
          "central_def": "completex", 
          "cols": {
             "0": {
@@ -331,7 +319,7 @@
                "width": "25"
             }
          }, 
-         "config_name": "personnesx", 
+         "config_name": "personnes", 
          "gateway": "concerne", 
          "gateway_fields": [
             "fonction", 
@@ -383,7 +371,7 @@
          "code": "[presentation]", 
          "condition": "select nom from personnes where presentation is not null", 
          "query": "", 
-         "table_def": "personnesx", 
+         "table_def": "personnes", 
          "type": "text"
       }, 
       "photo": {
@@ -1204,7 +1192,7 @@
          "options": "r=renvoi,n", 
          "peripheral_table": "personnes", 
          "result_def": "complete", 
-         "table_def": "personnesx", 
+         "table_def": "personnes", 
          "treeview": "clist3", 
          "type": "list"
       }, 
@@ -1262,7 +1250,7 @@
          "options": "r=renvoi,n", 
          "peripheral_table": "personnes", 
          "result_def": "complete", 
-         "table_def": "personnesx", 
+         "table_def": "personnes", 
          "treeview": "sp_persons", 
          "type": "list"
       }, 

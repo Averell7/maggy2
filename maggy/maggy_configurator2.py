@@ -3,7 +3,7 @@
 
 # Version 2.1.0.2   - May 2021
 # Version 2.0.0.48  - April 2016
-# Version 2.0.0     - Averell - GTK GUI - May 17th, 2012
+# Version 2.0.0     - Averell - Gtk GUI - May 17th, 2012
 # Version 1.9.6     - Gaston - Sept 03th, 2011 - Cosmetic enhancements (title, background color)
 # Version 1.9.5     - Revision 5 - Mar 03rd, 2012
 
@@ -43,15 +43,23 @@ Edit : Gateway data est construit avec cols = '' ce qui provoque une erreur dans
 ###########################################################################
 
 import copy
-import exceptions
+#£ import exceptions
 import glob
-import gtk
 import pprint
 import re
 from copy import deepcopy
 from optparse import OptionParser
 
-gtk.rc_parse("./gtkrc")
+import gi
+gi.require_version('Gtk', '3.0')
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GdkPixbuf
+from gi.repository import Pango as pango
+from gi.repository import Gio as gio
+from gi.repository import cairo
+Gtk.rc_parse("./Gtkrc")
 
 try:
     import _mysql
@@ -72,9 +80,9 @@ import magutils
 ###########################################################################
 # LOCALISATION ############################################################
 ###########################################################################
-import elib_intl
+import elib_intl3
 
-elib_intl.install("archeotes", "share/locale")
+elib_intl3.install("archeotes", "share/locale")
 
 ###########################################################################
 # APPLICATION LIBS ########################################################
@@ -101,18 +109,18 @@ def explode(separator, data):
 
 
 def unicode2(string):
-    if isinstance(string, unicode):
+    if isinstance(string, str):
         return string
     else:
         try:
-            return unicode(string, "utf_8")
+            return str(string, "utf_8")
         except:
             try:
                 #               print string, " est ecrit en cp1252"
-                return unicode(string, "cp1252")
+                return str(string, "cp1252")
             except:
                 return string  # Is this the good option ? Return False or an empty string ?
-                return u"inconnu"
+                return "inconnu"
 
 
 def v2(dictionary, *keys):  # verify is the keys exist (creates level if it does not exist)
@@ -165,11 +173,11 @@ def v2(dictionary, *keys):  # verify is the keys exist (creates level if it does
 class SqliteUnicode:
     #
     def __init__(self):
-        self.collation = {"e": u"eéèêë",
-                          "a": u"aàâä",
-                          "i": u"iîï",
-                          "o": u"oôö",
-                          "u": u"uûü"}
+        self.collation = {"e": "eéèêë",
+                          "a": "aàâä",
+                          "i": "iîï",
+                          "o": "oôö",
+                          "u": "uûü"}
 
         self.collation_ci = {}
         self.reg_exp = {}
@@ -284,14 +292,14 @@ class db_utilities:
 
         tables = []
         for row in cursor:
-            key = row.keys()[0]
+            key = list(row.keys())[0]
             name = row[key]
             try:
                 cursor.execute("show columns from " + name)  # Test the validity of the table name.
                 # We have seen a database with a table named "1" which was impossible to handle with sql commands
                 tables.append(name)
             except:
-                print ("WARNING : Unable to handle table " + name + "\nCheck if there is no problem with it.")
+                print(("WARNING : Unable to handle table " + name + "\nCheck if there is no problem with it."))
 
         for name in tables:
 
@@ -302,7 +310,7 @@ class db_utilities:
             cursor.execute("show columns from " + name)
             columns = cursor.fetchall()
             for col in columns:
-                keys = col.keys()
+                keys = list(col.keys())
                 colname = col['Field']
                 table_def[name][colname] = {}
                 table_def[name][colname]['type'] = col['Type']
@@ -315,21 +323,21 @@ class db_utilities:
 
     def db_compare(self, *params):
 
-        chooser = gtk.FileChooserDialog(title=_('_Open Configuration'),
-                                        action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                                        buttons=(gtk.STOCK_CANCEL,
-                                                 gtk.RESPONSE_CANCEL,
-                                                 gtk.STOCK_OPEN,
-                                                 gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title=_('_Open Configuration'),
+                                        action=Gtk.FileChooserAction.OPEN,
+                                        buttons=(Gtk.STOCK_CANCEL,
+                                                 Gtk.ResponseType.CANCEL,
+                                                 Gtk.STOCK_OPEN,
+                                                 Gtk.ResponseType.OK))
         chooser.set_current_folder(configdir_u)
         chooser.set_show_hidden(True)  # Test : does not work. Why ??
 
-        filter_all = gtk.FileFilter()
+        filter_all = Gtk.FileFilter()
         filter_all.set_name(_('All files'))
         filter_all.add_pattern('*')
         chooser.add_filter(filter_all)
 
-        filter_ini = gtk.FileFilter()
+        filter_ini = Gtk.FileFilter()
         filter_ini.set_name(_('sqlite files'))
         filter_ini.add_pattern('*.sqlite')
         filter_ini.add_pattern('*.db3')
@@ -337,12 +345,12 @@ class db_utilities:
         chooser.set_filter(filter_ini)
 
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             filename = chooser.get_filename()
-            filename_u = unicode(filename, "utf-8")  # convert utf-8 to unicode for internal use
+            filename_u = str(filename, "utf-8")  # convert utf-8 to unicode for internal use
 
-        elif response == gtk.RESPONSE_CANCEL:
-            print(_('Closed, no files selected'))
+        elif response == Gtk.ResponseType.CANCEL:
+            print((_('Closed, no files selected')))
             chooser.destroy()
             return
         chooser.destroy()
@@ -354,7 +362,7 @@ class db_utilities:
 
         cursor.execute("select * from complete")
         row = cursor.fetchone()
-        list_cols = row.keys()
+        list_cols = list(row.keys())
 
         info = self.arw['s_info10']
         buffer1 = info.get_buffer()
@@ -379,7 +387,7 @@ class db_utilities:
                 for field in list_cols:
                     # print field
                     # print row[field]
-                    if field in row2.keys():
+                    if field in list(row2.keys()):
                         # print row2[field]
                         if row[field] != row2[field]:
                             model1.append([str(id1), field, row[field], row2[field]])
@@ -446,7 +454,7 @@ class db_utilities:
             if db_type == "accdb" and coltype.lower() == "text":
                 coltype = "MEMO"
             # insertion_tv(buffer1, "g_" + table + " not present, we should create it")
-            print table + "." + field + " not present, we should create it"
+            print(table + "." + field + " not present, we should create it")
             req = "ALTER TABLE $table ADD COLUMN $field $coltype"
             req1 = eval(php_string(req))
             cursor.execute(req1)
@@ -457,10 +465,10 @@ class db_utilities:
 
 class ask_for_config:
     def __init__(self):
-        # dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
-        self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL,
+        # dialog = Gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
+        self.dialog = Gtk.Dialog(title='Configuration choice', parent=None, flags=Gtk.DialogFlags.MODAL,
                                  buttons=("OK", 1, "Cancel", 0))
-        self.combo = gtk.combo_box_new_text()
+        self.combo = Gtk.ComboBoxText()
         temp = glob.glob("config/*")
 
         for val in temp:
@@ -469,7 +477,7 @@ class ask_for_config:
                 if dir_name[0:1] != "#":
                     self.combo.append_text(dir_name)
         self.combo.set_active(0)
-        self.dialog.vbox.pack_start(self.combo)
+        self.dialog.vbox.pack_start(self.combo, True, True, 0)
         self.dialog.show_all()
 
     def run(self):
@@ -481,12 +489,12 @@ class ask_for_config:
 
 class ask_for_input:
     def __init__(self):
-        # dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
-        self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL,
+        # dialog = Gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
+        self.dialog = Gtk.Dialog(title='Configuration choice', parent=None, flags=Gtk.DialogFlags.MODAL,
                                  buttons=("OK", 1, "Cancel", 0))
-        self.entry = gtk.Entry()
+        self.entry = Gtk.Entry()
 
-        self.dialog.vbox.pack_start(self.entry)
+        self.dialog.vbox.pack_start(self.entry, True, True, 0)
         self.dialog.show_all()
 
     def run(self):
@@ -499,15 +507,15 @@ class ask_for_input:
 class general_chooser_dialog:
 
     def __init__(self, data):
-        # dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
-        self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL,
+        # dialog = Gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
+        self.dialog = Gtk.Dialog(title='Configuration choice', parent=None, flags=Gtk.DialogFlags.MODAL,
                                  buttons=("OK", 1, "Cancel", 0))
-        self.combo = gtk.combo_box_new_text()
+        self.combo = Gtk.ComboBoxText()
 
         for val in data:
             self.combo.append_text(str(val))
         self.combo.set_active(0)
-        self.dialog.vbox.pack_start(self.combo)
+        self.dialog.vbox.pack_start(self.combo, True, True, 0)
         self.dialog.show_all()
 
     def run(self):
@@ -529,7 +537,7 @@ class utilities:
         if isinstance(widget, str):
             name = widget
         else:
-            name = gtk.Buildable.get_name(widget)
+            name = Gtk.Buildable.get_name(widget)
 
         extension = re.sub(".*" + separator, "", name)
 
@@ -578,12 +586,12 @@ class utilities:
     def populate_combo(self, combo, data):
         # adds a model to a combo and populates it
         # data must be a list
-        model1 = gtk.ListStore(str)
+        model1 = Gtk.ListStore(str)
         combo.set_model(model1)
         for item in data:
             model1.append([item])
 
-        case = gtk.CellRendererText()
+        case = Gtk.CellRendererText()
         combo.pack_start(case, True)
         combo.add_attribute(case, 'text', 0)
         combo.set_active(0)
@@ -710,7 +718,7 @@ class Treeview_handle:
 
     def treeview_renum(self, treeview):
         use_config = self.treeview2_select(treeview)
-        keys = use_config['cols'].keys()
+        keys = list(use_config['cols'].keys())
         keys.sort()
         new_dict = {}
         i = 0
@@ -719,8 +727,8 @@ class Treeview_handle:
             i += 1
 
         use_config['cols'] = new_dict
-        keys = use_config['cols'].keys()
-        print keys
+        keys = list(use_config['cols'].keys())
+        print(keys)
 
     def treeview_down(self, treeview):
         self.treeview_up(treeview, down=1)
@@ -769,13 +777,13 @@ class Restore(utilities, Treeview_handle):
 
         self.program_dir = os.path.abspath('.').replace('\\', '/')
 
-        self.widgets = gtk.Builder()
+        self.widgets = Gtk.Builder()
         self.widgets.add_from_file('./data/config_explorer.glade')
         arWidgets = self.widgets.get_objects()
         self.arw = {}
         for z in arWidgets:
             try:
-                name = gtk.Buildable.get_name(z)
+                name = Gtk.Buildable.get_name(z)
                 self.arw[name] = z
                 z.set_name(name)
             except:
@@ -785,7 +793,7 @@ class Restore(utilities, Treeview_handle):
 
         # Create stores for the combo boxes
         for field in ["table_def", "type", "result_def", "details_def", "treeview", "entry"]:
-            self.arw['xtabs@' + field].set_model(gtk.ListStore(str))
+            self.arw['xtabs@' + field].set_model(Gtk.ListStore(str))
 
         for field in [
             'checkbox@field', 'checkbox@checkbox', 'combobox@combobox', 'central@table',
@@ -796,15 +804,15 @@ class Restore(utilities, Treeview_handle):
             'details@central_def', 'details@container',
             'popup@table_def', 'popup@type'
         ]:
-            self.arw[field].set_model(gtk.ListStore(str))
+            self.arw[field].set_model(Gtk.ListStore(str))
 
         # Advanced - Treeview for db structure tab
-        cell_renderer = gtk.CellRendererText()
-        self.model2 = gtk.TreeStore(str, str)
+        cell_renderer = Gtk.CellRendererText()
+        self.model2 = Gtk.TreeStore(str, str)
         view2 = self.arw['treeview2']
         # view2.set_size_request(400, 620);
-        view2.append_column(gtk.TreeViewColumn('Folders / Files', cell_renderer, text=0))
-        view2.append_column(gtk.TreeViewColumn('Folders / Files', cell_renderer, text=1))
+        view2.append_column(Gtk.TreeViewColumn('Folders / Files', cell_renderer, text=0))
+        view2.append_column(Gtk.TreeViewColumn('Folders / Files', cell_renderer, text=1))
         view2.set_model(self.model2)
 
         # treeview3 - presently unused
@@ -812,175 +820,175 @@ class Restore(utilities, Treeview_handle):
         # view3.set_size_request(400, 620);
 
         # Selected
-        bool_renderer = gtk.CellRendererToggle()
+        bool_renderer = Gtk.CellRendererToggle()
         bool_renderer.connect('toggled', self.toggle_find_name)
-        view3.get_column(0).pack_start(bool_renderer)
+        view3.get_column(0).pack_start(bool_renderer, 0)
         view3.get_column(0).add_attribute(bool_renderer, 'active', 3)
 
         # Path
-        text_render = gtk.CellRendererText()
+        text_render = Gtk.CellRendererText()
         text_render.set_property('wrap-width', 200)
-        view3.get_column(1).pack_start(text_render)
+        view3.get_column(1).pack_start(text_render, 0)
         view3.get_column(1).add_attribute(text_render, 'text', 0)
 
         # Result
-        view3.get_column(2).pack_start(text_render, expand=True)
+        view3.get_column(2).pack_start(text_render, 0)
         view3.get_column(2).add_attribute(text_render, 'text', 1)
 
         # Advanced search
-        self.model4 = gtk.ListStore(str, str, str, str)
+        self.model4 = Gtk.ListStore(str, str, str, str)
         view4 = self.arw['treeview4']
         cr = {}
         for j in range(0, 5):
-            cr[j] = gtk.CellRendererText()
+            cr[j] = Gtk.CellRendererText()
             cr[j].connect("edited", self.edit_list_search, j,
                           "treeview4")  # cette procÃ©dure permet au cell-renderer de renvoyer le numÃ©ro de la colonne
             cr[j].connect("editing-started", self.edit_treeview_started, j, "treeview4")
             cr[j].set_property('editable', True)
 
-        view4.append_column(gtk.TreeViewColumn('niveau', cr[0], text=0))
-        view4.append_column(gtk.TreeViewColumn('nom', cr[1], text=1))
-        view4.append_column(gtk.TreeViewColumn('etoile', cr[2], text=2))
-        view4.append_column(gtk.TreeViewColumn('centrale', cr[3], text=3))
-        # view4.append_column(gtk.TreeViewColumn('visible', cr[4], text=4));
-        # view4.append_column(gtk.TreeViewColumn('options', cr[5], text=5));
+        view4.append_column(Gtk.TreeViewColumn('niveau', cr[0], text=0))
+        view4.append_column(Gtk.TreeViewColumn('nom', cr[1], text=1))
+        view4.append_column(Gtk.TreeViewColumn('etoile', cr[2], text=2))
+        view4.append_column(Gtk.TreeViewColumn('centrale', cr[3], text=3))
+        # view4.append_column(Gtk.TreeViewColumn('visible', cr[4], text=4));
+        # view4.append_column(Gtk.TreeViewColumn('options', cr[5], text=5));
         view4.set_model(self.model4)
 
         # result lists details
-        self.model5 = gtk.ListStore(str, str, str, str, str)
+        self.model5 = Gtk.ListStore(str, str, str, str, str)
         view5 = self.arw['treeview5']
         cr = {}
         for j in range(0, 7):
-            cr[j] = gtk.CellRendererText()
+            cr[j] = Gtk.CellRendererText()
             cr[j].connect("edited", self.edit_list,
                           j)  # cette procÃ©dure permet au cell-renderer de renvoyer le numÃ©ro de la colonne
             cr[j].connect("editing-started", self.edit_treeview_started, j, "treeview5")
             cr[j].set_property('editable', True)
 
-        view5.append_column(gtk.TreeViewColumn('field', cr[0], text=0))
-        view5.append_column(gtk.TreeViewColumn('title', cr[1], text=1))
-        view5.append_column(gtk.TreeViewColumn('width', cr[2], text=2))
-        view5.append_column(gtk.TreeViewColumn('visible', cr[3], text=3))
-        view5.append_column(gtk.TreeViewColumn('options', cr[4], text=4))
+        view5.append_column(Gtk.TreeViewColumn('field', cr[0], text=0))
+        view5.append_column(Gtk.TreeViewColumn('title', cr[1], text=1))
+        view5.append_column(Gtk.TreeViewColumn('width', cr[2], text=2))
+        view5.append_column(Gtk.TreeViewColumn('visible', cr[3], text=3))
+        view5.append_column(Gtk.TreeViewColumn('options', cr[4], text=4))
         view5.set_model(self.model5)
 
         # search lists details
-        self.model6 = gtk.ListStore(str, str, str, str, str, str)
+        self.model6 = Gtk.ListStore(str, str, str, str, str, str)
         view6 = self.arw['treeview6']
         cr = {}
         for j in range(0, 7):
-            cr[j] = gtk.CellRendererText()
+            cr[j] = Gtk.CellRendererText()
             cr[j].connect("edited", self.edit_list_search, j,
                           "treeview6")  # cette procÃ©dure permet au cell-renderer de renvoyer le numÃ©ro de la colonne
             cr[j].connect("editing-started", self.edit_treeview_started, j, "treeview6")
             cr[j].set_property('editable', True)
         # view3.set_size_request(400, 620);
-        view6.append_column(gtk.TreeViewColumn('field', cr[0], text=0))
-        view6.append_column(gtk.TreeViewColumn('title', cr[1], text=1))
-        view6.append_column(gtk.TreeViewColumn('width', cr[2], text=2))
-        view6.append_column(gtk.TreeViewColumn('detail', cr[3], text=3))
-        view6.append_column(gtk.TreeViewColumn('options', cr[4], text=4))
-        view6.append_column(gtk.TreeViewColumn('-', cr[5], text=5))
+        view6.append_column(Gtk.TreeViewColumn('field', cr[0], text=0))
+        view6.append_column(Gtk.TreeViewColumn('title', cr[1], text=1))
+        view6.append_column(Gtk.TreeViewColumn('width', cr[2], text=2))
+        view6.append_column(Gtk.TreeViewColumn('detail', cr[3], text=3))
+        view6.append_column(Gtk.TreeViewColumn('options', cr[4], text=4))
+        view6.append_column(Gtk.TreeViewColumn('-', cr[5], text=5))
         view6.set_model(self.model6)
 
         # treeview for checkboxes
-        self.model7 = gtk.ListStore(str, str, str, str, str, str)
+        self.model7 = Gtk.ListStore(str, str, str, str, str, str)
         view7 = self.arw['treeview7']
         cr = {}
         for j in range(0, 6):
-            cr[j] = gtk.CellRendererText()
+            cr[j] = Gtk.CellRendererText()
             cr[j].connect("edited", self.edit_list_search, j,
                           "treeview7")  # cette procÃ©dure permet au cell-renderer de renvoyer le numÃ©ro de la colonne
             cr[j].connect("editing-started", self.edit_treeview_started, j, "treeview7")
             cr[j].set_property('editable', True)
-        view7.append_column(gtk.TreeViewColumn('name', cr[0], text=0))
-        view7.append_column(gtk.TreeViewColumn('sort1', cr[1], text=1))
-        view7.append_column(gtk.TreeViewColumn('sort2', cr[2], text=2))
-        view7.append_column(gtk.TreeViewColumn('sort3', cr[3], text=3))
-        view7.append_column(gtk.TreeViewColumn('-', cr[4], text=4))
-        view7.append_column(gtk.TreeViewColumn('-', cr[5], text=5))
+        view7.append_column(Gtk.TreeViewColumn('name', cr[0], text=0))
+        view7.append_column(Gtk.TreeViewColumn('sort1', cr[1], text=1))
+        view7.append_column(Gtk.TreeViewColumn('sort2', cr[2], text=2))
+        view7.append_column(Gtk.TreeViewColumn('sort3', cr[3], text=3))
+        view7.append_column(Gtk.TreeViewColumn('-', cr[4], text=4))
+        view7.append_column(Gtk.TreeViewColumn('-', cr[5], text=5))
         view7.set_model(self.model7)
 
         # treeview for gateway details
-        self.gateway_details_model = gtk.ListStore(str, str, str, str, str, str)
+        self.gateway_details_model = Gtk.ListStore(str, str, str, str, str, str)
         view = self.arw['gateway_details']
         cr = {}
         for j in range(0, 6):
-            cr[j] = gtk.CellRendererText()
+            cr[j] = Gtk.CellRendererText()
             cr[j].connect("edited", self.edit_list_search, j,
                           "gateway_details")  # cette procÃ©dure permet au cell-renderer de renvoyer le numÃ©ro de la colonne
             cr[j].connect("editing-started", self.edit_treeview_started, j, "gateway_details")
             cr[j].set_property('editable', True)
-        view.append_column(gtk.TreeViewColumn(_('field'), cr[0], text=0))
-        view.append_column(gtk.TreeViewColumn(_('title'), cr[1], text=1))
-        view.append_column(gtk.TreeViewColumn(_('width'), cr[2], text=2))
-        view.append_column(gtk.TreeViewColumn(_('type'), cr[3], text=3))
-        view.append_column(gtk.TreeViewColumn('-', cr[4], text=4))
-        view.append_column(gtk.TreeViewColumn('-', cr[5], text=5))
+        view.append_column(Gtk.TreeViewColumn(_('field'), cr[0], text=0))
+        view.append_column(Gtk.TreeViewColumn(_('title'), cr[1], text=1))
+        view.append_column(Gtk.TreeViewColumn(_('width'), cr[2], text=2))
+        view.append_column(Gtk.TreeViewColumn(_('type'), cr[3], text=3))
+        view.append_column(Gtk.TreeViewColumn('-', cr[4], text=4))
+        view.append_column(Gtk.TreeViewColumn('-', cr[5], text=5))
         view.set_model(self.gateway_details_model)
 
         # treeview for configuration selection (displays a list of possible choices)
-        self.model8 = gtk.ListStore(str)
+        self.model8 = Gtk.ListStore(str)
         view8 = self.arw['treeview8']
         # view3.set_size_request(400, 620);
-        view8.append_column(gtk.TreeViewColumn(_('Selector'), cell_renderer, text=0))
+        view8.append_column(Gtk.TreeViewColumn(_('Selector'), cell_renderer, text=0))
         view8.set_model(self.model8)
 
-        ##        colmenu = gtk.TreeViewColumn('Details', cell_renderer, text=0)
+        ##        colmenu = Gtk.TreeViewColumn('Details', cell_renderer, text=0)
         ##        colmenu.set_resizable(True)
         ##        self.arw['details_list'].append_column(colmenu)
 
         # treeview for search lists
-        self.search_model = gtk.ListStore(str)
+        self.search_model = Gtk.ListStore(str)
         self.arw['search_lists'].set_model(self.search_model)
-        cell_renderer = gtk.CellRendererText()
-        colmenu = gtk.TreeViewColumn('Search', cell_renderer, text=0)
+        cell_renderer = Gtk.CellRendererText()
+        colmenu = Gtk.TreeViewColumn('Search', cell_renderer, text=0)
         colmenu.set_resizable(True)
         self.arw['search_lists'].append_column(colmenu)
 
         # treeview for inversion
-        self.inversion_model = gtk.ListStore(str)
+        self.inversion_model = Gtk.ListStore(str)
         view9 = self.arw['inversion_treeview']
-        view9.append_column(gtk.TreeViewColumn(_('Selector'), cell_renderer, text=0))
+        view9.append_column(Gtk.TreeViewColumn(_('Selector'), cell_renderer, text=0))
         view9.set_model(self.inversion_model)
 
         # treeview for combobox
-        self.combobox_model = gtk.ListStore(str)
+        self.combobox_model = Gtk.ListStore(str)
         view10 = self.arw['combobox_treeview']
-        view10.append_column(gtk.TreeViewColumn(_('Selector'), cell_renderer, text=0))
+        view10.append_column(Gtk.TreeViewColumn(_('Selector'), cell_renderer, text=0))
         view10.set_model(self.combobox_model)
 
         # treeview for details
-        self.details_model = gtk.ListStore(str)
+        self.details_model = Gtk.ListStore(str)
         view11 = self.arw['details_list']
-        view11.append_column(gtk.TreeViewColumn(_('Details'), cell_renderer, text=0))
+        view11.append_column(Gtk.TreeViewColumn(_('Details'), cell_renderer, text=0))
         view11.set_model(self.details_model)
 
         # treeview for popups
-        self.popup_model = gtk.ListStore(str)
+        self.popup_model = Gtk.ListStore(str)
         view12 = self.arw['popup_list']
-        view12.append_column(gtk.TreeViewColumn(_('Popups'), cell_renderer, text=0))
+        view12.append_column(Gtk.TreeViewColumn(_('Popups'), cell_renderer, text=0))
         view12.set_model(self.popup_model)
 
         # treeview for gateway_data
-        self.edit_model = gtk.ListStore(str)
+        self.edit_model = Gtk.ListStore(str)
         view13 = self.arw['gateway_data']
-        view13.append_column(gtk.TreeViewColumn(_('Edit'), cell_renderer, text=0))
+        view13.append_column(Gtk.TreeViewColumn(_('Edit'), cell_renderer, text=0))
         view13.set_model(self.edit_model)
 
-        self.model_dbdetails = gtk.TreeStore(str, str)
+        self.model_dbdetails = Gtk.TreeStore(str, str)
         ##        view_dd = self.arw['database_details']
         ##        #view3.set_size_request(400, 620);
-        ##        cr_editable = gtk.CellRendererText();
+        ##        cr_editable = Gtk.CellRendererText();
         ##        cr_editable.connect("edited", self.edit_db_struct);
         ##        cr_editable.set_property('editable', True);
-        ##        view_dd.append_column(gtk.TreeViewColumn('Folders / Files', cell_renderer, text=0));
-        ##        view_dd.append_column(gtk.TreeViewColumn('Folders / Files', cr_editable, text=1));
+        ##        view_dd.append_column(Gtk.TreeViewColumn('Folders / Files', cell_renderer, text=0));
+        ##        view_dd.append_column(Gtk.TreeViewColumn('Folders / Files', cr_editable, text=1));
         ##        view_dd.set_model(self.model_dbdetails);
 
-        config_store = gtk.TreeStore(str, str, int, str)  # display, color, level, central config name
+        config_store = Gtk.TreeStore(str, str, int, str)  # display, color, level, central config name
         self.arw['database_tree'].set_model(config_store)
-        colmenu = gtk.TreeViewColumn('Database', cell_renderer, markup=0, foreground=1)
+        colmenu = Gtk.TreeViewColumn('Database', cell_renderer, markup=0, foreground=1)
         colmenu.set_resizable(True)
         self.arw['database_tree'].append_column(colmenu)
 
@@ -1001,12 +1009,12 @@ class Restore(utilities, Treeview_handle):
         # Configuration de l'interface
 
         # choix des couleurs
-        model1 = gtk.ListStore(str, str, str, str)
+        model1 = Gtk.ListStore(str, str, str, str)
         treeview = self.arw['colors_list']
         treeview.set_model(model1)
 
-        cell_renderer = gtk.CellRendererText()
-        colnew = gtk.TreeViewColumn("", cell_renderer, text=0)
+        cell_renderer = Gtk.CellRendererText()
+        colnew = Gtk.TreeViewColumn("", cell_renderer, text=0)
         colnew.set_fixed_width(200)
         colnew.set_resizable(True)
         treeview.append_column(colnew)
@@ -1025,7 +1033,7 @@ class Restore(utilities, Treeview_handle):
         # choix de la langue
         files = glob.glob("locale/*")
         combo = self.arw['language_combo']
-        model = gtk.ListStore(str)
+        model = Gtk.ListStore(str)
         combo.set_model(model)
         for i in range(0, len(files)):
 
@@ -1034,21 +1042,21 @@ class Restore(utilities, Treeview_handle):
             if filex == config['gui']['language']:
                 combo.set_active(i)
 
-        combo.pack_start(cell_renderer)
-        combo.set_attributes(cell_renderer, text=0)
+        combo.pack_start(cell_renderer, 0)
+        combo.add_attribute(cell_renderer, "text", 0)
 
         ##        # treeview de gauche
         ##        treeview2 = self.arw['config_periph'];
-        ##        treeview2.set_model(gtk.ListStore(str,str,str));
-        ##        renderer = gtk.CellRendererText();
-        ##        column = gtk.TreeViewColumn('Title', renderer, text=0);
+        ##        treeview2.set_model(Gtk.ListStore(str,str,str));
+        ##        renderer = Gtk.CellRendererText();
+        ##        column = Gtk.TreeViewColumn('Title', renderer, text=0);
         ##        treeview2.append_column(column);
-        ##        treeview2.append_column(gtk.TreeViewColumn('Title', renderer, text=2));
+        ##        treeview2.append_column(Gtk.TreeViewColumn('Title', renderer, text=2));
         ##        treeview2.connect('row-activated', self.load_data2);
         ##        treeview2.connect('cursor-changed', self.load_data2);
         ##        treeview2.set_reorderable(True);
         ##        treeview2.get_model().connect_after('rows-reordered', "reorder_list");
-        ##        # ne fonctionne pas dans php-gtk2 2.0
+        ##        # ne fonctionne pas dans php-Gtk2 2.0
 
         """
         # champs de saisie de la partie gauche
@@ -1078,24 +1086,24 @@ class Restore(utilities, Treeview_handle):
 
         ##        # Liste des colonnes
         ##        treeview3 = self.arw['config_cols'];
-        ##        treeview3.set_model(gtk.ListStore(str,str,str));
-        ##        renderer3 = gtk.CellRendererText();
-        ##        column3 = gtk.TreeViewColumn(_('Columns'), renderer3, text=0);
+        ##        treeview3.set_model(Gtk.ListStore(str,str,str));
+        ##        renderer3 = Gtk.CellRendererText();
+        ##        column3 = Gtk.TreeViewColumn(_('Columns'), renderer3, text=0);
         ##        treeview3.append_column(column3);
-        ##        treeview3.append_column(gtk.TreeViewColumn('Title', renderer, text=2));
+        ##        treeview3.append_column(Gtk.TreeViewColumn('Title', renderer, text=2));
         ####        treeview3.connect('row-activated', 'load_data_cols',"B");
         ####        treeview3.connect('cursor-changed', 'load_data_cols',"B");
         ##        treeview3.set_reorderable(True);
         ####        treeview3.get_model().connect_after('rows-reordered', "reorder_list_cols");
-        ##        # ne fonctionne pas dans php-gtk2 2.0
+        ##        # ne fonctionne pas dans php-Gtk2 2.0
         ##
         ##        # TroisiÃ¨me liste
         ##        treeview4 = self.arw['config_comp'];
-        ##        treeview4.set_model(gtk.ListStore(str,str,str));
-        ##        renderer4 = gtk.CellRendererText();
-        ##        column4 = gtk.TreeViewColumn(_('Columns'), renderer4, text=0);
+        ##        treeview4.set_model(Gtk.ListStore(str,str,str));
+        ##        renderer4 = Gtk.CellRendererText();
+        ##        column4 = Gtk.TreeViewColumn(_('Columns'), renderer4, text=0);
         ##        treeview4.append_column(column4);
-        ##        treeview4.append_column(gtk.TreeViewColumn('Title', renderer, text=2));
+        ##        treeview4.append_column(Gtk.TreeViewColumn('Title', renderer, text=2));
         ####        treeview4.connect('row-activated', 'load_data_cols',"C");
         ####        treeview4.connect('cursor-changed', 'load_data_cols',"C");
 
@@ -1117,8 +1125,8 @@ class Restore(utilities, Treeview_handle):
         window1 = self.arw["window1"]
         window1.show()
         # window1.set_title("Restore ARCHEOTES  [ 2.0 - RC6 ]")
-        window1.connect("destroy", lambda w: gtk.main_quit())
-        self.arw["quit_program"].connect("destroy", lambda w: gtk.main_quit())
+        window1.connect("destroy", lambda w: Gtk.main_quit())
+        self.arw["quit_program"].connect("destroy", lambda w: Gtk.main_quit())
 
         # view.expand_all()
 
@@ -1238,7 +1246,7 @@ class Restore(utilities, Treeview_handle):
                     if 'fieldlist' in self.config:
                         temp_fieldlist = deepcopy(self.config['fieldlist'])
                         del self.config['fieldlist']
-                        central_tables = self.config['central'].keys()
+                        central_tables = list(self.config['central'].keys())
                         self.config['central'][central_tables[0]]['cols'] = temp_fieldlist
                         if "$d_from" in temp_fieldlist:
                             if 'from' in temp_fieldlist['$d_from']:
@@ -1338,7 +1346,7 @@ class Restore(utilities, Treeview_handle):
         for (section, element, default) in arSettings:
             field_s = section + "@" + element
             if not field_s in self.arw:
-                print field_s, " not found"
+                print(field_s, " not found")
                 continue
 
             v2(self.config['ini'], section)
@@ -1351,13 +1359,13 @@ class Restore(utilities, Treeview_handle):
     def load_glade_objects(self, glade_file):
         # creates arrays of the objects names
 
-        self.widgets2 = gtk.Builder()
+        self.widgets2 = Gtk.Builder()
         arWidgets2 = {}
         try:
             self.widgets2.add_from_file(glade_file)
             arWidgets2 = self.widgets2.get_objects()
         except:
-            print "Glade file could not be loaded by gtk.Builder"
+            print("Glade file could not be loaded by Gtk.Builder")
         self.ar_treeview = {}
         self.ar_entry = {}
         self.ar_textview = {}
@@ -1366,7 +1374,7 @@ class Restore(utilities, Treeview_handle):
         self.arw2 = {}
         for z in arWidgets2:
             try:
-                name = gtk.Buildable.get_name(z)
+                name = Gtk.Buildable.get_name(z)
                 z.set_name(name)
                 self.arw2[name] = z
                 if magutils.widget_type(z) == "GtkTreeView":
@@ -1386,12 +1394,12 @@ class Restore(utilities, Treeview_handle):
     def populate_combo(self, combo, data):
         # adds a model to a combo and populates it
         # data must be a list
-        model1 = gtk.ListStore(str)
+        model1 = Gtk.ListStore(str)
         combo.set_model(model1)
         for item in data:
             model1.append([item])
 
-        case = gtk.CellRendererText()
+        case = Gtk.CellRendererText()
         combo.pack_start(case, True)
         combo.add_attribute(case, 'text', 0)
         combo.set_active(0)
@@ -1705,7 +1713,7 @@ class Restore(utilities, Treeview_handle):
             if not field in self.config["xtabs"][name]:
                 self.config["xtabs"][name][field] = ""
 
-            if isinstance(self.arw["xtabs@" + field], gtk.ComboBox):
+            if isinstance(self.arw["xtabs@" + field], Gtk.ComboBox):
                 self.load_chooser_store(
                     widget=self.arw["xtabs@" + field],
                     active=self.config['xtabs'][name][field]
@@ -1889,9 +1897,9 @@ class Restore(utilities, Treeview_handle):
                 self.general_chooser(self.arw["treeview5"], data=data)
 
             if col == 0:
-                data = table_def[table].keys()
+                data = list(table_def[table].keys())
             elif col == 3:
-                data = self.ar_entry.keys() + self.ar_textview.keys()
+                data = list(self.ar_entry.keys()) + list(self.ar_textview.keys())
 
             self.general_chooser(self.arw["treeview6"], data=data)
 
@@ -1902,11 +1910,11 @@ class Restore(utilities, Treeview_handle):
                 from_s = self.config["result"][conf]["from"]
                 table = from_s.split()[0]  # normally the first word of the from clause is the important table
                 if col == 0:
-                    data = table_def[table].keys()
+                    data = list(table_def[table].keys())
                 if col == 2:
-                    data = table_def[table].keys()
+                    data = list(table_def[table].keys())
             if col == 3:
-                data = self.ar_entry.keys() + self.ar_textview.keys()
+                data = list(self.ar_entry.keys()) + list(self.ar_textview.keys())
 
             self.general_chooser(self.arw["treeview5"], data=data)
 
@@ -1971,7 +1979,7 @@ class Restore(utilities, Treeview_handle):
                            "central@table",
                            "peripheral@gateway",
                            ]:
-            data = table_def.keys()
+            data = list(table_def.keys())
 
         # champs d'une table
         elif widget_name in ["central@id_main"]:
@@ -1979,7 +1987,7 @@ class Restore(utilities, Treeview_handle):
             table_iter = self.arw["central@table"].get_active_iter()
             if table_iter:
                 table_s = model.get_value(table_iter, 0)
-                data = table_def[table_s].keys()
+                data = list(table_def[table_s].keys())
 
         elif widget_name in ["peripheral@linked_field"]:
             model = self.arw["peripheral@central_def"].get_model()
@@ -1987,7 +1995,7 @@ class Restore(utilities, Treeview_handle):
             if table_iter:
                 central_config_s = model.get_value(table_iter, 0)
                 table_s = self.config['central'][central_config_s]['table']
-                data = table_def[table_s].keys()
+                data = list(table_def[table_s].keys())
 
         elif widget_name in ["inversion@invert_field", "inversion@content", "inversion@condition"]:
             model = self.arw["inversion@table_def"].get_model()
@@ -1995,7 +2003,7 @@ class Restore(utilities, Treeview_handle):
             if table_iter:
                 table_config_s = model.get_value(table_iter, 0)
                 table_s = self.config['peripheral'][table_config_s]['table']
-                data = table_def[table_s].keys()
+                data = list(table_def[table_s].keys())
 
         elif widget_name in ["inversion@central_field"]:
             model = self.arw["inversion@table_def"].get_model()
@@ -2005,40 +2013,40 @@ class Restore(utilities, Treeview_handle):
                 central_def_s = self.config['peripheral'][table_config_s]['central_def']
                 if central_def_s:
                     table_s = self.config['central'][central_def_s]['table']
-                    data = table_def[table_s].keys()
+                    data = list(table_def[table_s].keys())
 
         elif widget_name in ["peripheral@id_type", "peripheral@main_field"]:
             model = self.arw["peripheral@table"].get_model()
             table_iter = self.arw["peripheral@table"].get_active_iter()
             if table_iter:
                 table_s = model.get_value(table_iter, 0)
-                data = table_def[table_s].keys()
+                data = list(table_def[table_s].keys())
 
         # result definitions
         elif widget_name in ["central@result", "xtabs@result_def"]:
-            data = self.config["result"].keys()
+            data = list(self.config["result"].keys())
 
         # details definitions
         elif widget_name in ["central@details", "xtabs@details_def"]:
-            data = self.config["details"].keys()
+            data = list(self.config["details"].keys())
 
         # central tables definitions
         elif widget_name in ["peripheral@central_def", "details@central_def"]:
-            data = self.config["central"].keys()
+            data = list(self.config["central"].keys())
 
         # peripheral and words table definitions
         elif widget_name in ["xtabs@table_def"]:
-            data = self.config["peripheral"].keys()
-            data += self.config["words"].keys()
+            data = list(self.config["peripheral"].keys())
+            data += list(self.config["words"].keys())
 
         # peripheral table definitions
         elif widget_name in ["inversion@table_def"]:
-            data = self.config["peripheral"].keys()
+            data = list(self.config["peripheral"].keys())
 
         # central and peripheral table definitions
         elif widget_name in ["popup@table_def"]:
-            data = self.config["peripheral"].keys()
-            data += self.config["central"].keys()
+            data = list(self.config["peripheral"].keys())
+            data += list(self.config["central"].keys())
 
         elif widget_name == "xtabs@type":
             data = ["list", "tree"]
@@ -2047,16 +2055,16 @@ class Restore(utilities, Treeview_handle):
             data = ["text", "photo"]  # TODO
 
         elif widget_name in ["xtabs@treeview"]:
-            data = self.ar_treeview.keys()
+            data = list(self.ar_treeview.keys())
 
         elif widget_name in ["xtabs@entry"]:
-            data = self.ar_entry.keys()
+            data = list(self.ar_entry.keys())
 
         elif widget_name in ["combobox@combobox"]:
-            data = self.ar_comboboxentry.keys()
+            data = list(self.ar_comboboxentry.keys())
 
         elif widget_name == 'checkbox@checkbox':
-            data = self.ar_check.keys()
+            data = list(self.ar_check.keys())
 
         elif widget_name == 'checkbox@field':
             data = []
@@ -2075,7 +2083,7 @@ class Restore(utilities, Treeview_handle):
                 self.general_chooser(self.arw["treeview5"], data=data)
 
             if table:
-                data = table_def[table].keys()
+                data = list(table_def[table].keys())
 
         elif widget_name in ["details@container"]:  # list of containers of the tabs of s_notebook3
             y = self.arw2["s_notebook3"].children()
@@ -2255,7 +2263,7 @@ class Restore(utilities, Treeview_handle):
         self.config["peripheral"][text]["config_name"] = text
         self.config["peripheral"][text]["id_type"] = "---"
         self.config["peripheral"][text]["table"] = "---"
-        data = self.config["central"].keys()
+        data = list(self.config["central"].keys())
         dialog = general_chooser_dialog(data)
         response = dialog.run()
         self.config["peripheral"][text]["central_def"] = response
@@ -2305,10 +2313,10 @@ class Restore(utilities, Treeview_handle):
     ##        5 : [["gateway_data",_("Gateway data")],
     ##        ["edit_lists",   _("Edit lists")]]};
     ##
-    ##        config_store = gtk.TreeStore(str,str,str);
+    ##        config_store = Gtk.TreeStore(str,str,str);
     ##        self.arw['config_menu'].set_model(config_store);
-    ##        cell_renderer = gtk.CellRendererText();
-    ##        colmenu = gtk.TreeViewColumn('Menu', cell_renderer, markup=0);
+    ##        cell_renderer = Gtk.CellRendererText();
+    ##        colmenu = Gtk.TreeViewColumn('Menu', cell_renderer, markup=0);
     ##        colmenu.set_resizable(True);
     ##        self.arw['config_menu'].append_column(colmenu);
     ##
@@ -2332,28 +2340,28 @@ class Restore(utilities, Treeview_handle):
 
     def load_search_list(self):
 
-        keys = self.config["xtabs"].keys()
+        keys = list(self.config["xtabs"].keys())
         keys.sort()
         for val in keys:
             self.search_model.append([val])
 
     def load_gateway_data_list(self):
 
-        keys = self.config["gateway_data"].keys()
+        keys = list(self.config["gateway_data"].keys())
         keys.sort()
         for val in keys:
             self.edit_model.append([val])
 
     def load_combobox_list(self):
 
-        keys = self.config["combobox"].keys()
+        keys = list(self.config["combobox"].keys())
         keys.sort()
         for val in keys:
             self.combobox_model.append([val])
 
     def load_popup_list(self):
 
-        keys = self.config["popup"].keys()
+        keys = list(self.config["popup"].keys())
         keys.sort()
         for val in keys:
             self.popup_model.append([val])
@@ -2365,7 +2373,7 @@ class Restore(utilities, Treeview_handle):
 
         config_store = self.arw['database_tree'].get_model()
         config_store.clear()
-        keys = self.config["central"].keys()
+        keys = list(self.config["central"].keys())
         keys.sort()
         tempdict = {}
 
@@ -2379,7 +2387,7 @@ class Restore(utilities, Treeview_handle):
             node = config_store.append(None, [data, "red", 1, val])
 
             # Create second and third level (gateways and peripheral tables)
-            keys2 = self.config["peripheral"].keys()
+            keys2 = list(self.config["peripheral"].keys())
             keys2.sort()
             for val2 in keys2:
                 if val2 in self.config["peripheral"]:
@@ -2398,12 +2406,12 @@ class Restore(utilities, Treeview_handle):
                                 node2 = config_store.append(node, [gateway, "green", 2, val2])
                                 node3 = config_store.append(node2, [table, "blue", 3, val2])
                     else:
-                        print "We don't find 'central_def' in peripheral/%s definition" % val2
+                        print("We don't find 'central_def' in peripheral/%s definition" % val2)
                 else:
-                    print "We don't find %s in the peripheral tables definition" % val2
+                    print("We don't find %s in the peripheral tables definition" % val2)
 
             # Create second level (Words tables)
-            keys3 = self.config["words"].keys()
+            keys3 = list(self.config["words"].keys())
             keys3.sort()
             for val3 in keys3:
                 if self.config["words"][val3]["central_def"] == val:
@@ -2421,7 +2429,7 @@ class Restore(utilities, Treeview_handle):
         global arWidgets
         # Titles
 
-        keys = self.config["inversion"].keys()
+        keys = list(self.config["inversion"].keys())
         keys.sort()
         for val in keys:
             self.inversion_model.append([val])
@@ -2431,14 +2439,14 @@ class Restore(utilities, Treeview_handle):
         global arWidgets
         # Titles
 
-        config_store = gtk.ListStore(str)
+        config_store = Gtk.ListStore(str)
         self.arw['result_lists'].set_model(config_store)
-        cell_renderer = gtk.CellRendererText()
-        colmenu = gtk.TreeViewColumn('Result', cell_renderer, text=0)
+        cell_renderer = Gtk.CellRendererText()
+        colmenu = Gtk.TreeViewColumn('Result', cell_renderer, text=0)
         colmenu.set_resizable(True)
         self.arw['result_lists'].append_column(colmenu)
 
-        keys = self.config["result"].keys()
+        keys = list(self.config["result"].keys())
         keys.sort()
         for val in keys:
             config_store.append([val])
@@ -2469,7 +2477,7 @@ class Restore(utilities, Treeview_handle):
         global arWidgets
         # Titles
 
-        keys = self.config["details"].keys()
+        keys = list(self.config["details"].keys())
         keys.sort()
         for val in keys:
             node = self.details_model.append([val])
@@ -2477,7 +2485,7 @@ class Restore(utilities, Treeview_handle):
     def load_advanced_details(self):
 
         try:
-            firstdb = self.config["central"].keys()[0]
+            firstdb = list(self.config["central"].keys())[0]
             coldef = self.config["central"][firstdb]['cols']
             for s in coldef:
                 data1 = []
@@ -2533,7 +2541,7 @@ class Restore(utilities, Treeview_handle):
             else:
                 val['table_type'] = "peripheral1"  # relation 1:n (without gateway)
 
-            if val.has_key('table'):
+            if 'table' in val:
                 periph_tables[val['table']] = val
             periph_tables2[
                 key] = val  # TODO : problem if two peripheral definitions for the same table. Dirty workaround. This should be studied
@@ -2620,11 +2628,11 @@ class Restore(utilities, Treeview_handle):
         # peripheral tables and gateways
         for key in config['peripheral']:
             val = config['peripheral'][key]
-            if not val.has_key('table'):
+            if 'table' not in val:
                 continue
 
             config_info['periph_tables'][val['table']] = val
-            if val.has_key('gateway'):
+            if 'gateway' in val:
                 v2(config_info, 'gateways', val['gateway'], 'name')
                 config_info['gateways'][val['gateway']]['name'] = val['gateway']
 
@@ -2648,7 +2656,7 @@ class Restore(utilities, Treeview_handle):
             for key in config['words']:
                 val = config['words'][key]
 
-                if config_info['periph_def'].has_key(key):
+                if key in config_info['periph_def']:
                     msg = _(
                         "The name %s is already used for a peripheral table, it cannot be used for a words table !") % key
                     alert(msg)
@@ -2676,7 +2684,7 @@ class Restore(utilities, Treeview_handle):
                 central_table = v(config, 'central', central_table_def, 'table')
                 config_info['search_lists'][val['treeview']]['central_table'] = central_table
 
-                if config_info['periph_tables'].has_key(table):
+                if table in config_info['periph_tables']:
 
                     if 'search_lists' in config_info['periph_tables'][table]:
                         temp = config_info['periph_tables'][table]['search_lists']
@@ -2690,7 +2698,7 @@ class Restore(utilities, Treeview_handle):
                         config_info['periph_tables'][table]['search_lists'] = val['treeview']
 
             except:  # TODO : this should be done for all blocks above
-                print "Error in configuration for search lists"
+                print("Error in configuration for search lists")
 
     def check_config(self, widget=None):
 
@@ -2722,7 +2730,7 @@ class Restore(utilities, Treeview_handle):
     def hide_options(self):
         self.arw['options'].hide()
         self.arw['window1'].hide()
-        gtk.main_quit()
+        Gtk.main_quit()
 
 
     def search_names(self, widget=None):
@@ -2947,18 +2955,18 @@ def show_options():
 
 
 def alert(message, type=0):
-    dialog = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE,
+    dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.CLOSE,
                                message)
     dialog.run()
     dialog.destroy()
 
 
 def yes_no_dialog(message, type=0):
-    dialog = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_YES_NO,
+    dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.YES_NO,
                                message)
     answer = dialog.run()
     dialog.destroy()
-    if answer == gtk.RESPONSE_YES:
+    if answer == Gtk.ResponseType.YES:
         return True
     else:
         return False
@@ -3554,11 +3562,11 @@ def predef_query_build() :
     global arWidgets;
 
     treeview = arWidgets['clist4'];
-    treeview.set_model(gtk.ListStore(str,str,str,str,str,str,str,str));
-    renderer = gtk.CellRendererText();
-    column = gtk.TreeViewColumn('Title', renderer, 'text', 0);
+    treeview.set_model(Gtk.ListStore(str,str,str,str,str,str,str,str));
+    renderer = Gtk.CellRendererText();
+    column = Gtk.TreeViewColumn('Title', renderer, 'text', 0);
     treeview.append_column(column);
-    treeview.append_column(gtk.TreeViewColumn('Title', renderer, 'text', 1));
+    treeview.append_column(Gtk.TreeViewColumn('Title', renderer, 'text', 1));
     treeview.connect('row-activated', 'predef_query_detail');
     treeview.connect('cursor-changed', 'predef_query_detail');
     treeview.set_reorderable(True);
@@ -3936,7 +3944,7 @@ if __name__ == '__main__':
         # Get the configuration
         configname_u = None
         if len(arg_a) > 0:  # if the config is indicated on the command line
-            print "x", arg_a[0], "x"
+            print("x", arg_a[0], "x")
 
             if len(arg_a[0].strip()) > 0:
                 configname_u = unicode2(arg_a[0])
@@ -3949,7 +3957,7 @@ if __name__ == '__main__':
         # init
 
         tmp_u = unicode2(os.path.abspath("./"))
-        configdir_u = os.path.join(tmp_u, u"config", configname_u)
+        configdir_u = os.path.join(tmp_u, "config", configname_u)
 
         db_utils = db_utilities()
         selector = Restore()
@@ -3966,31 +3974,31 @@ if __name__ == '__main__':
         try:
             selector.load_popup_list()
         except:
-            print "Error loading popup list"
+            print("Error loading popup list")
         selector.load_gateway_data_list()
         selector.load_advanced_details()
-        gtk.main()
+        Gtk.main()
 
-    except ScriptSg, instance:
+    except ScriptSg as instance:
         isExcept = True
         excMsg_s = "%s" % (instance)
         (excType, excValue, excTb) = sys.exc_info()
         tb_a = traceback.format_exception(excType, excValue, excTb)
 
-    except ScriptIo, instance:
+    except ScriptIo as instance:
         isExcept = True
         excMsg_s = "%s" % (instance)
         (excType, excValue, excTb) = sys.exc_info()
         tb_a = traceback.format_exception(excType, excValue, excTb)
 
-    except ScriptRt, instance:
+    except ScriptRt as instance:
         isExcept = True
         excMsg_s = "%s" % (instance)
         (excType, excValue, excTb) = sys.exc_info()
         tb_a = traceback.format_exception(excType, excValue, excTb)
 
-    except exceptions.SystemExit, instance:
-        sys.exit(instance)
+    #£ except exceptions.SystemExit as instance:
+    #£    sys.exit(instance)
 
     except:
         isExcept = True
@@ -4002,9 +4010,9 @@ if __name__ == '__main__':
     if isExcept:
         # record exception
 
-        print("\nEXC: %s\n" % (excMsg_s))
+        print(("\nEXC: %s\n" % (excMsg_s)))
         for line_s in tb_a:
-            print(line_s.strip())
+            print((line_s.strip()))
         print("\nERR: Exception reÃ§ue\n")
 
         dt = datetime.datetime.now()
@@ -4013,9 +4021,9 @@ if __name__ == '__main__':
         for line_s in tb_a:
             l_msgerror += line_s.strip()
             l_msgerror += "\n"
-        print l_msgerror
+        print(l_msgerror)
 
-        dialog = gtk.MessageDialog(None, 0, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, l_msgerror)
+        dialog = Gtk.MessageDialog(None, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, l_msgerror)
         dialog.run()
         dialog.destroy()
         sys.exit(1)

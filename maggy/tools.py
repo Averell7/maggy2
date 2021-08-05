@@ -35,7 +35,7 @@ def nested_dict_search(obj, search, path=None, exact=False):
         path = []
 
     if isinstance(obj, dict):
-        for key, value in obj.items():
+        for key, value in list(obj.items()):
             _p = list(path)
             _p.append(key)
             results.extend(nested_dict_search(value, search, _p))

@@ -1,0 +1,77 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Maggy2
+
+name: Python application
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    #- name: Set up Python 3.7
+    #  uses: actions/setup-python@v2
+    #  with:
+    #    python-version: 3.7
+    - name: Install dependencies
+      run: |
+        sudo apt install -y python3 python3-dev python3-pip python3-venv python3-all \
+            dh-python debhelper devscripts dput software-properties-common \
+            python3-distutils python3-setuptools python3-wheel python3-stdeb
+        sudo apt-get install libgirepository1.0-dev gcc libcairo2-dev pkg-config gir1.2-gtk-3.0 --yes
+        python3 -m pip install --upgrade pip
+        # python -m pip install wheel
+        python3 -m pip install flake8 pytest
+        # python -m pip install rpm alien
+        sudo python3 -m pip install pyinstaller
+        python3 -m pip install PyGObject
+        if [ -f requirements.txt ]; then python3 -m pip install -r requirements.txt; fi
+        
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        # flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --builtins="_,xrange"   ==> this causes too many F821 (undefined) errors.
+        ## flake8 . --count --builtins="_,xrange" --select=E9,F63,F7 --show-source --statistics  
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        ## flake8 . --count --builtins="_,xrange" --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    # - name: Test with pytest
+    #  run: |
+    #    pytest maggy.py
+    - name: Create package
+      run: |        
+        python3 build.py
+        find . -iname *.pyc -delete
+        python3 setup.py --command-packages=stdeb.command bdist_deb
+        
+    - name: builds
+      uses: actions/upload-artifact@v2
+      with:
+        name: PyInstaller Archive
+        path: dist/pyinstaller-*.zip
+     
+    - name: source
+      uses: actions/upload-artifact@v2      
+      with:
+        name: Source Packages
+        path: dist/maggy-*.tar.gz
+
+    - name: rpm
+      uses: actions/upload-artifact@v2
+      with:
+        name: RPM Packages
+        path: dist/maggy-*.rpm
+
+    - name: deb
+      uses: actions/upload-artifact@v2
+      with:
+        name: Debian Packages
+        path: deb_dist/python3-maggy_*.deb

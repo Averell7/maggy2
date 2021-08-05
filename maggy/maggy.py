@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.1.0.4b - juin 2021
+# version 2.3.0 - juin 2021
 
 
 
@@ -10,8 +10,8 @@
 ###########################################################################
 import json_decoder
 
-maggy_version = "2.1.0.4"
-print "Maggy Version : ", maggy_version
+maggy_version = "2.3.0"
+print("Maggy Version : ", maggy_version)
 """
 In this version :
 
@@ -44,31 +44,31 @@ In peripheral tables, an index is necessary on the main field, otherwise inversi
 
 
 # remove accents
-remove_accents1 = { u"a" : u"àáâãäåą",
-                     "c" : u"çćč",
-                     "d" : u"ð",
-                     "e" : u"èéêëęε",
-                     "i" : u"ìíîï",
-                     "l" : u"ł",
-                     "n" : u"ñńŋ",
-                     "o" : u"òóôõöøő",
-                     "r" : u"ř",
-                     "s" : u"šśß",
-                     "u" : u"ùúûüű",
-                     "y" : u"ýÿ",
-                     "z" : u"źżž",
-                     u"ae" : u"æÆ",
-                     u"oe" : u"œŒ"
+remove_accents1 = { "a" : "àáâãäåą",
+                     "c" : "çćč",
+                     "d" : "ð",
+                     "e" : "èéêëęε",
+                     "i" : "ìíîï",
+                     "l" : "ł",
+                     "n" : "ñńŋ",
+                     "o" : "òóôõöøő",
+                     "r" : "ř",
+                     "s" : "šśß",
+                     "u" : "ùúûüű",
+                     "y" : "ýÿ",
+                     "z" : "źżž",
+                     "ae" : "æÆ",
+                     "oe" : "œŒ"
                    }
 
 
 remove_accents = {}
-for key, value in remove_accents1.iteritems() :
+for key, value in remove_accents1.items() :
     for letter in value :
         remove_accents[letter] = key
 
 # remove some other characters
-for letter in u"([<>…" :
+for letter in "([<>…" :
     remove_accents[letter] = ""
 
 
@@ -81,30 +81,32 @@ import copy     # for deep copies (copy without reference)
 import re, glob
 from collections import OrderedDict
 
-import exceptions
 from optparse import OptionParser
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from ctypes import *
 import traceback
 from operator import itemgetter, attrgetter
 import pickle       # serialize but unreadable
 import json         # serialize in a readable form
 import zipfile
-import StringIO
+import io
 #from collections import OrderedDict
 import pprint
 
+import gi
+gi.require_version('Gtk', '3.0')
 
-import pygtk
-import gtk
-
-import pango
-import gio          #to inquire mime types information
+from gi.repository import Gtk
+from gi.repository import Gdk
+from gi.repository import GdkPixbuf
+from gi.repository import Pango as pango
+from gi.repository import Gio as gio
+from gi.repository import cairo
 
 ##import StringMatcher
 ##from StringMatcher import *
 
-gtk.rc_parse("./gtkrc")
+Gtk.rc_parse("./gtkrc")
 
 try :
     import _mysql
@@ -112,6 +114,7 @@ try :
     from MySQLdb import cursors
 except :
     print("Mysql modules not installed.")
+
 
 ##try :
 ##    import pypyodbc         # for accdb tables
@@ -121,13 +124,14 @@ except :
 import sqlite3 as sqlite
 
 
+
 ###########################################################################
 # LOCALISATION ############################################################
 ###########################################################################
 import gettext
 import locale
-import elib_intl
-elib_intl.install("maggy2", "share/locale")
+import elib_intl3
+elib_intl3.install("maggy2", "share/locale")
 
 ###########################################################################
 # APPLICATION LIBS ########################################################
@@ -193,8 +197,8 @@ def array_diff(ar1, ar2) :
         # This will keep all keys of ar1 which are not equal in ar2
         # but will left aside all keys of ar2 which are not present in ar1
         # is this really the behaviour of php ?
-        keys1 = ar1.keys()
-        keys2 = ar2.keys()
+        keys1 = list(ar1.keys())
+        keys2 = list(ar2.keys())
         ar3 = {}
         for key in keys1 :
             if key in keys2 :
@@ -218,8 +222,8 @@ def array_intersect(ar1, ar2) :
 ##        ar3 = ar1.intersection(ar2)
 
     elif isinstance(ar1, dict) :
-        keys1 = ar1.keys()
-        keys2 = ar2.keys()
+        keys1 = list(ar1.keys())
+        keys2 = list(ar2.keys())
         ar3 = {}
         for key in keys1 :
             if key in keys2 :
@@ -246,7 +250,7 @@ def array_merge(list_a, list_b ) :
     # TODO : verify what is the exact behaviour of array_merge in php for dictionaries :
     # what happens if both arrays have the same key ? Here we keep the value of list_a
     elif isinstance(list_a, dict) :
-        keys_a = list_a.keys()
+        keys_a = list(list_a.keys())
         for key in list_b :
             if key not in keys_a :
                 list_a[key] = list_b[key]
@@ -275,21 +279,14 @@ def sql_error(link, req = "", message = "") :
     if error_s :
         message2 = message + "\nsql_error : " + req + "\n" + error_s
         alert(message2)
-        print "Error for : ", message2
+        print("Error for : ", message2)
     e = sqlite.Error()
 
     # TODO : verify how all this functions
     e2 = e.args
-    e3 = e.message
-
     if len(e2) > 0 :
-        print e2
-    if len(e3) > 0 :
-        print e3
-
-    sys.exc_clear()
-
-
+        print(e2)
+    #£ sys.exc_clear()
     return
 
     """
@@ -343,7 +340,7 @@ def md(data) :
         return data
 
 def check_key(dictionary,key) :
-    if dictionary.has_key(key) == False :
+    if (key in dictionary) == False :
         dictionary[key] = None
 
     return dictionary
@@ -394,14 +391,15 @@ def convert_rtf_hexcode(string1) :
 
 
     a = re.sub(r"\\'([0-9a-e]{2})", r"\x\1",  string1)
-    f1 = StringIO.StringIO()
-    f1.write( "b = '")
-    f1.write(a)
-    f1.write("'")
-    exec(f1.getvalue())
-    f1.close()
-    c = unicode2(b)
-    return c
+##    f1 = io.StringIO()
+##    f1.write( "b = '")
+##    f1.write(a)
+##    f1.write("'")
+##    exec(f1.getvalue())
+##    f1.close()
+##    c = unicode2(b)
+##    return c
+    return a    #£  Is this correct ??
 
 ##def debug22(string) :
 ##    f1 = open("debug22.txt", "a")
@@ -412,7 +410,7 @@ def debug22(string) :
     return "my function works"
 
 def to_utf8(value):
-    if isinstance(value, unicode):
+    if isinstance(value, str):
         return value.encode("utf-8")
     else:
         return value
@@ -500,38 +498,38 @@ d_logique=[
 class SqliteUnicode :
     #
     def __init__(self) :
-        self.collation = { u"a" : u"àáâãäåą",
-                           u"e" : u"eèéêëęε",
-                           u"i" : u"iìíîï",
-                           u"o" : u"òóôõöøő",
-                           u"u" : u"uûü",
-                           u"c" : u"cç",
-                           u"l" : u"ł",
-                           u"n" : u"ñńŋ",
-                           u"r" : u"ř",
-                           u"s" : u"sš",
-                           u"y" : u"ýÿ",
-                           u"z" : u"źżž",
-                           u"ae" : u"æÆ",
-                           u"oe" : u"œŒ"
+        self.collation = { "a" : "àáâãäåą",
+                           "e" : "eèéêëęε",
+                           "i" : "iìíîï",
+                           "o" : "òóôõöøő",
+                           "u" : "uûü",
+                           "c" : "cç",
+                           "l" : "ł",
+                           "n" : "ñńŋ",
+                           "r" : "ř",
+                           "s" : "sš",
+                           "y" : "ýÿ",
+                           "z" : "źżž",
+                           "ae" : "æÆ",
+                           "oe" : "œŒ"
 
                            }
 
         self.collation_ci = {}
         self.reg_exp = {}
 
-        for key, value in self.collation.iteritems() :
+        for key, value in self.collation.items() :
             for letter in value :
                 self.collation_ci[letter] = value + value.upper()
 
 
         self.remove_accents = copy.deepcopy(self.collation)
-        for key, value in remove_accents1.iteritems() :
+        for key, value in remove_accents1.items() :
             for letter in value :
                 self.remove_accents[letter] = key
 
         # remove some other characters
-        for letter in u"()[]<>…" :
+        for letter in "()[]<>…" :
             self.remove_accents[letter] = ""
 
 
@@ -541,11 +539,11 @@ class SqliteUnicode :
         # We compile them to improve performance
 
         # These ones are used by collate
-        self.re1 = re.compile(u"[àâä]")
-        self.re2 = re.compile(u"[éèêë]")
-        self.re3 = re.compile(u"[îï]")
-        self.re4 = re.compile(u"[ôö]")
-        self.re5 = re.compile(u"[ûü]")
+        self.re1 = re.compile("[àâä]")
+        self.re2 = re.compile("[éèêë]")
+        self.re3 = re.compile("[îï]")
+        self.re4 = re.compile("[ôö]")
+        self.re5 = re.compile("[ûü]")
 
 
 
@@ -586,7 +584,7 @@ class SqliteUnicode :
         try :
             comp_reg = re.compile(reg_string)
         except re.error as e :
-            print "compile error", reg_string
+            print("compile error", reg_string)
         self.reg_exp[data] = comp_reg
         return comp_reg
 
@@ -606,7 +604,7 @@ class SqliteUnicode :
             else :
                 return False
         except :
-            print "echec de like : ", a, "/", b
+            print("echec de like : ", a, "/", b)
             utils.printExcept()
             return False
 
@@ -628,7 +626,7 @@ class SqliteUnicode :
             else :
                 return False
         except :
-            print "echec de like : ", a, "/", b
+            print("echec de like : ", a, "/", b)
             utils.printExcept()
             return False
 
@@ -643,8 +641,8 @@ class SqliteUnicode :
 
     def collate(self,string1, string2):
 
-        string1 = unicode(string1,"utf_8")
-        string2 = unicode(string2,"utf_8")
+        string1 = str(string1,"utf_8")
+        string2 = str(string2,"utf_8")
         string1 = string1.lower()
         string2 = string2.lower()
 
@@ -725,10 +723,10 @@ class Import_csv :
         record = None
 
         # Setup treeview for authors
-        self.store1 = gtk.ListStore(int,int,str)
+        self.store1 = Gtk.ListStore(int,int,str)
         mag.arw["s_treeview21"].set_model(self.store1)
-        cr = gtk.CellRendererText()
-        colnew = gtk.TreeViewColumn("id", cr, text=1);
+        cr = Gtk.CellRendererText()
+        colnew = Gtk.TreeViewColumn("id", cr, text=1);
         colnew.set_resizable(True);
         #colnew.set_reorderable(True);
         #colnew.set_sort_column_id(j);
@@ -737,14 +735,14 @@ class Import_csv :
         mag.arw["s_treeview21"].append_column(colnew);
         mag.arw["s_treeview21"].connect('row-activated', self.detail);
         mag.arw["s_treeview21"].connect('cursor-changed', self.detail);
-        colnew = gtk.TreeViewColumn("nom", cr, text=2);
+        colnew = Gtk.TreeViewColumn("nom", cr, text=2);
         colnew.set_resizable(True);
         mag.arw["s_treeview21"].append_column(colnew);
 
         # Setup treeview for book titles
-        self.store2 = gtk.ListStore(str)
+        self.store2 = Gtk.ListStore(str)
         mag.arw["s_treeview22"].set_model(self.store2)
-        colnew = gtk.TreeViewColumn("Title", cr, text=0);
+        colnew = Gtk.TreeViewColumn("Title", cr, text=0);
         mag.arw["s_treeview22"].append_column(colnew);
 
 
@@ -792,7 +790,7 @@ class Import_csv :
     def delete_event(self, window, event,param =1)  :
 
         if param == 1 :
-            gtk.main_quit()
+            Gtk.main_quit()
             return False
 
         else :
@@ -814,7 +812,7 @@ class Import_csv :
 
     def gtk_main_quit(self, widget = None)   :
 
-        gtk.main_quit()
+        Gtk.main_quit()
         os._exit(0)
 
 
@@ -827,33 +825,33 @@ class Import_csv :
 
 
         if filename_u == None :
-            chooser = gtk.FileChooserDialog(title=_('_Open Configuration'),
-                    action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                    buttons=(gtk.STOCK_CANCEL,
-                        gtk.RESPONSE_CANCEL,
-                        gtk.STOCK_OPEN,
-                        gtk.RESPONSE_OK))
+            chooser = Gtk.FileChooserDialog(title=_('_Open Configuration'),
+                    action=Gtk.FILE_CHOOSER_ACTION_OPEN,
+                    buttons=(Gtk.STOCK_CANCEL,
+                        Gtk.RESPONSE_CANCEL,
+                        Gtk.STOCK_OPEN,
+                        Gtk.RESPONSE_OK))
             chooser.set_current_folder(configdir_u)
             chooser.set_show_hidden(True)  #Test : does not work. Why ??
 
-            filter_all = gtk.FileFilter()
+            filter_all = Gtk.FileFilter()
             filter_all.set_name(_('All files'))
             filter_all.add_pattern('*')
             chooser.add_filter(filter_all)
 
-            filter_ini = gtk.FileFilter()
+            filter_ini = Gtk.FileFilter()
             filter_ini.set_name(_('TXT files'))
             filter_ini.add_pattern('*.txt')
             chooser.add_filter(filter_ini)
             chooser.set_filter(filter_ini)
 
             response = chooser.run()
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.RESPONSE_OK:
                 filename = chooser.get_filename()
-                filename_u = unicode(filename,"utf-8")            # convert utf-8 to unicode for internal use
+                filename_u = str(filename,"utf-8")            # convert utf-8 to unicode for internal use
 
-            elif response == gtk.RESPONSE_CANCEL:
-                print(_('Closed, no files selected'))
+            elif response == Gtk.RESPONSE_CANCEL:
+                print((_('Closed, no files selected')))
                 chooser.destroy()
                 return
             chooser.destroy()
@@ -870,7 +868,7 @@ class Import_csv :
 
         fields_a = {}
         try:
-            f2 = open(os.path.join(configdir_u, u"collector_fields_table.txt"), "r")
+            f2 = open(os.path.join(configdir_u, "collector_fields_table.txt"), "r")
         except :
             alert("Could not open collector_fields_table.txt\nCheck if it is present in your config")
         BOM(f2)
@@ -907,7 +905,7 @@ class Import_csv :
                             record[maggyfieldname] = data2
 
                     else :
-                        print "field %s not found in collector_fields_table.txt" % collectorfieldname
+                        print("field %s not found in collector_fields_table.txt" % collectorfieldname)
                 i += 1
             #print record
             records_l.append(record)
@@ -1079,7 +1077,7 @@ class Import_csv :
             elif len(author) > 0 :
                 query = self.insert_into("complete", self.record, collector_auteur=author)      # import record with choosen author
             else :
-                print "This should not happen. author is : ", author
+                print("This should not happen. author is : ", author)
                 query = self.insert_into("complete", self.record)         # import record as is
 
             try :
@@ -1092,19 +1090,19 @@ class Import_csv :
                 return (id_livre, auteur_s)
 
             except Exception as error:
-                print "======> ERREUR : ", error
+                print("======> ERREUR : ", error)
                 return (None, None)
 
             #self.check_next_author()
 
     def insert_in_concerne(self, mydata, fonction) :
 
-        print len(mydata)
+        print(len(mydata))
         i = 0
         for data1 in mydata :
             i += 1
             if i % 10 == 0:
-                print ".",
+                print(".", end=' ')
             auteur = data1[1]
             id_livre = data1[0]
             if auteur :
@@ -1133,13 +1131,13 @@ class Import_csv :
                             #print query
                             cursor.execute(query)
                             if i % 100 == 0:
-                                print i,
+                                print(i, end=' ')
 
 
                         else :
-                            print "This should not happen. myauteur is : ", myauteur
+                            print("This should not happen. myauteur is : ", myauteur)
                     except Exception as error:
-                        print("Didn't work:", error)
+                        print(("Didn't work:", error))
         link.commit()
 
 
@@ -1360,14 +1358,14 @@ class db_utilities :
 
         tables = []
         for row in cursor :
-            key = row.keys()[0]
+            key = list(row.keys())[0]
             name = row[key]
             try :
                 cursor.execute("show columns from " + name)   # Test the validity of the table name.
                                                               # We have seen a database with a table named "1" which was impossible to handle with sql commands
                 tables.append(name)
             except :
-                print ("WARNING : Unable to handle table " + name + "\nCheck if there is no problem with it.")
+                print(("WARNING : Unable to handle table " + name + "\nCheck if there is no problem with it."))
 
 
         for name in tables :
@@ -1380,7 +1378,7 @@ class db_utilities :
             cursor.execute("show columns from " + name)
             columns = cursor.fetchall()
             for col in columns :
-                keys = col.keys()
+                keys = list(col.keys())
                 colname = col['Field']
                 table_def[name][colname] = {}
                 table_def[name][colname]['type'] = col['Type']
@@ -1402,21 +1400,21 @@ class db_utilities :
         central_table = "registre"      # TODO extraire de la config
         primary_key = "idpersonne"
 
-        chooser = gtk.FileChooserDialog(title=_('_Open Configuration'),
-                action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                buttons=(gtk.STOCK_CANCEL,
-                    gtk.RESPONSE_CANCEL,
-                    gtk.STOCK_OPEN,
-                    gtk.RESPONSE_OK))
+        chooser = Gtk.FileChooserDialog(title=_('_Open Configuration'),
+                action=Gtk.FILE_CHOOSER_ACTION_OPEN,
+                buttons=(Gtk.STOCK_CANCEL,
+                    Gtk.RESPONSE_CANCEL,
+                    Gtk.STOCK_OPEN,
+                    Gtk.RESPONSE_OK))
         chooser.set_current_folder(configdir_u)
         chooser.set_show_hidden(True)  #Test : does not work. Why ??
 
-        filter_all = gtk.FileFilter()
+        filter_all = Gtk.FileFilter()
         filter_all.set_name(_('All files'))
         filter_all.add_pattern('*')
         chooser.add_filter(filter_all)
 
-        filter_ini = gtk.FileFilter()
+        filter_ini = Gtk.FileFilter()
         filter_ini.set_name(_('sqlite files'))
         filter_ini.add_pattern('*.sqlite')
         filter_ini.add_pattern('*.db3')
@@ -1424,12 +1422,12 @@ class db_utilities :
         chooser.set_filter(filter_ini)
 
         response = chooser.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.RESPONSE_OK:
             filename = chooser.get_filename()
-            filename_u = unicode(filename,"utf-8")            # convert utf-8 to unicode for internal use
+            filename_u = str(filename,"utf-8")            # convert utf-8 to unicode for internal use
 
-        elif response == gtk.RESPONSE_CANCEL:
-            print(_('Closed, no files selected'))
+        elif response == Gtk.RESPONSE_CANCEL:
+            print((_('Closed, no files selected')))
             chooser.destroy()
             return
         chooser.destroy()
@@ -1442,7 +1440,7 @@ class db_utilities :
 
         cursor.execute("select * from " + central_table)
         row = cursor.fetchone()
-        list_cols = row.keys()
+        list_cols = list(row.keys())
 
 
         info = self.arw['s_info10'];
@@ -1468,7 +1466,7 @@ class db_utilities :
                 for field in list_cols :
                     #print field
                     #print row[field]
-                    if field in row2.keys() :
+                    if field in list(row2.keys()) :
                         #print row2[field]
                         if row[field] != row2[field] :
                             model1.append([str(id1), field, row[field], row2[field]])
@@ -1537,7 +1535,7 @@ class db_utilities :
                 if db_type == "accdb" and coltype.lower() == "text" :
                     coltype = "MEMO"
                 #insertion_tv(buffer1, "g_" + table + " not present, we should create it")
-                print table + "." + field + " not present, we should create it"
+                print(table + "." + field + " not present, we should create it")
                 req = "ALTER TABLE $table ADD COLUMN $field $coltype"
                 req1 = eval(php_string(req))
                 cursor.execute(req1)
@@ -1559,14 +1557,14 @@ class explode_db :
         return value
 
     def explode_insert_in_concerne(self, list_noms, fonction) :
-        print "insert in concerne : %d records" % len(list_noms)
+        print("insert in concerne : %d records" % len(list_noms))
         i = 0
         for data in list_noms :
             i += 1
             if i % 100 == 0:
-                while gtk.events_pending():
-                    gtk.main_iteration()
-                print i,            
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
+                print(i, end=' ')
             auteur = data[1]
             auteur = self.escape_quotes(auteur)
             id_livre = data[0]
@@ -1589,7 +1587,7 @@ class explode_db :
                     try:
                         cursor.execute(query)
                     except:
-                        print "Error for query :", query
+                        print("Error for query :", query)
 
                 else :
                     query = "select id_personne, nom from personnes where nom like '%" + myauteur + "%' "       # TODO generic (et en dessous)
@@ -1645,14 +1643,14 @@ class explode_db :
 
 
     def explode_insert_in_chartreuse(self, list_noms) :
-        print "insert in chartreuse : %d records" % len(list_noms)
+        print("insert in chartreuse : %d records" % len(list_noms))
         i = 0
         for data in list_noms :
             i += 1
             if i % 100 == 0:
-                while gtk.events_pending():
-                    gtk.main_iteration()
-                print i,
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
+                print(i, end=' ')
             auteur = data[1]
             id_livre = data[0]
             auteur = auteur
@@ -1671,22 +1669,25 @@ class explode_db :
 
 
                     else :
-                        print mychartreuse
+                        print(mychartreuse)
                 except Exception as error:
-                    print("Didn't work:", error)
+                    if "UNIQUE constraint failed:" in error.message:
+                        pass
+                    else:
+                        print(("Didn't work:", error))
         link.commit()
 
     def explode_insert_in_collection(self, list_noms) :
-        print "insert in collections : %d records" % len(list_noms)
+        print("insert in collections : %d records" % len(list_noms))
         i = 0
         for data in list_noms :
             i += 1
             if i % 100 == 0:
-                while gtk.events_pending():
-                    gtk.main_iteration()
-                print i,
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
+                print(i, end=' ')
             collection = data[1]
-            id_livre = data[0]            
+            id_livre = data[0]
             sep = collection.split(self.separator)
             for mycollection in sep :
                 mycollection = mycollection.strip()
@@ -1708,21 +1709,24 @@ class explode_db :
                         cursor.execute(query)
 
                     else :
-                        print "\nError for ", mycollection
+                        print("\nError for ", mycollection)
                 except Exception as error:
-                    print "\nDidn't work:", error, "Query was : \n", query
+                    if "UNIQUE constraint failed:" in error.message:
+                        pass
+                    else:
+                        print("\nDidn't work:", error, "Query was : \n", query)
         link.commit()
 
     def explode_insert_in_theme(self, list_noms) :
-        print "insert in theme : %d records" % len(list_noms)
+        print("insert in theme : %d records" % len(list_noms))
         i = 0
         for data in list_noms :
             i += 1
             if i % 100 == 0:
-                while gtk.events_pending():
-                    gtk.main_iteration()
-                print i,
-            theme = data[1]           
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
+                print(i, end=' ')
+            theme = data[1]
             id_livre = data[0]
             sep = theme.split(self.separator)
             for mytheme in sep :
@@ -1747,27 +1751,27 @@ class explode_db :
                         #print ".",
 
                     else :
-                        print "\n ===========> Error for ", mytheme
+                        print("\n ===========> Error for ", mytheme)
                 except Exception as error:
-                    if "UNIQUE constraint failed:" in error:
+                    if "UNIQUE constraint failed:" in error.message:
                         pass
                     else:
-                    print "\nDidn't work:", error, "Query was : \n", query
+                        print("\nDidn't work:", error, "Query was : \n", query)
         link.commit()
 
 
     def explode_insert_in_langue(self, list_noms) :
-        print "insert in langue : %d records" % len(list_noms)
+        print("insert in langue : %d records" % len(list_noms))
         i = 0
         for data in list_noms :
             i += 1
             if i % 100 == 0:
-                while gtk.events_pending():
-                    gtk.main_iteration()
-                print i,
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
+                print(i, end=' ')
             langue = data[1]
             id_livre = data[0]
-            langue = langue           
+            langue = langue
             sep = langue.split(self.separator)
             for mylangue in sep :
                 mylangue = mylangue.strip()
@@ -1788,10 +1792,13 @@ class explode_db :
                         #print ".",
 
                     else :
-                        print "\nError for ", mylangue
+                        print("\nError for ", mylangue)
                 except Exception as error:
-                    print "\nDidn't work:", error, "Query was : \n", query
-        link.commit()
+                    if "UNIQUE constraint failed:" in error.message:
+                        pass
+                    else:
+                        print("\nDidn't work:", error, "Query was : \n", query)
+            link.commit()
 
     def explode_full_db(self, widget = None) :
 
@@ -1819,17 +1826,17 @@ class explode_db :
         query = "delete from concerne"
         cursor.execute(query)
 
-        print ""
-        print "auteur"
+        print("")
+        print("auteur")
         self.explode_insert_in_concerne(self.auteur, "auteur")
-        print ""
-        print "collaborateurs"
+        print("")
+        print("collaborateurs")
         self.explode_insert_in_concerne(self.collaborateur, "collaborateur")
-        print ""
-        print "biographie"
+        print("")
+        print("biographie")
         self.explode_insert_in_concerne(self.biographie, "biographie")
-        print ""
-        print "vedette"
+        print("")
+        print("vedette")
         self.explode_insert_in_concerne(self.vedette, "vedette")
 
 
@@ -1846,17 +1853,17 @@ class explode_db :
         cursor.execute(query)
         link.commit()
 
-        print ""
-        print "chartreuse"
+        print("")
+        print("chartreuse")
         self.explode_insert_in_chartreuse(self.chartreuse)
-        print ""
-        print "collection"
+        print("")
+        print("collection")
         self.explode_insert_in_collection(self.collection)
-        print ""
-        print "theme"
+        print("")
+        print("theme")
         self.explode_insert_in_theme(self.theme)
-        print ""
-        print "langue"
+        print("")
+        print("langue")
         self.explode_insert_in_langue(self.langue)
         link.commit()
 
@@ -1879,10 +1886,7 @@ class explode_db :
         self.insert_in_concerne(self.field_data, "auteur")
 
 
-
-
-
-class TextBuffer (gtk.TextBuffer) :
+class TextBuffer (Gtk.TextBuffer) :
     tag_def = []
     def __init__(self)  :
         parent.__init__()
@@ -1897,9 +1901,9 @@ class ParsePangoMarkup :
     def apply_style(self, buffer1, tag, tag_attributes, start, end)  :
         tag_def = buffer1.tag_def    #...    tag_def = &buffer.tag_def
                                                 # pango code => textview tag code
-        tag_mapping = {'b' : ['weight', pango.WEIGHT_BOLD],
-                       'i' : ['style', pango.STYLE_ITALIC],
-                       'u' : ['underline', pango.UNDERLINE_SINGLE],
+        tag_mapping = {'b' : ['weight', gi.repository.Pango.Weight.BOLD],
+                       'i' : ['style', gi.repository.Pango.Style.ITALIC],
+                       'u' : ['underline', gi.repository.Pango.Underline.SINGLE],
                        'sup' : ['rise', 5000],
                        'sub' : ['rise', -5000],
                        'size' : 'size',
@@ -1916,12 +1920,19 @@ class ParsePangoMarkup :
                 k2 = tag_mapping[k]
                 tag_name = k2+'@'+v
                 self.setup_tag(buffer1, tag_name, k2, v)
-                buffer1.apply_tag(tag_def[tag_name], start, end)
+                try:
+                    buffer1.apply_tag(tag_def[tag_name], start, end)
+                except:
+                    print ("Pango error (1) to fix for tag", tag_def, tag_name, "\n")
+
 
         else :
             (property1, value) = tag_mapping[tag]
             self.setup_tag(buffer1, tag, property1, value)
-            buffer1.apply_tag(tag_def[tag], start, end)
+            try:
+                buffer1.apply_tag(tag_def[tag], start, end)
+            except:
+                print ("Pango error (2) to fix for tag", tag, "\n")
 
     def go(self)  :
         buffer1 = self.buffer1
@@ -1947,7 +1958,7 @@ class ParsePangoMarkup :
             if closetag=='/' :
                 (tag_id, tag, tag_attributes) = self.retrieve_begin_tag(tags, htmltag)
                 if tag=='' :
-                    print "warning>>> mismatched tag!\n"
+                    print("warning>>> mismatched tag!\n")
 
                 else :
                     start = buffer1.get_iter_at_mark(buffer1.get_mark('mark'+ str(tag_id)))
@@ -2000,14 +2011,11 @@ class ParsePangoMarkup :
 
     def setup_tag(self, buffer1, tag_name, property_name, value)  :
         tag_def = buffer1.tag_def    #...    tag_def = &buffer.tag_def
-        if not tag_def.has_key(tag_name) :
-            try :
-                tag_table = buffer1.get_tag_table()
-                tag_def[tag_name] = gtk.TextTag(tag_name)
-                tag_def[tag_name].set_property(property_name, value)
-                tag_table.add(tag_def[tag_name])
-            except :
-                print tag_name, property_name, value
+        if tag_name not in tag_def :
+            tag_table = buffer1.get_tag_table()
+            tag_def[tag_name] = Gtk.TextTag()
+            tag_def[tag_name].set_property(property_name, value)
+            tag_table.add(tag_def[tag_name])
 
 
 
@@ -2031,22 +2039,22 @@ class zoomx() :
     MODEL_ROW_EXTERN = 1002         # unused
     MODEL_ROW_MOTION = 1004
 
-    TARGETS = [('MODEL_ROW_INTERN', gtk.TARGET_SAME_WIDGET, MODEL_ROW_INTERN),
-            ('MODEL_ROW_EXTERN', gtk.TARGET_OTHER_APP, MODEL_ROW_EXTERN),
+    TARGETS = [('MODEL_ROW_INTERN', Gtk.TargetFlags.SAME_WIDGET, MODEL_ROW_INTERN),
+            ('MODEL_ROW_EXTERN', Gtk.TargetFlags.OTHER_APP, MODEL_ROW_EXTERN),
             ('MODEL_ROW_MOTION', 0, MODEL_ROW_MOTION)]
 
     def __init__(self, treeview)  :
 
         global arWidgets, config, config_info, periph_tables, mem, popup_saisie, tab_conversion
 
-        self.widgets = gtk.Builder()
+        self.widgets = Gtk.Builder()
         self.widgets.add_from_file('./data/zoom1.glade')
         arWidgets = self.widgets.get_objects()
 
         self.arZoom = {}
         for z in  arWidgets:
             try :
-                name = gtk.Buildable.get_name(z)
+                name = Gtk.Buildable.get_name(z)
                 self.arZoom[name]= z
                 z.set_name(name)
             except :
@@ -2098,7 +2106,7 @@ or the list does not exist."""))
 
         for  i in range(len(clists))  :
             clist = clists[i]
-            if not mag.arw.has_key(clist) :     # TODO ????
+            if clist not in mag.arw :     # TODO ????
                 continue
 
 
@@ -2108,10 +2116,10 @@ or the list does not exist."""))
                 # if more than one page add tabs to the notebook
 
 
-                sw = gtk.ScrolledWindow()
+                sw = Gtk.ScrolledWindow()
 
                 nb.append_page(sw)
-                new_list = gtk.TreeView()
+                new_list = Gtk.TreeView()
                 self.arZoom['treeleft'+ str(i)] = new_list
                 sw.add(new_list)
 
@@ -2133,11 +2141,11 @@ or the list does not exist."""))
             model1 = mag.arw[clist].get_model()
             left = self.arZoom['treeleft'+ str(i)]
             left.set_model(model1)
-            cell_renderer_left = gtk.CellRendererText()
+            cell_renderer_left = Gtk.CellRendererText()
             # ajout de la première colonne
-            colnew= gtk.TreeViewColumn("", cell_renderer_left, text=0)
-            if col_data.has_key("width") :
-                if col_data['width'] > 0 :
+            colnew= Gtk.TreeViewColumn("", cell_renderer_left, text=0)
+            if "width" in col_data :
+                if int(col_data['width']) > 0 :
                     # if width is defined
                     colnew.set_sizing(2)             # 2 = GTK_TREE_VIEW_COLUMN_FIXED
                     colnew.set_fixed_width(int(col_data['width']))
@@ -2145,7 +2153,7 @@ or the list does not exist."""))
 
             left.append_column(colnew)
 
-            left.enable_model_drag_source( gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
+            left.enable_model_drag_source( Gdk.ModifierType.BUTTON1_MASK, self.TARGETS, Gdk.DragAction.COPY | Gdk.DragAction.MOVE)
             left.connect("drag_data_get", self.drag_data_get_data) #$left->connect("drag_data_get", array($this,"drag_data_get_data"));
 
             # ajout des colonnes additionnelles définies dans config / gateway_data
@@ -2162,7 +2170,7 @@ or the list does not exist."""))
                             if cols['width'].isdigit() :
                                 width = int(cols['width'])
 
-                    colnew = gtk.TreeViewColumn("", cell_renderer_left, text=field)
+                    colnew = Gtk.TreeViewColumn("", cell_renderer_left, text=field)
                     colnew.set_sizing(2)             # 2 = GTK_TREE_VIEW_COLUMN_FIXED
                     colnew.set_fixed_width(width)
                     colnew.set_resizable(True)
@@ -2183,7 +2191,7 @@ or the list does not exist."""))
                     ref_column = num
 
 
-            if ref_column > 0 :
+            if ref_column and int(ref_column) > 0 :
                 col.set_cell_data_func(cell_renderer_left, mag.renvois, ref_column)
 
 
@@ -2206,13 +2214,13 @@ or the list does not exist."""))
         treeselect.connect('changed',self.additional_data_show, table, id_type,right)
 
 
-        cell_renderer = gtk.CellRendererText()
+        cell_renderer = Gtk.CellRendererText()
         columns = treeview.get_columns()
         k = 1
         for  col  in columns  :
             colwidth = col.get_width()
             title = col.get_title()
-            colnew = gtk.TreeViewColumn(title, cell_renderer, text=k)
+            colnew = Gtk.TreeViewColumn(title, cell_renderer, text=k)
             colnew.set_sizing(2)             # 2 = GTK_TREE_VIEW_COLUMN_FIXED
             colnew.set_resizable(True)
             colnew.set_fixed_width(colwidth)
@@ -2228,16 +2236,19 @@ or the list does not exist."""))
                 val = data [ key ]
                 if len(val['field']) > 0 :
                 #Create a label
-                    label = gtk.Label(val['field'])
-                    self.arZoom['vbox_data'].pack_start(label)
+                    label = Gtk.Label(val['field'])
+                    self.arZoom['vbox_data'].pack_start(label, True, True, 0)
                     # Create a text combobox.
-                    combo = gtk.combo_box_entry_new_text()
+                    combo = Gtk.ComboBoxText()
                     #combo.child.connect('changed', self.changed_cb)
                     combo.set_active(0)
 
-                    alignment = gtk.Alignment(0.5, 0, 0, 0) # note 2
-                    alignment.add(combo)
-                    self.arZoom['vbox_data'].pack_start(alignment)
+
+                    #£  gtk_alignment_set has been deprecated since version 3.14 and should not be used in newly-written code. Use GtkWidget alignment and margin properties
+                    #£ alignment = Gtk.Alignment(0.5, 0, 0, 0) # note 2
+                    #alignment.add(combo)
+                    #self.arZoom['vbox_data'].pack_start(alignment,label, True, True, 0)
+                    self.arZoom['vbox_data'].pack_start(combo, True, True, 0)
 
                     field = val['field']
                     req = eval(php_string("select distinct $field from $gateway order by $field"))
@@ -2255,8 +2266,9 @@ or the list does not exist."""))
 
 
                     combo.set_active(0)
-                    entry = combo.get_child()
-                    entry.connect('changed', self.additional_data,right,field,index)
+                    #£     To be simple, we have used comboBoxText. This should be changed ?
+##                    entry = combo.get_child()
+##                    entry.connect('changed', self.additional_data,right,field,index)
                     index+= 1
                     mag.arw['zoom_combo'+ str(index)] = combo
 
@@ -2278,12 +2290,10 @@ or the list does not exist."""))
 
         # glisser déposer pour les deux listes d'édition  (les fonctions appelées se trouvent dans ad-libros.php)
 
-
-        #$dest->enable_model_drag_dest($targets, Gdk::ACTION_DEFAULT);
-        right.enable_model_drag_dest(self.TARGETS, gtk.gdk.ACTION_DEFAULT)
+        right.enable_model_drag_dest(self.TARGETS, Gdk.DragAction.DEFAULT)
         right.connect("drag_data_received", self.drag_data_received_data)
         # réorganiser la liste de destination (= drag and drop de la liste sur elle-même)
-        right.enable_model_drag_source(gtk.gdk.BUTTON1_MASK, self.TARGETS, gtk.gdk.ACTION_COPY|gtk.gdk.ACTION_MOVE) #$right->connect("drag-data-get", array($this, "drag_data_get_data"));
+        right.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, self.TARGETS, Gdk.DragAction.COPY|Gdk.DragAction.MOVE) #$right->connect("drag-data-get", array($this, "drag_data_get_data"));
         right.connect("drag-data-get", self.drag_data_get_data)
 
 
@@ -2298,12 +2308,12 @@ or the list does not exist."""))
                 self.arw["crypt_list"],
                 self.arw["cryptnames_list"]] :
 
-            widget.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
+            widget.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
                     self.TARGETS_IV,
-                    gtk.gdk.ACTION_MOVE)
+                    Gtk.gdk.ACTION_MOVE)
 
             widget.enable_model_drag_dest(self.TARGETS_IV,
-                    gtk.gdk.ACTION_DEFAULT)
+                    Gtk.gdk.ACTION_DEFAULT)
             widget.connect('drag_data_get', self.lists_dnd_get_data)
             widget.connect('drag_data_received', self.dnd_received_data)
 
@@ -2339,23 +2349,20 @@ or the list does not exist."""))
             return
         listpath = model.get_string_from_iter(iter1)
 
-        #name = treeview.name
+        #name = treeview.get_name()
         try :                           # this function is used for left and right lists with different models
             id1 = model.get_value(iter1, 20)
         except :
             id1 = ""
         nom = model.get_value(iter1, 0)
 
-        data1 = pickle.dumps([listpath, nom, id1])    #data1 = serialize([name, id, nom])
-        #data1 = base64_encode(data1)           # nécessaire pour la transmission des caractères accentués
+        data1 = json.dumps([listpath, nom, id1])    #data1 = serialize([name, id, nom])
+        data.set_text(data1, -1)                #£ is -1 the right value ?
 
-        # sinon ils sont convertis en \Uxxxx et je ne sais pas décoder cela
-        #data.set_text(data1)
-        data.set(data.target, 8, data1)  # second argument is "format"
 
 
     def drag_data_received_data1(self, widget, context, x, y, data, info, time)  :
-
+        # ############  unused  ####################
         model = widget.get_model()
         drop_info = widget.get_dest_row_at_pos(x, y)
         (dest_path, position) = drop_info
@@ -2366,7 +2373,7 @@ or the list does not exist."""))
 
 
 
-        if name == widget.name :
+        if name == widget.get_name() :
 
             # reorder
 
@@ -2379,12 +2386,12 @@ or the list does not exist."""))
 
 
 
-                if position == gtk.TREE_VIEW_DROP_BEFORE : src_model.move_before(src_iter,dest_iter)
+                if position == Gtk.TREE_VIEW_DROP_BEFORE : src_model.move_before(src_iter,dest_iter)
 
 
-                elif (position == gtk.TREE_VIEW_DROP_AFTER
-                    or gtk.TREE_VIEW_DROP_INTO_OR_BEFORE
-                    or gtk.TREE_VIEW_DROP_INTO_OR_AFTER) :
+                elif (position == Gtk.TREE_VIEW_DROP_AFTER
+                    or Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE
+                    or Gtk.TREE_VIEW_DROP_INTO_OR_AFTER) :
                         src_model.move_after(src_iter,dest_iter)
 
 
@@ -2398,18 +2405,18 @@ or the list does not exist."""))
 
             if drop_info :
 
-                    if position == gtk.TREE_VIEW_DROP_BEFORE : model.insert(dest_path[0], data2)
+                    if position == Gtk.TREE_VIEW_DROP_BEFORE : model.insert(dest_path[0], data2)
 
 
-                    elif (position == gtk.TREE_VIEW_DROP_AFTER
-                        or gtk.TREE_VIEW_DROP_INTO_OR_BEFORE
-                        or gtk.TREE_VIEW_DROP_INTO_OR_AFTER) :
+                    elif (position == Gtk.TREE_VIEW_DROP_AFTER
+                        or Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE
+                        or Gtk.TREE_VIEW_DROP_INTO_OR_AFTER) :
                             model.insert(dest_path[0] + 1, data2)          # dropped after the selected line
 
 
             else : model.append(data2)
 
-    def drag_data_received_data(self, treeview, context, x, y, selection_data, target_id, etime):
+    def drag_data_received_data(self, treeview, context, x, y, data, target_id, etime):
         # Handles received data by drag and drop. As always for dnd, it is not simple...
 
         # For options lists, we use only the destination and position.
@@ -2423,7 +2430,20 @@ or the list does not exist."""))
         model = treeview.get_model()
         numcols = model.get_n_columns()
         info_depot = treeview.get_dest_row_at_pos(x, y)
-        (listpath_s,name_s, id1) = pickle.loads(selection_data.data)
+        #£ Data is not received. Why ?
+        try:
+            data1 = data.data
+        except:
+            pass
+        try:
+            data1 = data.get_data()
+        except:
+            pass
+        try:
+            data1 = data.get_text()
+        except:
+            pass
+        (listpath_s,name_s, id1) = json.loads(data1)
 
 
         # reorder list (set reorderable does not work when dnd is explicitly set)
@@ -2437,15 +2457,15 @@ or the list does not exist."""))
                 chemin, position = info_depot
                 myIter = model.get_iter(chemin)
 
-                if (position == gtk.TREE_VIEW_DROP_BEFORE
-                        or position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+                if (position == Gtk.TREE_VIEW_DROP_BEFORE
+                        or position == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
                     model.insert_before(myIter, donnees)
                 else:
                     model.insert_after(myIter, donnees)
             else:
                 model.append(donnees)
 
-            if context.action == gtk.gdk.ACTION_MOVE:
+            if context.action == Gtk.gdk.ACTION_MOVE:
                 context.finish(True, True, etime)
 
             return
@@ -2473,8 +2493,8 @@ or the list does not exist."""))
                 chemin, position = info_depot
                 myIter = model.get_iter(chemin)
 
-                if (position == gtk.TREE_VIEW_DROP_BEFORE
-                        or position == gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+                if (position == Gtk.TREE_VIEW_DROP_BEFORE
+                        or position == Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
                     model.insert_before(myIter, data1)
                 else:
                     model.insert_after(myIter, data1)
@@ -2482,8 +2502,8 @@ or the list does not exist."""))
                 model.append(data1)
 
 
-        while gtk.events_pending():
-            gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
         return True
 
@@ -2557,7 +2577,7 @@ or the list does not exist."""))
                     text = get_sel_row_data(treeview,0,int(int(z) + 1))
                     entry.set_text(text)
                 except :
-                    print "echec"
+                    print("echec")
 
 
 
@@ -2568,11 +2588,11 @@ or the list does not exist."""))
         text = ""
         popups = ""
         id = get_sel_row_data(left,0,20)
-        if id > 0 :
+        if int(id) > 0 :
             query = eval(php_string("select * from $table where $id_type = $id"))
             cursor.execute(query)
             fiche = fetch_array(cursor, table)
-            if col_data.has_key('details') :
+            if 'details' in col_data :
                 code = col_data['details']
                 (text,popups) = mag.parse_code(fiche,code)
 
@@ -2761,17 +2781,17 @@ class Prompt :
         self.entry = {}
         self.ok = 0
 
-        dialog = gtk.Dialog('Edit', None, gtk.DIALOG_MODAL|gtk.DIALOG_NO_SEPARATOR)
-        table = gtk.Table()
+        dialog = Gtk.Dialog('Edit', None, Gtk.DIALOG_MODAL|Gtk.DIALOG_NO_SEPARATOR)
+        table = Gtk.Table()
         self.display_table(table, fields)
         dialog.vbox.pack_start(table)
 
-        button = gtk.Button('  OK  ')
-        alignment = gtk.Alignment(0, 0, 0, 0)
+        button = Gtk.Button('  OK  ')
+        alignment = Gtk.Alignment(0, 0, 0, 0)
         alignment.add(button)
         button.connect('clicked', self.on_button)
         row = len(fields)
-        table.attach(alignment, 1, 2, row, row+1, gtk.FILL, gtk.SHRINK)
+        table.attach(alignment, 1, 2, row, row+1, Gtk.FILL, Gtk.SHRINK)
 
         self.dialog = dialog
         dialog.show_all()
@@ -2794,13 +2814,13 @@ class Prompt :
             value = fields [label]
             if isinstance(value, str) :
                 value = [value,None,None]
-            label = gtk.Label(label)
+            label = Gtk.Label(label)
 
 
-            self.entry[row] = gtk.Entry()
+            self.entry[row] = Gtk.Entry()
 
 
-            alignment = gtk.Alignment(1, .5, 0, 0)
+            alignment = Gtk.Alignment(1, .5, 0, 0)
             alignment.add(label)
             table.attach(alignment, 0, 1, row, row+1)
             table.attach(self.entry[row], 1, 2, row, row+1)
@@ -2860,17 +2880,17 @@ class Prompt2A :
         self.model = {}
         self.ok = 0
 
-        dialog = gtk.Dialog('Edit', None, gtk.DIALOG_MODAL|gtk.DIALOG_NO_SEPARATOR)
-        table = gtk.Table()
+        dialog = Gtk.Dialog('Edit', None, Gtk.DIALOG_MODAL|Gtk.DIALOG_NO_SEPARATOR)
+        table = Gtk.Table()
         self.display_table(table, fields)
         dialog.vbox.pack_start(table)
 
-        button = gtk.Button('  OK  ')
-        alignment = gtk.Alignment(0, 0, 0, 0)
+        button = Gtk.Button('  OK  ')
+        alignment = Gtk.Alignment(0, 0, 0, 0)
         alignment.add(button)
         button.connect('clicked', self.on_button)
         row = len(fields)
-        table.attach(alignment, 1, 2, row, row+1, gtk.FILL, gtk.SHRINK)
+        table.attach(alignment, 1, 2, row, row+1, Gtk.FILL, Gtk.SHRINK)
 
         self.dialog = dialog
         dialog.show_all()
@@ -2893,23 +2913,23 @@ class Prompt2A :
             value = fields [label]
             if isinstance(value, str) :
                 value = [value,None,None]
-            label = gtk.Label(label)
+            label = Gtk.Label(label)
 
-##            self.combo[row] = gtk.ComboBoxEntry()
-##            self.model[row] = gtk.ListStore(str)
+##            self.combo[row] = Gtk.ComboBoxEntry()
+##            self.model[row] = Gtk.ListStore(str)
 ##            self.combo[row].set_model(self.model[row])
 ##            self.combo[row].set_text_column(0)
-            self.combo[row] = gtk.combo_box_entry_new_text()
+            self.combo[row] = Gtk.combo_box_entry_new_text()
             self.entry[row] = self.combo[row].get_child()
             # add completion to the entry
-##            completion = gtk.EntryCompletion
+##            completion = Gtk.EntryCompletion
 ##            completion.set_model(self.model[row])
 ##            completion.set_text_column(0)
 ##            self.entry[row].set_completion(completion)
 
 
 ##            self.entry[row].connect("changed","allchars","entry")
-            alignment = gtk.Alignment(1, .5, 0, 0)
+            alignment = Gtk.Alignment(1, .5, 0, 0)
             alignment.add(label)
             table.attach(alignment, 0, 1, row, row+1)
             table.attach(self.combo[row], 1, 2, row, row+1)
@@ -2957,9 +2977,9 @@ class Prompt2A :
 
 class ask_for_config:
     def __init__(self) :
-        #dialog = gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
-        self.dialog = gtk.Dialog(title='Configuration choice', parent=None, flags=gtk.DIALOG_MODAL, buttons=("OK", 1, "Cancel", 0));
-        self.combo = gtk.combo_box_new_text();
+        #dialog = Gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
+        self.dialog = Gtk.Dialog(title='Configuration choice', parent=None, flags=Gtk.DialogFlags.MODAL, buttons=("OK", 1, "Cancel", 0));
+        self.combo = Gtk.ComboBoxText();
         temp = glob.glob("config/*");
 
         for val in temp :
@@ -2968,7 +2988,7 @@ class ask_for_config:
                 if dir_name[0:1] != "#" :
                     self.combo.append_text(dir_name);
         self.combo.set_active(0);
-        self.dialog.vbox.pack_start(self.combo);
+        self.dialog.vbox.pack_start(self.combo, True, True, 0);
         self.dialog.show_all();
 
     def run(self) :
@@ -3030,7 +3050,7 @@ class maglist() :
             treeview = table_data["treeview"];
             if table_data["type"] == "tree" :
 
-                listes[treeview] = gtk.TreeStore(str,str,str,str,str,str,str,str,str,str,str,str,
+                listes[treeview] = Gtk.TreeStore(str,str,str,str,str,str,str,str,str,str,str,str,
                 str,str,str,str,str,str,str,str,str,str,str,str);
 
                 self.configure_list(treeview);
@@ -3041,25 +3061,25 @@ class maglist() :
 
             else :
 
-                listes[treeview] = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,
+                listes[treeview] = Gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,
                 str,str,str,str,str,str,str,str,str,str,str,str,
                 str,str,str,str,str,str,str,str,str,str,str,str);
                 # an easier way could be :
-                #model = gtk.ListStore(*([str] * ncols))
+                #model = Gtk.ListStore(*([str] * ncols))
                 #which creates exactly ncols columns of type str.
 
 
                 self.configure_list(treeview);
 
                 entry = table_data["entry"];
-                if table_data.has_key('table') :
+                if 'table' in table_data :
                     table = table_data["table"];
                 complement = table_data["treeview"];
 
                 if len(entry.strip()) > 0 :
 
 
-                    if self.arw.has_key(entry) :
+                    if entry in self.arw :
 
                         self.arw[entry].connect("changed", self.refresh_list,tab);
 
@@ -3105,11 +3125,11 @@ class maglist() :
         # valeur par défaut pour l'affichage : on prend les données de la première table centrale
 
         try :
-            temp = config['central'].keys()
+            temp = list(config['central'].keys())
             result = config['central'][temp[0]]['result'];
             details = config['central'][temp[0]]['details'];
         except :
-            print "The configuration of the central table %s is incomplete" % temp[0]
+            print("The configuration of the central table %s is incomplete" % temp[0])
 
         if result and details :
 
@@ -3129,7 +3149,7 @@ class maglist() :
                 if not 'combobox' in val :
                     return
                 if not val['combobox'] in self.arw :
-                    print val['combobox'],"does not exist"
+                    print(val['combobox'],"does not exist")
                     continue
                 widget = self.arw[val['combobox']];
                 type = widget_type(widget);
@@ -3142,7 +3162,7 @@ class maglist() :
                 if len(req) > 0 :
 
                     # si une requête est définie pour remplir la combobox
-                    listStore = gtk.ListStore(str,str);
+                    listStore = Gtk.ListStore(str,str);
                     try :
                         cursor.execute(req);
                     except sqlite.Error as er :
@@ -3165,9 +3185,9 @@ class maglist() :
                                     data2 = ""
                                 listStore.append([data,data2]);
                             except :                            # for mysql
-                                data = fiche[fiche.keys()[0]];
-                                if len(fiche.keys()) > 1 :
-                                    data2 = fiche.keys()[1]
+                                data = fiche[list(fiche.keys())[0]];
+                                if len(list(fiche.keys())) > 1 :
+                                    data2 = list(fiche.keys())[1]
                                 else :
                                     data2 = ""
                                 listStore.append([data,data2]);
@@ -3177,16 +3197,16 @@ class maglist() :
 
 
                 if (widget) :
-                    if type  == "GtkComboBox" or type  == "GtkComboBoxEntry":
+                    if type  in ["GtkComboBox", "GtkComboBoxEntry", "GtkComboBoxText"]:
 
-                        cell_renderer = gtk.CellRendererText();
+                        cell_renderer = Gtk.CellRendererText();
                         combo = widget;
                         if listStore :
 
                             combo.set_model(listStore);
-                            combo.pack_start(cell_renderer);
+                            combo.pack_start(cell_renderer, True);
 
-                            completion = gtk.EntryCompletion();
+                            completion = Gtk.EntryCompletion();
                             completion.set_model(listStore);
                             completion.set_text_column(0);
 
@@ -3195,14 +3215,8 @@ class maglist() :
                                 combo.set_text_column(0);
                                 entry = combo.child
                                 entry.set_completion(completion);
-
                             else :
-
-                                combo.set_attributes(cell_renderer, text=0);
-
-
-
-
+                                combo.add_attribute(cell_renderer, "text", 0);
                 else :
                     self.build_listes_errors.append(["The combobox", val['combobox']])
                     #alert(_(" The combobox %s does not exist") % val['combobox'])
@@ -3211,11 +3225,9 @@ class maglist() :
 ##        print " time25 : ", (t2-t1)
 ##        t1 = t2
 
-
-
         popup_condition = {}
         # chargement des listes conditionnelles pour les popup
-        if config.has_key('popup') and isinstance(config['popup'], dict):
+        if 'popup' in config and isinstance(config['popup'], dict):
 
             for key  in config['popup'] :
                 val = config['popup'][key ]
@@ -3232,7 +3244,7 @@ class maglist() :
                     n = len(result)
                     popup_condition[key] = []
                     for row in result :
-                        popup_condition[key].append(row.keys()[0])
+                        popup_condition[key].append(list(row.keys())[0])
 
 
 
@@ -3251,15 +3263,15 @@ class maglist() :
 
         if not name in self.arw :
 
-            print name + _(" not found !!");
+            print(name + _(" not found !!"));
             return;
 
         # defaults
         hauteur = 12
-        points = long(10)
+        points = int(10)
 
 
-        if config['ini']['lists'].has_key('line_height') :
+        if 'line_height' in config['ini']['lists'] :
             try :
                 hauteur = int(config['ini']['lists']['line_height'])
             except : hauteur = 12
@@ -3267,16 +3279,16 @@ class maglist() :
             hauteur = 12
 
         # doit être un entier, sinon erreur
-        if config['ini']['lists'].has_key('font_size') :
+        if 'font_size' in config['ini']['lists'] :
 
-            points = long(config['ini']['lists']['font_size']);
+            points = int(config['ini']['lists']['font_size']);
 
         # doit être un double
         else :
-            points = long(10);
+            points = int(10);
 
         cr = {}
-        cr[name] = gtk.CellRendererText();
+        cr[name] = Gtk.CellRendererText();
         cr[name].set_property('height', hauteur);
         cr[name].set_property('family', config['ini']['lists']['font']);
         cr[name].set_property('size-points', points);
@@ -3284,7 +3296,7 @@ class maglist() :
 
         treeview=self.arw[name];
         if magutils.widget_type(treeview) != "GtkTreeView" :
-            alert(name . _(" is not a GtkTreeView. \nVerify your configuration"));
+            alert(name + _(" is not a GtkTreeView. \nVerify your configuration"));
             return;
 
         store=listes[name];
@@ -3320,7 +3332,7 @@ class maglist() :
                     else :
                         col_title = ""
 
-                    colnew = gtk.TreeViewColumn(col_title, cr[name], text=int(key));
+                    colnew = Gtk.TreeViewColumn(col_title, cr[name], text=int(key));
                     colnew.set_sizing(2);
                     # 2 = GTK_TREE_VIEW_COLUMN_FIXED
                     colnew.set_fixed_width(int(coldef[key]['width']));
@@ -3370,7 +3382,7 @@ class maglist() :
                         v2(checkbox_list,name)
                         checkbox_list[name][val['checkbox']] = [val['field'],index]
                 except :
-                    print "error in configuration"          # TODO
+                    print("error in configuration")          # TODO
 
 
         # couleurs pour les renvois ; elles sont gérées par une fonction
@@ -3384,7 +3396,7 @@ class maglist() :
                 if val['field'] == ref_field :
 
 
-                    ref_column = key;
+                    ref_column = int(key)
                     if ref_column > 0 :
                         col.set_cell_data_func(cr[name], self.renvois, ref_column);
 
@@ -3483,7 +3495,7 @@ class maglist() :
         Si cette fonction renvoie quelque chose (n'importe quoi, il semble), le timer continue à fonctionner et
         exécutera de nouveau la fonction après qu'un nouveau délai aura passé. Ceci continuera jusqu'à ce que
         la fonction cesse de renvoyer quelque chose, ou bien jusqu'à la destruction du timer par la fonction
-        timeout_remove.
+        source_remove.
         Cette procédure à deux degrés peut sembler complexe, mais elle permet à la fonction appelée directement
         par le timer de faire un choix entre les actions à exécuter en fonction de l'état du programme. Cela
         offre donc une grande souplesse. Ci-dessous l'exemple le plus simple où la fonction appelée par le timer
@@ -3506,17 +3518,18 @@ class maglist() :
 
         if 'timer1' in mem :
             if mem['timer1'] != None :
-                gtk.timeout_remove(mem['timer1']);
+                gi.repository.GLib.source_remove(mem['timer1']);
 
         a=self.arw[entry].get_chars(0,-1);
         # recherche du mot actif, c'est à dire élimination de tout ce qui précède un opérateur logique
         e = re.split("[&+/_]", a)[0];
 
         if len(e.lstrip()) <3 :
-            if ((e <> "") and(e <> " ")) or(a == "") :      # ignorer les espaces après un séparateur, mais prendre en compte le cas où le champ est tout à fait vide
+            if ((e != "") and(e != " ")) or(a == "") :      # ignorer les espaces après un séparateur, mais prendre en compte le cas où le champ est tout à fait vide
+
 
                 if 'type_delay' in config['ini']['lists'] :
-                    mem['timer1'] = gtk.timeout_add(int(config['ini']['lists']['type_delay']),self.timer1,tab, entry, complement);
+                    mem['timer1'] = gi.repository.GLib.timeout_add(int(config['ini']['lists']['type_delay']),self.timer1,tab, entry, complement);
                 else :
                     self.refresh_list2(tab,entry,complement);
 
@@ -3526,7 +3539,8 @@ class maglist() :
 
     def timer1(self, tab, entry, complement) :
         self.refresh_list2(tab,entry,complement)
-        #gtk.timeout_remove(mem['timer1'])
+        if mem["timer1"]:
+            gi.repository.GLib.source_remove(mem['timer1'])
         return "refresh_list2";
 
 
@@ -3546,8 +3560,8 @@ class maglist() :
 
 
         if 'timer1' in mem :
-            if mem['timer1'] :
-                gtk.timeout_remove(mem['timer1']);
+            if mem['timer1'] != None:
+                gi.repository.GLib.source_remove(mem['timer1']);
             mem['timer1'] = None
 
 
@@ -3555,14 +3569,13 @@ class maglist() :
 
         liste = table_data["treeview"];
         if entry == None :
-
             entry = table_data["entry"];
 
         config_table = table_data["table_def"];
         # TODO IMPORTANT  sélection des tables de mots
         if not config_table in config['peripheral'] :
             if not config_table in config['words'] :
-                print (_("WARNING : table %s does not seem to exist, or information missing for this table") % config_table)
+                print((_("WARNING : table %s does not seem to exist, or information missing for this table") % config_table))
                 return
             else :
                 table = config['words'][config_table]['table'];
@@ -3571,7 +3584,7 @@ class maglist() :
         else :
             if (not 'table' in config['peripheral'][config_table] or
                 not 'main_field' in config['peripheral'][config_table]) :
-                    print "FATAL ERROR : table ", config_table, " improperly configured"
+                    print("FATAL ERROR : table ", config_table, " improperly configured")
                     return
             else :
                 table = config['peripheral'][config_table]['table'];
@@ -3580,9 +3593,6 @@ class maglist() :
                 if 'order' in config['peripheral'][config_table] :
                     order_field = config['peripheral'][config_table]['order']
 
-
-
-        a = ""
 
         if complement == None :             # if complement has been sent by the caller (zoomx) use the value sent.
                                         # This feature is used to avoid using complement and get a full listing in the edit boxes
@@ -3641,7 +3651,7 @@ class maglist() :
                 iter = model.get_iter(path);
                 idlivre = model.get_value(iter, 20);
                 groupe = model.get_value(iter, 19);
-                if not selection.has_key(groupe) :
+                if groupe not in selection :
                     selection[groupe] = []
                 selection[groupe].append(idlivre)
 
@@ -3672,13 +3682,13 @@ class maglist() :
 
 
         # display the number of records
-        if self.arw.has_key(entry + '_#') :
+        if entry + '_#' in self.arw :
 
             set_text(self.arw[entry + '_#'],num);
 
 
         # champ exclure
-        if self.arw.has_key(entry + '_x') :
+        if entry + '_x' in self.arw :
 
             exclure=get_text(self.arw[entry + '_x']);
             exclure=str_replace(["/","&",";\n"],[";"],exclure);      # TODO : ?? le \n est il juste ?
@@ -3722,7 +3732,7 @@ class maglist() :
 
         #mot = self.Chaine(mot)
         limite=config['ini']['lists']["max_lines"];
-        if limite < 1 :
+        if limite.isdigit() and int(limite) < 1 :
             limite = 100;
 
         # N.B. : dans la version sqlite, order by a été supprimé et petu être mis dans complements
@@ -3736,7 +3746,7 @@ class maglist() :
         try :
             cursor.execute(req)
         except :
-            print "Erreur SQL dans cree_listes"
+            print("Erreur SQL dans cree_listes")
             sql_error(link,req);
 
             return
@@ -3759,7 +3769,7 @@ class maglist() :
             color_field = get_option("c",options);
             central_table = config['central'][central_def]['table'];
         except :
-            print "Definition for list ", liste, " is not complete"
+            print("Definition for list ", liste, " is not complete")
             return
 
         if db_type == "accdb" :             # Access driver returns fields name in lower case
@@ -3792,7 +3802,7 @@ class maglist() :
                     if field == "#" :
                         temp = "i_data_" + central_table;
                     if not db_type == "accdb" :          # TODO : with accdb, error : Row object has no attribute 'keys'
-                        if temp in fiche.keys() :
+                        if temp in list(fiche.keys()) :
                             values[int(key)] = self.compter(fiche[temp])
 
                 elif field == "" :
@@ -3821,15 +3831,15 @@ class maglist() :
                 values[18] = '#ffffff';
             values[19]=groupe;
             if not db_type == "accdb" :          # TODO : with accdb, error : Row object has no attribute 'keys'
-                if primary_key in fiche.keys() :
+                if primary_key in list(fiche.keys()) :
                     try:
                         values[20]=fiche[primary_key]
                     except:
-                        print "Error for list, primary_key ", liste, primary_key
+                        print("Error for list, primary_key ", liste, primary_key)
             if not db_type == "accdb" :          # TODO : with accdb, error : Row object has no attribute 'keys'
-                if ('i_data_' + central_table) in fiche.keys() :
+                if ('i_data_' + central_table) in list(fiche.keys()) :
                     thisvalue = fiche['i_data_' + central_table];
-                    if isinstance(thisvalue, unicode):
+                    if isinstance(thisvalue, str):
                             thisvalue = thisvalue.encode("utf-8")
                     values[21] = thisvalue
 
@@ -3842,18 +3852,19 @@ class maglist() :
                     except :
                         continue
 
-            
+
             values1 = []
             for value in values:
-                if isinstance(value, int):
-                    value = str(value)                
-                values1.append(value)
-            listes[liste].append(values1);            
+                values1.append(x2str(value))  # insure all is str
+            try:
+                listes[liste].append(values1);
+            except:
+                print ("===>Error in cree_listes")
 
             # éviter la fonction append(liste,values) plus lente
 
             # indication : exclure
-            if groupe < 0 :                
+            if groupe < 0 :
                 n=len(liste)
                 liste.set_row_style(n-1,style_exclure);
 
@@ -3923,7 +3934,7 @@ class maglist() :
             table_data = config['xtabs'][tab ]
 
             treeview = table_data["treeview"];
-            if treeview == self.active_list.name :
+            if treeview == self.active_list.get_name() :
                 self.refresh_list2(tab)
 
 
@@ -3990,11 +4001,12 @@ class maglist() :
 
     def detail_liste(self, selection) :
 
+        print ("detail_liste  (3993)")
         # Affichage dans le cadre de droite
         global query;
         global config, tab_conversion;
-        while gtk.events_pending() :
-            gtk.main_iteration();
+        while Gtk.events_pending() :
+            Gtk.main_iteration();
 
         datadef = {}
 
@@ -4013,7 +4025,7 @@ class maglist() :
         # s'il n'y a pas de sélection, on efface
 
         temp = selection.get_tree_view();
-        list_name = gtk.Buildable.get_name(temp)
+        list_name = Gtk.Buildable.get_name(temp)
         config_name = tab_conversion[list_name];
         table_data = config['xtabs'][config_name];
 
@@ -4032,19 +4044,16 @@ class maglist() :
 
         for z in datadef :
 
-            model_field = z;
+            model_field = int(z)
             # extraction du numéro de colonne
             #         model_field -= 1;                   # les champs du modèle commencent à 0 et non à 1
             if effacer == 1 :
-
                 texte ="";
-
             else :
-
                 texte=model.get_value(iter, model_field);
 
             if not datadef[z]['detail'] in self.arw :
-                print datadef[z]['detail'], "does not seem to exist "
+                print(datadef[z]['detail'], "does not seem to exist (4044) ")
             else :
                 widget = self.arw[datadef[z]['detail']];
                 magutils.set_text(widget,texte);
@@ -4052,9 +4061,9 @@ class maglist() :
 
 
 
-        while (gtk.events_pending()) :
+        while (Gtk.events_pending()) :
 
-            gtk.main_iteration();
+            Gtk.main_iteration();
 
         # nombre de fiches renvoyées par la sélection actuelle
         if list_name + "_#" in self.arw :
@@ -4066,9 +4075,9 @@ class maglist() :
             set_text(self.arw[list_name + "_#"],msg);
 
 
-        while (gtk.events_pending()) :
+        while (Gtk.events_pending()) :
 
-            gtk.main_iteration();
+            Gtk.main_iteration();
 
 
 
@@ -4089,7 +4098,7 @@ class maglist() :
 
         global mem, config, config_info, popup_saisie, listes, query
         global tab_conversion, periph_tables, treeview_data, affichage;
-
+        print ("====>  ok_liste")
         listes_combinees = []
         query = {}
         # déclarations
@@ -4109,7 +4118,7 @@ class maglist() :
         if magutils.widget_type(treeview) == "GtkTreeView" :
 
             # si la fonction est appelée par un contrôle lié à une liste, ou par la liste elle-même
-            nom_liste1 = treeview.name
+            nom_liste1 = Gtk.Buildable.get_name(treeview)
             # Is there a selection (function is launched by the signal "cursor changed"
             # the first time the tab is opened, with no selection, which provokes
             # an annoying alert
@@ -4127,7 +4136,7 @@ class maglist() :
 
 
 
-        if option == "combine" :
+        if option == "combinexx" :  #£
 
             # fonction appelée par le bouton de la fenêtre combiner
             logic = []
@@ -4168,7 +4177,7 @@ class maglist() :
                     in_liste = self.ok_liste_b(treeview,nom_liste2);
                     mem ['critere' + str(i)] = in_liste
 
-                print(i, mem['critere' + str(i)])
+                print((i, mem['critere' + str(i)]))
 
                 i+= 1;
 
@@ -4349,7 +4358,7 @@ class maglist() :
                 # Extraction de l'opérateur logique dont le code est dans le champ 19
                 logique19=model.get_value(z,19)
                 if logique19 == '' :
-                    print "Erreur sur champ logique 19"
+                    print("Erreur sur champ logique 19")
                     logique19 = 0
                 logique19 = int(logique19)
 
@@ -4424,10 +4433,10 @@ class maglist() :
         global config
 
         if not group :              # if group not given, we take it from the reset button name
-            name = widget.name;
+            name = widget.get_name();
             group = substr(name,strrpos(name,'@')+1);
 
-        for key, val  in config['combobox'].iteritems() :
+        for key, val  in config['combobox'].items() :
 
             if 'group' in val and val['group'] == group :
                 if 'combobox' in val  and val['combobox'].strip() != "" :
@@ -4483,15 +4492,20 @@ class maglist() :
             central_def = config['peripheral'][table_def]['central_def'];
             central_table = config['central'][central_def]['table'];
         except :
-            print "Configuration for treeview %s seems incomplete" % name
+            print("Configuration for treeview %s seems incomplete" % name)
             return
 
 
-        keys = table_data.keys()
+        keys = list(table_data.keys())
         for z in keys :
             # extraire les champs datax
             if z[0:3] == "col" :
-                numcol = z[3:] ;
+                numcol = z[3:]
+                if isinstance(numcol, str):
+                    if numcol.isdigit():
+                        numcol = int(numcol)
+                    else:
+                        numcol = 0
                 if numcol>0 :
                     coldef[numcol] = table_data[z];
 
@@ -4520,7 +4534,7 @@ class maglist() :
             try:
                 id = fiche[primary_key];
             except:
-                print "Error for primary_key ", primary_key
+                print("Error for primary_key ", primary_key)
 
             if isset(coldef) :
 
@@ -4537,7 +4551,7 @@ class maglist() :
                         if field == "#" :
 
                             temp = "i_data_" + central_table;
-                        if temp in fiche.keys() :
+                        if temp in list(fiche.keys()) :
                             values[key] = self.compter(fiche[temp]);
                         else :
                             values[key] = ""
@@ -4580,17 +4594,24 @@ class maglist() :
 ##                values[18] = '#bb88bb'              # background
             # values[19]=groupe    groupe n'est pas défini dans cette fonction
             values[20]=fiche[primary_key];
-            if 'i_data_' + central_table in fiche.keys() :
+            if 'i_data_' + central_table in list(fiche.keys()) :
                 values[21]=fiche['i_data_' + central_table];
 
             parent=fiche["parent"];
             niveau=fiche["niveau"];
 
-            if (node.has_key(parent) == False) :
-                node[id]= listes[name].append(None,values);
-            else :
+            values1 = []                     # insure all is str
+            for value in values:
+                values1.append(x2str(value))
 
-                node[id]= listes[name].append(node[parent],values);
+            try:
+                if ((parent in node) == False) :
+                    node[id]= listes[name].append(None,values1);
+                else :
+
+                    node[id]= listes[name].append(node[parent],values1);
+            except:
+                print("====> Error in build tree")
 
 
 
@@ -4608,7 +4629,7 @@ class maglist() :
                 col.add_attribute(cr[name],'foreground', 17);
                 col.add_attribute(cr[name],'cell-background', 18);
             else :
-                print "debug : ", name, "was not found in cr"
+                print("debug : ", name, "was not found in cr")
 
 
         # la propriété cell-background évite le quadrillage qui se produit avec background
@@ -4666,7 +4687,7 @@ class maglist() :
 
             return;
 
-        list_name = list.name;
+        list_name = list.get_name();
         self.arw[list_name].expand_all();
 
 
@@ -4678,7 +4699,7 @@ class maglist() :
 
             return;
 
-        list_name = list.name;
+        list_name = list.get_name();
         ctree= self.arw[list_name];
         ctree.collapse_all();
 
@@ -4694,7 +4715,7 @@ class maglist() :
 
             return;
 
-        list_name = list.name;
+        list_name = list.get_name();
         ctree = self.arw[list_name];
         sel=ctree.get_selection();
 
@@ -4717,7 +4738,7 @@ class maglist() :
 
             return;
 
-        list_name = list.name;
+        list_name = list.get_name();
         ctree = self.arw[list_name];
         sel=ctree.get_selection();
 
@@ -4737,7 +4758,7 @@ class maglist() :
             return;
 
         try :
-            name = mylist.name;
+            name = mylist.get_name();
         except :
             name = mylist
             mylist = self.arw[mylist];
@@ -4772,7 +4793,7 @@ class maglist() :
 
             return;
 
-        list_name = mylist.name;
+        list_name = mylist.get_name();
         config_name = tab_conversion[list_name];
         table_data = config['xtabs'][config_name];
         table = table_data['table_def'];
@@ -4846,7 +4867,7 @@ class maglist() :
 
             return;
 
-        list_name = list1.name;
+        list_name = list1.get_name();
         config_list = tab_conversion[list_name];
         list_data = config['xtabs'][config_list];
         config_table = list_data['table_def'];
@@ -4921,7 +4942,7 @@ class maglist() :
 
             return;
 
-        list_name = list1.name;
+        list_name = list1.get_name();
         config_list = tab_conversion[list_name];
         list_data = config['xtabs'][config_list];
         config_table = list_data['table_def'];
@@ -5076,7 +5097,7 @@ class maglist() :
 
             return;
 
-        list_name = list1.name;
+        list_name = list1.get_name();
         config_list = tab_conversion[list_name];
         list_data = config['xtabs'][config_list];
         config_table = list_data['table_def'];
@@ -5159,7 +5180,7 @@ class maglist() :
                 i_data = "i_data_" + central_table;
 
                 gateway = None
-                if val.has_key('gateway') and len(val['gateway'].strip()) > 0 :
+                if 'gateway' in val and len(val['gateway'].strip()) > 0 :
                     gateway = val['gateway']
 
 
@@ -5173,7 +5194,7 @@ class maglist() :
 
 
         # Inversions defined in the configuration (config.py)
-        if config.has_key('inversion') :
+        if 'inversion' in config :
             for key in config['inversion'] :
                 val = config['inversion'][key]
 
@@ -5242,16 +5263,16 @@ class maglist() :
 
                 req1 = eval(php_string(req0))
                 # TODO order à la ligne 2 de cette requête. (?)
-                print req1   # TODO DEBUG
+                print(req1)   # TODO DEBUG
 
 
                 # affichage dans le TextView
                 message = _("Inversion of table ") + table + _("; creating field ") + i_data + "\n"
                 insertion_tv(buffer1,message);
-                info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+                #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
 
-                while (gtk.events_pending()) :
-                    gtk.main_iteration();
+                while (Gtk.events_pending()) :
+                    Gtk.main_iteration();
 
                 t1 = time.time()
 
@@ -5323,10 +5344,10 @@ class maglist() :
                 titre = substr(req1,0,pos);
                 message = titre + "\n";
                 insertion_tv(buffer1,message);
-                info.scroll_to_mark(buffer1.get_insert(), 0);
+                #£ info.scroll_to_mark(buffer1.get_insert(), 0);
 
-                while (gtk.events_pending()) :
-                    gtk.main_iteration();
+                while (Gtk.events_pending()) :
+                    Gtk.main_iteration();
                 cursor.execute(req1);
                 sql_error(link,req1);
 
@@ -5358,7 +5379,7 @@ class maglist() :
         message += _("End of inversion process")
         message += "\n\n =========================================\n\n"
         insertion_tv(buffer1, message)
-        info.scroll_to_mark(buffer1.get_insert(), 0)
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0)
 
         #TODO : refresh_all_lists() ??
 
@@ -5460,9 +5481,9 @@ class maglist() :
         # création du champ i_data
 
         insertion_tv(buffer1,_("Global field creation\n"))          # affichage
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
-            gtk.main_iteration();
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        while (Gtk.events_pending()) :
+            Gtk.main_iteration();
 
 
         i_global = "i_data_" + config['central'][central_def]['table'];
@@ -5487,9 +5508,9 @@ class maglist() :
 
         # effacement des enregistrements qui ne renvoient à rien
         insertion_tv(buffer1,"Deletion of empty records\n");            # affichage
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
-            gtk.main_iteration();
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        while (Gtk.events_pending()) :
+            Gtk.main_iteration();
 
 
         where = implode(" is null and ", arI_data);
@@ -5518,9 +5539,9 @@ class maglist() :
         if db_type == "sqlite" :
             message += _("Now compressing database") + "\n"
             insertion_tv(buffer1,message);
-            info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-            while (gtk.events_pending()) :
-                gtk.main_iteration();
+            #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+            while (Gtk.events_pending()) :
+                Gtk.main_iteration();
             cursor.execute("VACUUM")
             message = "\n"
 
@@ -5551,9 +5572,9 @@ class maglist() :
 
         message = _("Inversion of words tables started\n")
         insertion_tv(buffer1,message);
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
-            gtk.main_iteration();
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        while (Gtk.events_pending()) :
+            Gtk.main_iteration();
 
         if db_type == "accdb" :
                 champ = champ.lower()
@@ -5587,7 +5608,7 @@ class maglist() :
 
 
             contenu =unicode2(contenu)
-            ex1 = re.findall(u"(?u)\w+",contenu);   # division en mots
+            ex1 = re.findall("(?u)\w+",contenu);   # division en mots
 
             # suppression des doublons
             ex=array_unique(ex1);
@@ -5596,21 +5617,18 @@ class maglist() :
               try :
                 # si le mot n'est pas dans la liste des mots vides
                 if (not ex[k] in mots_vides) and (len(ex[k])>1) :
-                    if isinstance(ex[k], unicode) :
-                        mot1 = ex[k].encode("utf8")
-                    else :
-                        mot1 = ex[k]
+                    mot1 = ex[k]
                     mots.append("('" + mot1 + "'," + str(fiche[main_field]) + ")");
               except :
-                print "======>", len(mots), repr(contenu), repr(ex1), repr(ex[k])
+                print("======>", len(mots), repr(contenu), repr(ex1), repr(ex[k]))
 
 
         count = len(mots);
         message = _("array created for") + " " + champ + " ---  " +  str(count) + " " + _("words")
         insertion_tv(buffer1,message);
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
-            gtk.main_iteration();
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        while (Gtk.events_pending()) :
+            Gtk.main_iteration();
 
 
 
@@ -5666,10 +5684,10 @@ class maglist() :
         link.commit()
         message = " --- " + _("data loaded") + " "
         insertion_tv(buffer1,message);
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        while (Gtk.events_pending()) :
 
-            gtk.main_iteration();
+            Gtk.main_iteration();
 
 
         i_field = "i_" + champ;
@@ -5737,9 +5755,9 @@ class maglist() :
 
         message = " --- " + _("Ended\n")
         insertion_tv(buffer1,message);
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
-        while (gtk.events_pending()) :
-            gtk.main_iteration();
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        while (Gtk.events_pending()) :
+            Gtk.main_iteration();
 
 
 
@@ -5787,13 +5805,13 @@ class maglist() :
 
             except :
                 insertion_tv(buffer1,"impossible to update " + key + "\n")
-                info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+                #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
                 #print config['central'][central_def]
                 continue
 
         # création des champs générés définis dans la section [inversion] de config.php
         # TODO : sécurité si un champ manque
-        temp =periph_tables.keys();
+        temp =list(periph_tables.keys());
 
         if 'inversion' in config :
             for key in config['inversion'] :
@@ -5835,7 +5853,7 @@ class maglist() :
 
                 except :
                     insertion_tv(buffer1,"impossible to update " + key + "\n")
-                    info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+                    #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
                     #print config['central'][central_def]
                     continue
 
@@ -5854,7 +5872,7 @@ class maglist() :
 
                 if main_field == None :
                     insertion_tv(buffer1,_("main field not present"))
-                    info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+                    #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
                     continue
 
                 if db_type == "mysql" :
@@ -5888,7 +5906,7 @@ class maglist() :
                     cursor.execute(req1)            # TODO handle error
                     temp = cursor.description
                     a = cursor.description[0]
-                    if a[1] == str or a[1] == unicode :
+                    if a[1] == str or a[1] == str :
                         if a[2] < 255 :
                             type_s = "TEXT (" + str(a[2]) + ")"
                         else :
@@ -5908,7 +5926,7 @@ class maglist() :
 
 
                 if linked_field == None :
-                    print _("linked field not present for ") + key   # TODO : préciser le messsage
+                    print(_("linked field not present for ") + key)   # TODO : préciser le messsage
                     continue
                 req1 = "update $central_table set $fieldname = ("
                 req1 += "select $name from $table "
@@ -5919,18 +5937,18 @@ class maglist() :
 
             message = _("updating field ") + central_table + "." + fieldname
             insertion_tv(buffer1,message);
-            info.scroll_to_mark(buffer1.get_insert(), 0);    # Kksou 87
+            #£ info.scroll_to_mark(buffer1.get_insert(), 0);    # Kksou 87
 
-            while (gtk.events_pending()) :
+            while (Gtk.events_pending()) :
 
-                gtk.main_iteration();
+                Gtk.main_iteration();
 
 
             if db_type != "accdb" :
                 try :
                     result = cursor.execute(req2)
                 except :
-                    print "Error for : ", req2
+                    print("Error for : ", req2)
                     utils.printExcept()
                 link.commit()
 
@@ -5941,7 +5959,7 @@ class maglist() :
 
                     if main_field == None :
                         insertion_tv(buffer1,_("main field not present"))
-                        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+                        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
                         continue
 
                     req1 = "select distinct $content from $table "
@@ -5959,7 +5977,7 @@ class maglist() :
                 else :      # Table sans passerelle
 
                     if linked_field == None or linked_field.strip() == "":
-                        print _("linked field not present")   # TODO : préciser le messsage
+                        print(_("linked field not present"))   # TODO : préciser le messsage
                         continue
                     req1 = "select $content as content, $central_table.$main_field from $table, $central_table "
                     req1 += "where $central_table.$linked_field = $table.$id_type"
@@ -5983,7 +6001,7 @@ class maglist() :
 
             t2 = time.time()
             insertion_tv(buffer1," -  " + _("duration") + " : " + str(int(t2 - t1)) + " " + _("seconds") + "\n")
-            info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+            #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
 
 
 
@@ -6051,8 +6069,8 @@ class maglist() :
 ##                insertion_tv(buffer1,titre)
 ##                info.scroll_to_mark(buffer1.get_insert(), 0);   # Kksou 87
 ##
-##                while (gtk.events_pending()) :
-##                    gtk.main_iteration();
+##                while (Gtk.events_pending()) :
+##                    Gtk.main_iteration();
 ##
 ##
 ##
@@ -6078,7 +6096,7 @@ class maglist() :
 
 
         insertion_tv(buffer1, message)
-        info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
+        #£ info.scroll_to_mark(buffer1.get_insert(), 0);       # Kksou 87
 
 
     def importx() :
@@ -6173,13 +6191,13 @@ class maglist() :
         # menu de tri
         if isset(self.arw['s_sort_button']) :
 
-            menu = gtk.Menu();
+            menu = Gtk.Menu();
             if isset(tris_predefinis) :
 
                 for key  in tris_predefinis :
                     val = tris_predefinis[key ]
                     if val :
-                        item = gtk.MenuItem(val['name']);
+                        item = Gtk.MenuItem(val['name']);
                         item.connect("activate", self.trie_liste, val);
                         menu.add(item)
 
@@ -6226,7 +6244,7 @@ class maglist() :
         c_colonnes, tab_conversion, config, periph_tables, checkbox_list, link;
 
 
-        list_name = liste.name;
+        list_name = liste.get_name();
         list_def = tab_conversion[list_name];
         list_data  = config['xtabs'][list_def];
         table_data = periph_tables[list_data['table_def']];
@@ -6397,7 +6415,7 @@ class edit() :
         saisieFlipActive = self.arSaisieFlip[table_data['edit']]
         central_table = table_data['table']
         main_field = table_data['id_main']
-        t_periph_tables = (periph_tables).keys()    # liste des tables périphériques
+        t_periph_tables = list((periph_tables).keys())    # liste des tables périphériques
 
 
         req="select * from " + central_table + " where " + main_field + "=" + str(id_fiche)
@@ -6443,7 +6461,7 @@ class edit() :
                         values[1] = fiches[field]
                         # données additionnelles
 
-                        if self.additional_data.has_key(table) :
+                        if table in self.additional_data :
                             j = 2
                             for  val2 in self.additional_data[table]  :
                                 field2 = val2['field']
@@ -6465,7 +6483,7 @@ class edit() :
                     id_type = periph_tables[table]['id_type']
                     field = periph_tables[table]['main_field']
                     linked_field = periph_tables[table]['linked_field']
-                    if linked_field.strip() != "" and linked_field in fiche.keys() :
+                    if linked_field.strip() != "" and linked_field in list(fiche.keys()) :
                         try :                                   # 0.9 compatibility
                             value1 = int(fiche[linked_field])
                             req = "select " + field + " from " + val[1] + " where " + id_type + " = " + str(value1)
@@ -6482,7 +6500,7 @@ class edit() :
                     set_text(self.arw[z],data2)
 
                 else :
-                    if val[1] in fiche.keys() :
+                    if val[1] in list(fiche.keys()) :
                         set_text(self.arw[z],fiche[val[1]])
                     else :
                         alert (_("Field " + val[1] + " not found in " + central_table ))
@@ -6525,7 +6543,7 @@ class edit() :
         # If the user starts directly with a new record, use the first central definition
         if central_table == None :
             if count(config["central"]) == 1 :
-                temp = config["central"].keys()
+                temp = list(config["central"].keys())
                 central_table = config["central"][temp[0]]["table"]
                 main_field = config["central"][temp[0]]["id_main"]
                 mem['saisie_table_config'] = temp[0]
@@ -6784,8 +6802,8 @@ class edit() :
                     if "info_label" in self.arw :
                         self.arw["info_label"].set_text( _("record ") + str(i) + "/" + str(l))
                     i += 1
-                    while (gtk. events_pending()) :
-                        gtk.main_iteration();
+                    while (Gtk. events_pending()) :
+                        Gtk.main_iteration();
 
                 else :
                     return True
@@ -6901,7 +6919,7 @@ class edit() :
         main_field_control = saisieFlipActive[main_field]
         avant = mem["saisie_avant"]
         apres = self.memoriser_fiche()
-        t_periph_tables = periph_tables.keys()    # liste des tables périphériques
+        t_periph_tables = list(periph_tables.keys())    # liste des tables périphériques
 
         if isset(main_field_control) :
             id_livre=get_text(self.arw[main_field_control]) # vérifier si l'enregistrement existe, sinon le créer
@@ -7142,7 +7160,7 @@ class edit() :
             # MySQL  :req=eval(php_string("insert into $gateway SET $main_field = $id_livre,$id_type = $id ,"))
             req=eval(php_string("insert into $gateway ($main_field, $id_type )  values ($id_livre, $id1) "))
 
-            if self.additional_data.has_key(table) :
+            if table in self.additional_data :
 
                 j=2
                 for  k in range(len(self.additional_data[table]))  :
@@ -7187,7 +7205,7 @@ class edit() :
                 if row[1] == field :
                     found = True
             if not found :
-                print "column not present, is this really normal ?"
+                print("column not present, is this really normal ?")
 
         elif db_type == "mysql" or db_type == "accdb" :
 
@@ -7311,7 +7329,7 @@ class edit() :
                 if id_livre in idata :
                     idata.remove(id_livre)
                 else :
-                    print "on demandait d'effacer " + id_livre + " de " + repr(idata)
+                    print("on demandait d'effacer " + id_livre + " de " + repr(idata))
 
 
             idata = array_unique(idata)
@@ -7384,7 +7402,7 @@ class edit() :
         if self.verify_button(treeview) == False :
             return
 
-        list_name = treeview.name
+        list_name = treeview.get_name()
         config_list = tab_conversion[list_name]
         list_data = config['xtabs'][config_list]
         config_table = list_data['table_def']
@@ -7451,7 +7469,7 @@ class edit() :
         if self.verify_button(treeview) == False :
             return
         datadef = {}
-        list_name = treeview.name
+        list_name = treeview.get_name()
         config_list = tab_conversion[list_name]
         list_data = config['xtabs'][config_list]
         config_table = list_data['table_def']
@@ -7489,7 +7507,7 @@ class edit() :
         for ii  in range( 0, 25) :     #... for (ii = 0| ii < 25| ii+= 1)
             temp[ii] = model.get_value(iter,ii)
 
-        for  key, value in list_data['cols'].iteritems()  :          # extraire les champs data
+        for  key, value in list_data['cols'].items()  :          # extraire les champs data
             if 'detail' in value :
                 widgetname = value['detail']
                 if len(widgetname) > 0 :
@@ -7585,7 +7603,7 @@ class edit() :
         if self.verify_button(treeview) == False :
             return
 
-        list_name = treeview.name
+        list_name = treeview.get_name()
         config_list = tab_conversion[list_name]
         list_data = config['xtabs'][config_list]
         config_table = list_data['table_def']
@@ -7673,8 +7691,8 @@ class complex_queries :
         # paramétrage des combobox
 
 
-        cell_renderer = gtk.CellRendererText()
-        stores["champs"]= gtk.TreeStore(str,str,str)
+        cell_renderer = Gtk.CellRendererText()
+        stores["champs"]= Gtk.TreeStore(str,str,str)
 
         parent = None
 
@@ -7693,14 +7711,14 @@ class complex_queries :
         for i in range(1,4) :
 
             self.arw["s_combo_champ" + str(i)].set_model(stores["champs"])
-            self.arw["s_combo_champ" + str(i)].pack_start(cell_renderer)
-            self.arw["s_combo_champ" + str(i)].set_attributes(cell_renderer, text=0)
+            self.arw["s_combo_champ" + str(i)].pack_start(cell_renderer, True)
+            #self.arw["s_combo_champ" + str(i)].set_attributes(cell_renderer, text=0)
             self.arw["s_combo_champ" + str(i)].set_wrap_width(1)
 
 
 
-        cell_renderer = gtk.CellRendererText()
-        stores["logic"]= gtk.ListStore(str,str)
+        cell_renderer = Gtk.CellRendererText()
+        stores["logic"]= Gtk.ListStore(str,str)
         for  z in d_logique  :
             stores["logic"].append(z)
 
@@ -7709,18 +7727,18 @@ class complex_queries :
         for i in range(1,4) :
 
             self.arw["s_combo_logic" + str(i)].set_model(stores["logic"])
-            self.arw["s_combo_logic" + str(i)].pack_start(cell_renderer)
-            self.arw["s_combo_logic" + str(i)].set_attributes(cell_renderer, text=0)
+            self.arw["s_combo_logic" + str(i)].pack_start(cell_renderer, True)
+            self.arw["s_combo_logic" + str(i)].add_attribute(cell_renderer, "text", 0)
             self.arw["s_combo_logic" + str(i)].set_wrap_width(1)
 
 
 
         # chargement de la combo de sélection de la table
-        stores["central"]= gtk.ListStore(str)
+        stores["central"]= Gtk.ListStore(str)
         combo = self.arw['s_central_table_combo']
         combo.set_model(stores['central'])
-        combo.pack_start(cell_renderer)
-        combo.set_attributes(cell_renderer, text=0)
+        combo.pack_start(cell_renderer,True)
+        combo.add_attribute(cell_renderer, "text", 0)
 
         for  key  in config['central']  :
             val = config['central'][ key ]
@@ -7728,27 +7746,27 @@ class complex_queries :
         combo.set_active(0)
 
         # chargement de la combo de sélection de la liste de résultat
-        stores["result"]= gtk.ListStore(str)
+        stores["result"]= Gtk.ListStore(str)
         combo = self.arw['s_result_list_combo']
         combo.set_model(stores['result'])
-        combo.pack_start(cell_renderer)
-        combo.set_attributes(cell_renderer, text=0)
+        combo.pack_start(cell_renderer, True)
+        combo.add_attribute(cell_renderer, "text", 0)
         self.load_result_combo('result')
         combo.set_active(0)
 
         # chargement de la combo de sélection de la zone détails
-        stores["details"]= gtk.ListStore(str)
+        stores["details"]= Gtk.ListStore(str)
         combo = self.arw['s_details_zone_combo']
         combo.set_model(stores['details'])
-        combo.pack_start(cell_renderer)
-        combo.set_attributes(cell_renderer, text=0)
+        combo.pack_start(cell_renderer, True)
+        combo.add_attribute(cell_renderer, "text", 0)
         self.load_result_combo('details')
         combo.set_active(0)
 
 
         # Fenêtre Combiner
         cr_toggle = {}
-        listes['combine'] = gtk.ListStore(str,str,bool,bool,bool,bool)
+        listes['combine'] = Gtk.ListStore(str,str,bool,bool,bool,bool)
 
         combi = self.arw['s_combine_list']
         combi.set_model(listes['combine'])
@@ -7756,20 +7774,20 @@ class complex_queries :
         selection = combi.get_selection()
         selection.set_mode(0)
 
-        cell_renderer = gtk.CellRendererText()
-        combi.append_column(gtk.TreeViewColumn("Liste", cell_renderer, text=0)) #$combi->append_column(new GtkTreeViewColumn("Liste", $cell_renderer, 'text', 1));
+        cell_renderer = Gtk.CellRendererText()
+        combi.append_column(Gtk.TreeViewColumn("Liste", cell_renderer, text=0)) #$combi->append_column(new GtkTreeViewColumn("Liste", $cell_renderer, 'text', 1));
 
-        cr_toggle[2] = gtk.CellRendererToggle() #$cr_toggle[2]->set_property('activatable',True);
+        cr_toggle[2] = Gtk.CellRendererToggle() #$cr_toggle[2]->set_property('activatable',True);
         cr_toggle[2].connect('toggled', self.combi_logic_toggled, 2)
-        combi.append_column(gtk.TreeViewColumn("", cr_toggle[2], active=2))
+        combi.append_column(Gtk.TreeViewColumn("", cr_toggle[2], active=2))
 
         titles = { 3:"OU", 4:"ET", 5:"SAUF"}
         for  z in [3,4,5]  :
-            cr_toggle[z] = gtk.CellRendererToggle()
+            cr_toggle[z] = Gtk.CellRendererToggle()
             cr_toggle[z].set_property('activatable',True)
             cr_toggle[z].set_property('radio',True)
             cr_toggle[z].connect('toggled', self.combi_logic_toggled, z)
-            combi.append_column(gtk.TreeViewColumn(titles[z], cr_toggle[z], active=z))
+            combi.append_column(Gtk.TreeViewColumn(titles[z], cr_toggle[z], active=z))
 
 
 
@@ -7800,7 +7818,7 @@ class complex_queries :
                 temp = config_info['central_tables'][central][action]
                 if temp :
                     data = temp.split(",")
-                    if stores.has_key(action) :
+                    if action in stores :
                         stores[action].clear()
                         for  val in data  :
                             stores[action].append([val])
@@ -7848,7 +7866,7 @@ class complex_queries :
         if type == "GtkTreeView":
 
             # bouton de l'interface utilisateur
-            list_name = widget.name
+            list_name = widget.get_name()
             table = config_info['search_lists'][list_name]['peripheral_table']
 
         elif type == "GtkComboBox" :
@@ -8159,11 +8177,11 @@ class predef_queries :
     def predef_query_build(self)  :
 
         treeview = self.arw['s_clist4']
-        treeview.set_model(gtk.ListStore(str,str,str,str,str,str,str,str, str, str))
-        renderer = gtk.CellRendererText()
-        column = gtk.TreeViewColumn('Title', renderer, text=0)
+        treeview.set_model(Gtk.ListStore(str,str,str,str,str,str,str,str, str, str))
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn('Title', renderer, text=0)
         treeview.append_column(column)
-        treeview.append_column(gtk.TreeViewColumn('Title', renderer, text=1))
+        treeview.append_column(Gtk.TreeViewColumn('Title', renderer, text=1))
         treeview.connect('row-activated', self.predef_query_detail)
         treeview.connect('cursor-changed', self.predef_query_detail)
         treeview.set_reorderable(True)
@@ -8197,8 +8215,8 @@ class predef_queries :
 
         combo = self.arw['s_details4']
         combo.set_model(stores['details'])
-        combo.pack_start(renderer)
-        combo.set_attributes(renderer, text=0)
+        combo.pack_start(renderer, True)
+        combo.add_attribute(renderer, "text", 0)
         stores['details'].clear()
         for  key  in config['details']  :
             stores['details'].append([key])
@@ -8209,8 +8227,8 @@ class predef_queries :
 
         combo = self.arw['s_central_def4']
         combo.set_model(stores['central'])
-        combo.pack_start(renderer)
-        combo.set_attributes(renderer, text=0)
+        combo.pack_start(renderer, True)
+        combo.add_attribute(renderer, "text", 0)
         stores['central'].clear()
         for  key  in config['central']  :
             stores['central'].append([key])
@@ -8220,8 +8238,8 @@ class predef_queries :
 
         combo = self.arw['s_result4']
         combo.set_model(stores['result'])
-        combo.pack_start(renderer)
-        combo.set_attributes(renderer, text=0)
+        combo.pack_start(renderer, True)
+        combo.add_attribute(renderer, "text", 0)
         stores['result'].clear()
         for  key  in config['result']  :
             stores['result'].append([key])
@@ -8230,8 +8248,8 @@ class predef_queries :
     def predef_query_load(self)  :
         global link, queries, configdir
 
-        php_source = os.path.join(configdir_u, u"queries.php")
-        py_source = os.path.join(configdir_u, u"queries.py")
+        php_source = os.path.join(configdir_u, "queries.php")
+        py_source = os.path.join(configdir_u, "queries.py")
 
         # maggy 2.0 migration : convert php to py, if not yet done
         if not os.path.exists(py_source) :
@@ -8258,7 +8276,7 @@ class predef_queries :
 
             # Order keys
             self.queries = OrderedDict()
-            keys = self.queries1.keys()
+            keys = list(self.queries1.keys())
             keys.sort()
             for key in keys :
                 self.queries[key] = self.queries1[key]
@@ -8277,8 +8295,8 @@ class predef_queries :
             for  key in self.queries  :
                 data = self.queries[key]
                 data2 = []
-                for  key, name in self.fields.iteritems()  :
-                    if data.has_key(name) :
+                for  key, name in self.fields.items()  :
+                    if name in data :
                         data2.append( to_utf8(data[name]))
                     else :
                         data2.append("")
@@ -8304,7 +8322,7 @@ class predef_queries :
             iter = null
 
 
-        for key, name in self.fields.iteritems() :
+        for key, name in self.fields.items() :
             if effacer == 1 :
                 texte =""
             else :
@@ -8332,18 +8350,18 @@ class predef_queries :
         # and saves this dictionary in the queries.py file
 
         line_name = get_text(self.arw["s_name4"])       # name of active query
-        for key, option in self.fields.iteritems() :
+        for key, option in self.fields.items() :
             text = get_text(self.arw["s_" + option + "4"])
             self.queries[line_name][option] = text
 
-        f1 = open(os.path.join(configdir_u,u"queries.py"),"w")
+        f1 = open(os.path.join(configdir_u,"queries.py"),"w")
         pp = pprint.PrettyPrinter(indent = 1, width = 100)
         data = pp.pformat(self.queries)
 
         f1.write(data)
         f1.close()
 
-        f2 = open(os.path.join(configdir_u,u"queries-od.py"),"w")
+        f2 = open(os.path.join(configdir_u,"queries-od.py"),"w")
         data = utilities.dict_or_OrdDict_to_formatted_str(self.queries, mode='OD')
         f2.write('OrderedDict([\n' + data + '])')
         f2.close()
@@ -8575,19 +8593,19 @@ class predef_queries :
                             params[temp2[0].strip()] = temp2[1];
 
                     #traitement des paramètres
-                    if params.has_key("label") :
+                    if "label" in params :
                         label = params["label"];
 
-                    if params.has_key("select") :
+                    if "select" in params :
                         select = params["select"];
 
-                    if params.has_key("default") :
+                    if "default" in params :
                         default = params["default"];
 
-                    if params.has_key("ifnull") :
+                    if "ifnull" in params :
                         ifnull = params["ifnull"];
 
-                    if params.has_key("values") :
+                    if "values" in params :
                         values = explode("|",params["values"]);
 
                     arPrompt[label] = [default,select,values];
@@ -8605,7 +8623,7 @@ class predef_queries :
                     if widget_name.strip() == "" :      # If there is an empty line
                         continue
                     if not widget_name in self.arw :
-                        print widget_name, "does not seem to exist (8500)"
+                        print(widget_name, "does not seem to exist (8500)")
                         continue
                     text = get_text(self.arw[widget_name]);
                     #traitement des paramètres
@@ -8615,9 +8633,9 @@ class predef_queries :
                         params[temp2[0].strip()] = temp2[1];
 
 
-                    if params.has_key("ifnull") and(text.strip() == "") :
+                    if "ifnull" in params and(text.strip() == "") :
                         text = params["ifnull"];
-                    if params.has_key("choice") :
+                    if "choice" in params :
 
                         choice = params['choice'].split("|");
                         if text == 1 :
@@ -8758,7 +8776,7 @@ class predef_queries :
                 # toutes les colonnes sont visibles (mais pas plus de 40, maximum actuel de la liste)
                 col = liste2.get_column(i);
                 col.set_visible(True);
-                for z in self.colonnes_resultat[page].keys() :
+                for z in list(self.colonnes_resultat[page].keys()) :
 
                     self.colonnes_resultat[page][z][1] = 1;
 
@@ -8780,8 +8798,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
     MODEL_ROW_EXTERN = 1002         # unused
     MODEL_ROW_MOTION = 1004
 
-    TARGETS = [('MODEL_ROW_INTERN', gtk.TARGET_SAME_WIDGET, MODEL_ROW_INTERN),
-            ('MODEL_ROW_EXTERN', gtk.TARGET_OTHER_APP, MODEL_ROW_EXTERN),
+
+    TARGETS = [('MODEL_ROW_INTERN', Gtk.TargetFlags.SAME_WIDGET, MODEL_ROW_INTERN),
+            ('MODEL_ROW_EXTERN', Gtk.TargetFlags.OTHER_APP, MODEL_ROW_EXTERN),
             ('MODEL_ROW_MOTION', 0, MODEL_ROW_MOTION)]
 
     def __init__(self):
@@ -8819,7 +8838,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # initialisation
 
-        #£mem['result_page'] = d_resultat;      d_resultat n'existe pas
+        # mem['result_page'] = d_resultat;     # d_resultat n'existe pas ???
         mem['colonnes_conserver'] = 0;
         mem['tri_actif'] = "oui";
         mem['ecran'] = "max";
@@ -8833,31 +8852,30 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         self.program_dir = os.path.abspath('.').replace('\\', '/')
 
-        self.widgets = gtk.Builder()
-        self.widgets.add_from_file(os.path.join(configdir_u, configname_u + u'.glade'))
+        self.widgets = Gtk.Builder()
+        self.widgets.add_from_file(os.path.join(configdir_u, configname_u + '.glade'))
         arWidgets = self.widgets.get_objects()
 
         for z in  arWidgets:
-            try :
-                name = gtk.Buildable.get_name(z)
+            if isinstance(z, Gtk.Buildable):
+                name = Gtk.Buildable.get_name(z)
                 arw[name]= z
                 z.set_name(name)
-            except :
-                pass
+
         self.arw = arw
 
         self.widgets.connect_signals(self)
 
         # Build system windows
-        self.widgets2 = gtk.Builder()
+        self.widgets2 = Gtk.Builder()
         self.widgets2.add_from_file('./data/maggy.glade')
         arWidgets2 = self.widgets2.get_objects()
 
         for z in arWidgets2 :
             try :
-                name = gtk.Buildable.get_name(z)
+                name = Gtk.Buildable.get_name(z)
                 name2 = "s_" + name
-                gtk.Buildable.set_name(z, name2)
+                Gtk.Buildable.set_name(z, name2)
                 self.arw[name2]= z
             except :
                 pass
@@ -8900,7 +8918,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             for window in config['ini']['position'] :
                 if window in self.arw :
                     self.arw[window].show()
-                    win=self.arw[window].window;        # get the GdkWindow
+                    win=self.arw[window].get_window();        # get the GdkWindow
                     if win :
                         h = config['ini']['position'][window]["h"];
                         w = config['ini']['position'][window]["w"];
@@ -8911,19 +8929,19 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 ##                        self.arw[window].hide()
 
         # Wait until the window is resized before setting the Hpaned position, otherwise it will be changed when resizing
-        while (gtk. events_pending()) :
-            gtk.main_iteration();
+        while (Gtk. events_pending()) :
+            Gtk.main_iteration();
 
 
         # positionnement des Hpaned et Vpanes
         if 'Hpaned' in config['ini'] :
             for key in config['ini']['Hpaned'] :
                 val = config['ini']['Hpaned'][key]
-                if self.arw.has_key(key) :
+                if key in self.arw :
                     self.arw[key].set_position(val)
 
-        while (gtk. events_pending()) :
-            gtk.main_iteration();
+        while (Gtk. events_pending()) :
+            Gtk.main_iteration();
 
         # Hide the windows we have shown
         if 'position' in config['ini'] :
@@ -8946,7 +8964,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 for widget in group1 :
                     code = get_text(widget)
                     if len(code.strip()) > 0 :
-                        data1.append([widget.name, code])
+                        data1.append([ Gtk.Buildable.get_name(widget), code])
                 if config1 in config_info['details'] :
                     config_info['details'][config1]['zones2'] = {}
                     i = 0
@@ -8958,7 +8976,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
                 else :
-                    print config1, _(" is not defined in config_info['details']")
+                    print(config1, _(" is not defined in config_info['details']"))
 
 
         # delete text of code so that it does not appear in the window
@@ -8991,12 +9009,12 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         self.arw["s_bouton_tri_exec"].connect("clicked", self.trie_liste);
         # impression
         if 's_print_button' in self.arw :
-            menu = gtk.Menu();
-            files = glob.glob(os.path.join(configdir_u, u"models/*.*"))
+            menu = Gtk.Menu();
+            files = glob.glob(os.path.join(configdir_u, "models/*.*"))
             for val in files :
 
                 path, name = os.path.split(val)
-                item = gtk.MenuItem(name);
+                item = Gtk.MenuItem(name);
                 item.connect("activate", self.impression, name);
                 menu.add(item);
             self.arw['s_print_button'].set_menu(menu);
@@ -9010,15 +9028,15 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         # Construction des listes de résultat qui ne sont pas construites dans Glade
 
         for j in range(0,40) :
-            cr_editable[j] = gtk.CellRendererText();
+            cr_editable[j] = Gtk.CellRendererText();
             cr_editable[j].connect("edited", self.edit_list,j); # cette procédure permet au cell-renderer de renvoyer le numéro de la colonne
 
         for i in range(0,10) :  # (i=0; i<=9; i++):
             # the model
-            stores[i] = gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str);
-            modelsort[i] = gtk.TreeModelSort(stores[i]);
+            stores[i] = Gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str,str);
+            modelsort[i] = Gtk.TreeModelSort(stores[i]);
             # note 1
-            self.arw['s_list2' + str(i)] = gtk.TreeView(modelsort[i]);
+            self.arw['s_list2' + str(i)] = Gtk.TreeView(modelsort[i]);
             treeview=self.arw['s_list2' + str(i)];
             treeview.connect('row-activated', self.detail, i);
             treeview.connect('cursor-changed', self.detail, i);
@@ -9049,7 +9067,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             #treeview.set_rubber_banding(True); # kksou 331
             # Création et paramétrage des colonnes
             for j in range(0,40) : # (j=0; j<40; j++):
-                colnew = gtk.TreeViewColumn(str(j), cr_editable[j], text=j);
+                colnew = Gtk.TreeViewColumn(str(j), cr_editable[j], text=j);
                 # pango est géré dans la fonction chercher
                 colnew.set_sizing(2);
                 # 2 = GTK_TREE_VIEW_COLUMN_FIXED
@@ -9059,25 +9077,25 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 colnew.set_clickable(True);
                 #colnew.connect("clicked", "list_click_column");
                 treeview.append_column(colnew);
-            self.arw['s_scrolledwindow2' + str(i)] = gtk.ScrolledWindow();
+            self.arw['s_scrolledwindow2' + str(i)] = Gtk.ScrolledWindow();
             child = self.arw['s_scrolledwindow2' + str(i)];
             child.set_policy(1,1);
             child.add(treeview);
-            label = gtk.Label("Page_" + str(i));
-            menu = gtk.Label("Page_" + str(i));
+            label = Gtk.Label("Page_" + str(i));
+            menu = Gtk.Label("Page_" + str(i));
             self.arw['s_notebook2'].insert_page_menu(child, label, menu, i);
 
         # historique
-        cell_renderer2 = gtk.CellRendererText();
-        #£ titres = array_pad(c_titres.get('historique'),10,"   ");  c_titres n'existe pas
-        stores['historique'] = gtk.ListStore(str,str,str,str,str,str,str,str,str,str);
+        cell_renderer2 = Gtk.CellRendererText();
+        # ?? titres = array_pad(c_titres.get('historique'),10,"   ");  c_titres n'existe pas
+        stores['historique'] = Gtk.ListStore(str,str,str,str,str,str,str,str,str,str);
         treeview=self.arw['s_historique'];
         treeview.set_model(stores['historique']);
         treeselect=treeview.get_selection();
         treeselect.set_mode(3);
         # sélection multiple
         for j in [0,1] :
-            colnew = gtk.TreeViewColumn(" ", cell_renderer2, text=j);
+            colnew = Gtk.TreeViewColumn(" ", cell_renderer2, text=j);
             colnew.set_max_width(400);
             colnew.set_resizable(True);
             # make it sortable and let it sort after model column 1
@@ -9103,39 +9121,39 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         """
 
         # Fenêtre tri - colonnes
-        stores['liste_cols'] = gtk.ListStore(str,bool,int,bool,bool);       # Si c'est vrai que 32 = int et 20 = bool !!
+        stores['liste_cols'] = Gtk.ListStore(str,bool,int,bool,bool);       # Si c'est vrai que 32 = int et 20 = bool !!
         self.arw['s_liste_colonnes'].set_model(stores['liste_cols']);
         self.arw['s_liste_colonnes'].set_reorderable(True);
         # ajout des colonnes Ã  la liste de sélection des colonnes
-        cell_renderer = gtk.CellRendererText();
-        colnew = gtk.TreeViewColumn(" ", cell_renderer, text=0);
+        cell_renderer = Gtk.CellRendererText();
+        colnew = Gtk.TreeViewColumn(" ", cell_renderer, text=0);
         self.arw['s_liste_colonnes'].append_column(colnew);
-        cell_renderer2 = gtk.CellRendererToggle();
+        cell_renderer2 = Gtk.CellRendererToggle();
         cell_renderer2.connect("toggled", self.toggle_cols);
-        colnew = gtk.TreeViewColumn(" ", cell_renderer2, active=1);
+        colnew = Gtk.TreeViewColumn(" ", cell_renderer2, active=1);
         self.arw['s_liste_colonnes'].append_column(colnew);
-        colnew = gtk.TreeViewColumn(" ", cell_renderer, text=2);
+        colnew = Gtk.TreeViewColumn(" ", cell_renderer, text=2);
         self.arw['s_liste_colonnes'].append_column(colnew);
 
         # Combobox de tri
         for z in [1,2,3] :
             self.arw['s_combo_tri' + str(z)].set_model(stores['liste_cols']);
-            self.arw['s_combo_tri' + str(z)].set_text_column(0);
+            #£ self.arw['s_combo_tri' + str(z)].set_text_column(0);    Unused for comboboxtext
 
 ##        # import dialog
-##        stores['import_dialog'] = gtk.ListStore(str,str);       # Si c'est vrai que 32 = int et 20 = bool !!
+##        stores['import_dialog'] = Gtk.ListStore(str,str);       # Si c'est vrai que 32 = int et 20 = bool !!
 ##        self.arw['s_import_treeview3'].set_model(stores['import_dialog']);
-##        cell_renderer = gtk.CellRendererText();
-##        colnew = gtk.TreeViewColumn(" ", cell_renderer, text=1);
+##        cell_renderer = Gtk.CellRendererText();
+##        colnew = Gtk.TreeViewColumn(" ", cell_renderer, text=1);
 ##        self.arw['s_import_treeview4'].append_column(colnew);
 
         # Compare tab
         treeview = self.arw["s_compare_tree"]
-        model1 = gtk.ListStore(str,str,str,str)
+        model1 = Gtk.ListStore(str,str,str,str)
         treeview.set_model(model1)
-        cr = gtk.CellRendererText()
+        cr = Gtk.CellRendererText()
         for j in range(0,4) : # (j=0; j<40; j++):
-            colnew = gtk.TreeViewColumn(str(j), cr, text=j);
+            colnew = Gtk.TreeViewColumn(str(j), cr, text=j);
 ##            colnew.set_sizing(2);
 ##            # 2 = GTK_TREE_VIEW_COLUMN_FIXED
             colnew.set_resizable(True);
@@ -9226,9 +9244,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
             # extraire les objets contenant l'indicateur de saisie (@)
 
-            t_periph_tables = periph_tables.keys()    # liste des tables périphériques  => obsolete
+            t_periph_tables = list(periph_tables.keys())    # liste des tables périphériques  => obsolete
             t_periph_config = []                      # We use config names to allow several peripheral configurations for the same table
-            for key1 in config["peripheral"].keys() :
+            for key1 in list(config["peripheral"].keys()) :
                 if "config_name" in config["peripheral"][key1] :
                     t_periph_config.append(config["peripheral"][key1]["config_name"])
                 else :
@@ -9238,7 +9256,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
             for  widget in group  :
-                nomObjet = gtk.Buildable.get_name(widget)
+                nomObjet = Gtk.Buildable.get_name(widget)
                 pos = strrpos(nomObjet,"@")
                 if pos == -1 :      # if the indicator is not present, ignore
                     pass
@@ -9267,7 +9285,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         arTreeView = []
         # Listes des données des passerelles
-        cell_renderer = gtk.CellRendererText()
+        cell_renderer = Gtk.CellRendererText()
         # faire la  liste des TreeView des interfaces de  saisie
         for  key in self.arSaisie  :
             container = self.arSaisie[key]
@@ -9280,7 +9298,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                         table = periph_config["table"]
                         arTreeView.append( {'config' : val[1], 'table' : table, 'widget' : val[0]})
                     except:
-                        print "Configuration of edit interface %s is probably incomplete" % val[1]
+                        print("Configuration of edit interface %s is probably incomplete" % val[1])
 
 
 
@@ -9289,7 +9307,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 treeview = self.arw[val['widget']]
                 table = val['table']
 
-                stores[table]= gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str)
+                stores[table]= Gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str)
                 treeview.set_model(stores[table])
                 # configuration des listes
                 treeview.connect("key-press-event",self.effacer_ligne)
@@ -9298,9 +9316,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 treeview.set_headers_visible(False)
                 # ajout des colonnes
 
-                colnew = gtk.TreeViewColumn("", cell_renderer, text=1)
+                colnew = Gtk.TreeViewColumn("", cell_renderer, text=1)
                 colnew.set_sizing(2)             # 2 = GTK_TREE_VIEW_COLUMN_FIXED
-                if val.has_key('cols') and val['cols'][0]['width'] > 0 :
+                if 'cols' in val and val['cols'][0]['width'] > 0 :
 
                     colnew.set_fixed_width(val['cols'][0]['width'])
 
@@ -9318,10 +9336,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                                 val2 = data[key2]
                                 if len(val2['field']) > 0 :
                                     title = val2['title']
-                                    if not self.additional_data.has_key(table) :
+                                    if table not in self.additional_data :
                                         self.additional_data[table] = []
                                     self.additional_data[table].append(val2)
-                                    colnew = gtk.TreeViewColumn(title, cell_renderer, text=j)
+                                    colnew = Gtk.TreeViewColumn(title, cell_renderer, text=j)
                                     colnew.set_sizing(2)             # 2 = GTK_TREE_VIEW_COLUMN_FIXED
                                     colnew.set_fixed_width(int(val2['width']))
                                     colnew.set_resizable(True)
@@ -9352,7 +9370,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             except :
                 message = utils.printExcept()       # Error not critical, the program must not stop
                 alert(_("UserFunctions has errors. Impossible to load. \nPlease check your 'userfunctions.py' file. The error is :\n\n %s" % message))
-                print message
+                print(message)
 
 
         # show the tab defined in the configuration
@@ -9364,13 +9382,15 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         except :        # undefined or invalid
             pass        # TODO : message to signal configuration is invalid
 
+        print ("end of ini")
+
 ##        self.arw["button8"].connect("clicked", test.toto )
 
 
     def delete_event(self, window, event,param =1)   :
 
         if param == 1 :
-            gtk.main_quit()
+            Gtk.main_quit()
             return False
 
         else :
@@ -9392,7 +9412,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
     def gtk_main_quit(self, widget = None)   :
 
-        gtk.main_quit()
+        Gtk.main_quit()
         os._exit(0)
 
 
@@ -9579,7 +9599,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
         # Afficher le titre dans l'onglet
-        if changetitre <> 0 :
+        if changetitre != 0 :
             active_page = self.arw['s_notebook2'].get_nth_page(page);
             text = mem['nom_requete'][0:25]
             self.arw['s_notebook2'].set_tab_label_text(active_page,text);
@@ -9590,7 +9610,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         try :
             cursor.execute(req)
         except :
-            print "Error for : ", req
+            print("Error for : ", req)
 
         sql_error(link,req);
 
@@ -9672,8 +9692,8 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 ##                status_text = str(i) + _(" records")
 ##                self.arw["status"].set_text(status_text);
 ##
-##                while (gtk.events_pending()) :
-##                    gtk.main_iteration();
+##                while (Gtk.events_pending()) :
+##                    Gtk.main_iteration();
 ##            i += 1
 ##        tt("c")
 
@@ -9711,13 +9731,13 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
         for data1 in data2 :
-            append(store,data1);
+            append(store,data1, datatype = "str");
             if i % 100 == 0 :
                 status_text = str(i) + _(" records")
                 self.arw["status"].set_text(status_text);
 
-                while (gtk.events_pending()) :
-                    gtk.main_iteration();
+                while (Gtk.events_pending()) :
+                    Gtk.main_iteration();
             i += 1
 
 
@@ -9726,7 +9746,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # reattach store and modelSort (if they were detached)
         if len(result_a) > 200 :
-            modelsort[page] = gtk.TreeModelSort(store);
+            modelsort[page] = Gtk.TreeModelSort(store);
             clist.set_model(modelsort[page])
 
         # select first line to force display of the details
@@ -9787,8 +9807,8 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
 
-        while (gtk. events_pending()) :
-            gtk.main_iteration();
+        while (Gtk. events_pending()) :
+            Gtk.main_iteration();
 
         #timer(5);
 
@@ -9910,7 +9930,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         for i in range(0, lignes) :
             for j in range(0, num_colonnes) :
 
-                if col.has_key(j) :         # if a criteria is defined
+                if j in col :         # if a criteria is defined
                     temp[j] = store.get_value(arIter[i],col[j]);
 
                     # TODO : attention, si c'est de l'utf-8 et pas du unicode, problèmes. Vérifier.
@@ -9931,10 +9951,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
                     if ascen[j]=='-' and alpha[j]=='n' :    # tri numérique descendant
-                        temp[j]= str(long(10000000000) - long(temp[j]))
+                        temp[j]= str(int(10000000000) - int(temp[j]))
 
 
-                    if ascen[j]=='-' and alpha[j]<>'n' :    # TODO : tri alphabétique descendant
+                    if ascen[j]=='-' and alpha[j]!='n' :    # TODO : tri alphabétique descendant
                         v2 = temp[j].encode("hex")
                         v3 = v2.ljust(10,"0")
                         v4 = v3[0:10]
@@ -10080,7 +10100,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
                 if len(ar2) == 1 :                   # s'il n'y a pas de paramètre
                     temp = str(temp)                # TODO : unicode  n'est pas supporté. Ceci n'est qu'un truc rapide mais il ne supportera pas les accents
-                    if (f != None) and (temp in f.keys()) :
+                    if (f != None) and (temp in list(f.keys())) :
                         value = f[temp]
                         if value == None :
                             value = " "
@@ -10096,14 +10116,14 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                     field = ar2[0];
                     field = convert_rtf_hexcode(field)
                     # Depending on the program, the code may be already written in utf-8, so let us try :
-                    if isinstance(field, unicode) :
+                    if isinstance(field, str) :
                         field = field.encode("utf-8")  # field names are written in utf-8
 
 
                     #traitement des paramètres
 
                     if "before" in params :
-                        if field in f.keys()  :
+                        if field in list(f.keys())  :
 
                             if f[field] and (f[field].strip() != ""):   #When there is no result, don't add "before"
                                 text +=(params["before"]);
@@ -10126,7 +10146,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                     elif "separator" in params :
                         value = params["separator"];
                         # caractères de séparation
-                        if field in f.keys() :
+                        if field in list(f.keys()) :
                             if f[field] :
                                 names = f[field].split(field_separator)
                             else :
@@ -10156,19 +10176,19 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                         text += implode(value,artemp);
 
                     else :
-                        if field in f.keys() :
+                        if field in list(f.keys()) :
                             if f[field] :
                                 text +=f[field]
 
                     if "popup" in params and "separator" not in params :
-                        if field in f.keys():
+                        if field in list(f.keys()):
                             value2 = params['popup'].strip()
                             popup = "[" + f[field] + "]";
                             popups.append([popup,value2]);
                             text += popup;
 
                     if "after" in params :
-                        if field in f.keys() :
+                        if field in list(f.keys()) :
                             if f[field] :
                                 if f[field].strip() != "" :
                                     text +=(params["after"]);
@@ -10196,10 +10216,12 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             w = widget.get_buffer()
             z = w.get_tag_table()
 
-            buffer_copy = gtk.TextBuffer()          # défini dans rt_zoom.php;met à zéro la tag_table
-            tag_haut = gtk.TextTag("haut");         # d'où la nécessité de recharger le tag haut
+            buffer_copy = Gtk.TextBuffer()          # défini dans rt_zoom.php;met à zéro la tag_table
+            tag_haut = Gtk.TextTag();         # d'où la nécessité de recharger le tag haut
+            #£ tag_haut.set_property("name", "haut")
             tag_haut.set_property("rise",-8000);    # ce tag est utilisé pour mettre les liens au niveau du texte
             tt = buffer_copy.get_tag_table();
+
             tt.add(tag_haut);
 
             parse_pango_markup = ParsePangoMarkup(buffer_copy, text);       # conversion du pango markup en tags
@@ -10239,7 +10261,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 ##            return;
 
         if not model in config['popup'] :
-            print( "popup " + model + " is not configured")
+            print(( "popup " + model + " is not configured"))
             return
 
         _nom = nom.strip()
@@ -10268,7 +10290,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # Création du bouton de lien
         if nom != None :
-            link_button1 = gtk.LinkButton(None, nom);
+            link_button1 = Gtk.LinkButton(None, nom);
             link_button1.connect('clicked', self.on_linkbutton, nom,model);
 
             link_button1.show();
@@ -10377,17 +10399,17 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 self.arw["status"].set_text(mem['status'][page])
             # TODO : Rajouter un if, sinon plantage si le contrôle n'existe pas
             label = nb.get_tab_label(current_page);
-            text=label.get();
+            text=label.get_text();
             self.arw['s_onglet_actif'].set_text(text);
 
 
             details_tab = v(affichage,page,'details_tab');
 
-            if details_tab > 0 :
-                if details_tab.isdigit() :
+            if isinstance(details_tab, str) and details_tab.isdigit() :
+                if int(details_tab) > 0 :
                     self.arw['s_notebook3'].set_current_page(int(details_tab) -1);
-                else :
-                    self.arw['s_notebook3'].set_current_page(0);
+            else :
+                self.arw['s_notebook3'].set_current_page(0);
 
 
             self.detail(liste);
@@ -10403,10 +10425,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         #fichier_impression = MessageBox("Nom du fichier de sortie ","fichier de sortie",10001,None,perso['repertoire_impression']);
 
-        dialog = gtk.FileChooserDialog("File Save", None, gtk.FILE_CHOOSER_ACTION_SAVE,
-        (gtk.STOCK_OK, gtk.RESPONSE_OK), None);
+        dialog = Gtk.FileChooserDialog("File Save", None, Gtk.FILE_CHOOSER_ACTION_SAVE,
+        (Gtk.STOCK_OK, Gtk.RESPONSE_OK), None);
         dialog.show_all();
-        if dialog.run() == gtk.RESPONSE_OK :
+        if dialog.run() == Gtk.RESPONSE_OK :
             file1 = dialog.get_filename();      # get the input filename
 
 
@@ -10423,9 +10445,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             button2_s = _("Selection")
             button1_s = button1_s.encode("utf-8")
             button2_s = button2_s.encode("utf-8")
-            dialog = gtk.Dialog(title=_("Records to export"),
+            dialog = Gtk.Dialog(title=_("Records to export"),
                                 parent = None,
-                                flags = gtk.DIALOG_MODAL |gtk.MESSAGE_QUESTION,
+                                flags = Gtk.DIALOG_MODAL |Gtk.MESSAGE_QUESTION,
                                 buttons = (button1_s, 1, button2_s, 2));
             dialog.show_all();
             if dialog.run() == 1 :          # If user chooses to print all
@@ -10437,7 +10459,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # extract format
 
-        f1 = open(os.path.join(configdir_u, u"models", unicode2(option)))
+        f1 = open(os.path.join(configdir_u, "models", unicode2(option)))
 
         before = "";
         after = "";
@@ -10580,10 +10602,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         #fichier_impression = MessageBox("Nom du fichier de sortie ","fichier de sortie",10001,None,perso['repertoire_impression']);
 
-        dialog = gtk.FileChooserDialog("File Save", None, gtk.FILE_CHOOSER_ACTION_SAVE, # note 2
-        [gtk.STOCK_OK, gtk.RESPONSE_OK], None);
+        dialog = Gtk.FileChooserDialog("File Save", None, Gtk.FILE_CHOOSER_ACTION_SAVE, # note 2
+        [Gtk.STOCK_OK, Gtk.RESPONSE_OK], None);
         dialog.show_all();
-        if dialog.run() == gtk.RESPONSE_OK :
+        if dialog.run() == Gtk.RESPONSE_OK :
             file = dialog.get_filename();
             # get the input filename
 
@@ -11018,7 +11040,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         if iter==None :
             return;
 
-        name = treeview.name;
+        name = treeview.get_name();
         id = model.get_value(iter, 20);
         nom = model.get_value(iter, 0);
 
@@ -11044,7 +11066,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         name = array_shift(data2);
 
 
-        if name == widget.name :
+        if name == widget.get_name() :
             # reorder
             if drop_info :
 
@@ -11053,13 +11075,13 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 (src_model, src_iter) = src_selection.get_selected();
 
 
-                if position == gtk.TREE_VIEW_DROP_BEFORE :
+                if position == Gtk.TREE_VIEW_DROP_BEFORE :
                     src_model.move_before(src_iter,dest_iter);
 
 
-                elif position in [gtk.TREE_VIEW_DROP_AFTER,
-                        gtk.TREE_VIEW_DROP_INTO_OR_BEFORE,
-                        gtk.TREE_VIEW_DROP_INTO_OR_AFTER] :
+                elif position in [Gtk.TREE_VIEW_DROP_AFTER,
+                        Gtk.TREE_VIEW_DROP_INTO_OR_BEFORE,
+                        Gtk.TREE_VIEW_DROP_INTO_OR_AFTER] :
                     src_model.move_after(src_iter,dest_iter);
 
 
@@ -11101,7 +11123,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
     def help(self, object) :
 
-        name = utils.get_extension(object.name);
+        name = utils.get_extension(object.get_name());
         command = "start \"title\" \"doc/" + name + "\"";
         #Attention start prend un premier paramètre entre guillemets qui est le titre de la fenêtre
         exec(command);
@@ -11144,7 +11166,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         for z in titres :
             titre = z
-            if z <> " " :
+            if z != " " :
                 if not v(self.colonnes_resultat,page) :
                     alert( "result page not yet configured (you must display at least one record)")
                     return False
@@ -11157,7 +11179,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                         continue
 
                 if not z in self.colonnes_resultat[page] :
-                    print z, " : pas trouvé"
+                    print(z, " : pas trouvé")
                     continue
                 data = self.colonnes_resultat[page][z];
                 if data and len(data) > 2 :
@@ -11237,7 +11259,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
 
-        t1=tris_predefinis.keys()
+        t1=list(tris_predefinis.keys())
         # pourrait servir pour nommer dynamiquement les boutons de tri prédéfinis
         if trier == 1 :
             set_tris_predef();
@@ -11403,7 +11425,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
         #chargement de la fiche et ouverture du bon onglet
-        nom_liste = liste.name;
+        nom_liste = liste.get_name();
         table_config = treeview_data[nom_liste]['table'];
         n = config['peripheral'][table_config]['edit_tab'];
 
@@ -11431,7 +11453,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             id1 = store.get_value(iter1, 0)
         else :                                      # aucune donnée dans la liste, donc "affichage" n'est pas initialisé. Il faut contourner le prooblème
             if len(config["central"]) == 1 :   # S'il n'y a qu'une table centrale définie, on peut la choisir sans risque
-                central_def = config['central'].keys()[0]
+                central_def = list(config['central'].keys())[0]
                 central_table = config['central'][central_def]['table']
                 id_main = config['central'][central_def]["id_main"]
                 req = "select %s from %s limit 1" % (id_main, central_table)
@@ -11585,7 +11607,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             alert(_("Your button is misconfigured, \nyou must select a window as parameter."));
             return;
 
-        name = gtk.Buildable.get_name(window)
+        name = Gtk.Buildable.get_name(window)
 
         (x, y) = window.get_position();
         (w, h) = window.get_size();
@@ -11614,12 +11636,12 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # TODO : mettre la compression en option
 
-        chooser = gtk.FileChooserDialog(title=_('Save database...'),
-                action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                buttons=(gtk.STOCK_CANCEL,
-                    gtk.RESPONSE_CANCEL,
-                    gtk.STOCK_SAVE,
-                    gtk.RESPONSE_ACCEPT))
+        chooser = Gtk.FileChooserDialog(title=_('Save database...'),
+                action=Gtk.FILE_CHOOSER_ACTION_SAVE,
+                buttons=(Gtk.STOCK_CANCEL,
+                    Gtk.RESPONSE_CANCEL,
+                    Gtk.STOCK_SAVE,
+                    Gtk.RESPONSE_ACCEPT))
         chooser.set_do_overwrite_confirmation(True)
         #chooser.set_current_folder(???)
         dirname_u,filename_u = os.path.split(db_file)
@@ -11627,22 +11649,22 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         date1 = datetime.date.today()
         today_u = unicode2(date1.isoformat())
-        name_u = name_u + " " + today_u  + ext_u + u".zip"
+        name_u = name_u + " " + today_u  + ext_u + ".zip"
         chooser.set_current_name(name_u)
 
         response = chooser.run()
 
-        if response == gtk.RESPONSE_CANCEL:
+        if response == Gtk.RESPONSE_CANCEL:
             chooser.destroy()
             return
 
-        elif response == gtk.RESPONSE_ACCEPT:
+        elif response == Gtk.RESPONSE_ACCEPT:
             filename = chooser.get_filename()
-            filename_u = unicode(filename, "utf-8")
+            filename_u = str(filename, "utf-8")
             chooser.destroy()
 
         if os.path.splitext(filename_u)[1] != ".zip" :
-            filename_u += u"zip"
+            filename_u += "zip"
 
 
         if db_file.lower().replace("\\", "/") == filename_u.lower().replace("\\", "/") :
@@ -11665,21 +11687,21 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         global config1
 
         if filename_u == None :
-            chooser = gtk.FileChooserDialog(title=_('_Open Database'),
-                    action=gtk.FILE_CHOOSER_ACTION_OPEN,
-                    buttons=(gtk.STOCK_CANCEL,
-                        gtk.RESPONSE_CANCEL,
-                        gtk.STOCK_OPEN,
-                        gtk.RESPONSE_OK))
+            chooser = Gtk.FileChooserDialog(title=_('_Open Database'),
+                    action=Gtk.FILE_CHOOSER_ACTION_OPEN,
+                    buttons=(Gtk.STOCK_CANCEL,
+                        Gtk.RESPONSE_CANCEL,
+                        Gtk.STOCK_OPEN,
+                        Gtk.RESPONSE_OK))
             chooser.set_current_folder(configdir_u)
             chooser.set_show_hidden(True)  #Test : does not work. Why ??
 
-            filter_all = gtk.FileFilter()
+            filter_all = Gtk.FileFilter()
             filter_all.set_name(_('All files'))
             filter_all.add_pattern('*')
             chooser.add_filter(filter_all)
 
-            filter_ini = gtk.FileFilter()
+            filter_ini = Gtk.FileFilter()
             filter_ini.set_name(_('SQLITE files'))
             filter_ini.add_pattern('*.sqlite')
             filter_ini.add_pattern('*.db3')
@@ -11688,16 +11710,16 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             chooser.set_filter(filter_ini)
 
             response = chooser.run()
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.RESPONSE_OK:
                 filename = chooser.get_filename()
-                filename_u = unicode(filename,"utf-8")            # convert utf-8 to unicode for internal use
+                filename_u = str(filename,"utf-8")            # convert utf-8 to unicode for internal use
 
                 if zipfile.is_zipfile(filename_u) :
-                    print "====>", filename_u, " zipped"
+                    print("====>", filename_u, " zipped")
 
 
-            elif response == gtk.RESPONSE_CANCEL:
-                print(_('Closed, no files selected'))
+            elif response == Gtk.RESPONSE_CANCEL:
+                print((_('Closed, no files selected')))
                 chooser.destroy()
                 return
             chooser.destroy()
@@ -11710,7 +11732,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         (name_u,ext) = os.path.splitext(db_name)
         date1 = datetime.date.today()
         today_u = unicode2(date1.isoformat())
-        name_u = name_u + " " + today_u  + u".zip"
+        name_u = name_u + " " + today_u  + ".zip"
 
         backup_name_u = os.path.join(db_dir,"backup",name_u)
         if auto == True :
@@ -11720,23 +11742,23 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 and config["ini"]["database"]["autobackup"] == 0) :     # Automatic backup only if configured
                 return
             else:
-                self.dialog = gtk.MessageDialog(None,0,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,
+                self.dialog = Gtk.MessageDialog(None,0,Gtk.MessageType.INFO,Gtk.ButtonsType.CLOSE,
                                _("Automatic Backup running, please wait"))
 
                 self.dialog.show_all()
 
-                while gtk.events_pending():
-                    gtk.main_iteration()
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
 
 
-        if not os.path.isdir(os.path.join(db_dir,u"backup")) :
-            os.makedirs(os.path.join(db_dir,u"backup"))
+        if not os.path.isdir(os.path.join(db_dir,"backup")) :
+            os.makedirs(os.path.join(db_dir,"backup"))
 
         try :
             output = zipfile.ZipFile(backup_name_u, "w", zipfile.ZIP_DEFLATED)
             db_filename = os.path.split(db_file)[1]
 
-            files_list = glob.glob(os.path.join(configdir_u, u"*"))     # add all config files
+            files_list = glob.glob(os.path.join(configdir_u, "*"))     # add all config files
             files_list.append(db_file)
             for filename_u in files_list :
                 if os.path.isfile(filename_u) :
@@ -11771,7 +11793,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         global  config;
 
-        name = gtk.Buildable.get_name(button)
+        name = Gtk.Buildable.get_name(button)
         gtkpaned = substr(name,strrpos(name,'@')+1);
 
         if button.get_active() == True :
@@ -11822,7 +11844,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         else :
 
-            self.arw[window.name].show();
+            self.arw[window.get_name()].show();
 
 
     def window_hide(self, window) :
@@ -11831,7 +11853,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             #if is_object(window) :
             window.hide();
         except :
-            self.arw[window.name].hide();
+            self.arw[window.get_name()].hide();
 
 
 
@@ -11885,7 +11907,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             self.arw[window].present();
 
 
-            win=self.arw[window].window;        # get the GdkWindow
+            win=self.arw[window].get_window()        # get the GdkWindow
 
 ##            if resize == 1 :
 ##                if 'position' in config['ini'] :
@@ -11944,7 +11966,7 @@ class utilities () :
         if isinstance(widget, str) :
             name = widget;
         else :
-            name = gtk.Buildable.get_name(widget);
+            name = Gtk.Buildable.get_name(widget);
 
         extension = re.sub(".*" + separator, "" , name)
 
@@ -11962,14 +11984,14 @@ class utilities () :
     def printExcept() :
         a,b,c = sys.exc_info()
         message_s = ""
-        result = traceback.format_exception(a,b,c)
-        if result[0] == "None\n" :
+
+        if a == None:
             return None
-        else :
-            for d in result :
-                print d,
-                message_s += d
-            return message_s
+        result = traceback.format_exception(a,b,c)
+        for d in result :
+            print(d, end=' ')
+            message_s += d
+        return message_s
 
 
     @staticmethod
@@ -12066,7 +12088,7 @@ def first_config() :
             val['table_type'] = "peripheral1";      # relation 1:n (without gateway)
 
 
-        if val.has_key('table') :
+        if 'table' in val :
             periph_tables[val['table']] = val;
         if 'config_name' in val :
             periph_tables2[val['config_name']] = val        # TODO : problem if two peripheral definitions for the same table.
@@ -12155,11 +12177,11 @@ def first_config() :
     # peripheral tables and gateways
     for key  in config['peripheral'] :
         val = config['peripheral'][key ]
-        if not val.has_key('table') :
+        if 'table' not in val :
             continue
 
         config_info['periph_tables'][val['table']] = val;
-        if val.has_key('gateway') :
+        if 'gateway' in val :
 
             v2(config_info, 'gateways',val['gateway'],'name')
             config_info['gateways'][val['gateway']]['name'] = val['gateway']
@@ -12187,7 +12209,7 @@ def first_config() :
             val = config['words'][key ]
 
 
-            if config_info['periph_def'].has_key(key) :
+            if key in config_info['periph_def'] :
 
                 msg = _("The name %s is already used for a peripheral table, it cannot be used for a words table !") % key
                 alert(msg);
@@ -12222,7 +12244,7 @@ def first_config() :
             central_table = v(config,'central',central_table_def,'table');
             config_info['search_lists'][val['treeview']]['central_table'] = central_table;
 
-            if config_info['periph_tables'].has_key(table) :
+            if table in config_info['periph_tables'] :
 
                 if 'search_lists' in config_info['periph_tables'][table] :
                     temp = config_info['periph_tables'][table]['search_lists']
@@ -12236,7 +12258,7 @@ def first_config() :
                     config_info['periph_tables'][table]['search_lists'] = val['treeview']
 
         except :        # TODO : this should be done for all blocks above
-            print "Error in configuration for search lists"
+            print("Error in configuration for search lists")
 
 
 
@@ -12278,33 +12300,33 @@ def save_settings(widget = "") :
 
         global settings, config;
 
-        # Backup configuration in JSON
-        if os.path.exists(os.path.join(configdir_u, 'config.json')):
-            with open(os.path.join(configdir_u, 'config.json'), 'r') as f:
-                json_data = json.load(f, cls=json_decoder.StringJSONDecoder)
-
-            if json_data:
-                with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
-                    f.write(json.dumps(json_data, indent=3, encoding=json_decoder.encoding, sort_keys=True))
+##        # Backup configuration in JSON
+##        if os.path.exists(os.path.join(configdir_u, 'config.json')):
+##            with open(os.path.join(configdir_u, 'config.json')0, 'r') as f:
+##                json_data = json.load(f, cls=json_decoder.StringJSONDecoder)
+##
+##            if json_data:
+##                with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
+##                    f.write(json.dumps(json_data, indent=3 ))
 
         #création d'un backup.
         # procédure un peu lourde mais qui évite l'enfer des " pour les commandes shell
-        f1 = open(os.path.join(configdir_u, u"config.py"), "r")
+        f1 = open(os.path.join(configdir_u, "config.py"), "r")
         backup = f1.read()
         f1.close()
 
-        f2 = open(os.path.join(configdir_u, u"config.bak"),"w")
+        f2 = open(os.path.join(configdir_u, "config.bak"),"w")
         f2.write(backup);
         f2.close()
 
         pp = pprint.PrettyPrinter(indent = 4, width = 100)
         data1 = pp.pformat(config)
-        f3 = open(os.path.join(configdir_u,u"config.py"),"w")
+        f3 = open(os.path.join(configdir_u,"config.py"),"w")
         f3.write(data1)
         f3.close()
 
-        with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
-            f.write(json.dumps(OrderedDict(config), indent=3, encoding=json_decoder.encoding, sort_keys=True))
+##        with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
+##            f.write(json.dumps(OrderedDict(config), indent=3, encoding=json_decoder.encoding, sort_keys=True))
 
 
 
@@ -12318,30 +12340,30 @@ def recordFilenames(label_s, dest_u) :
     pass
 
 def unicode2(string) :
-    if isinstance(string,unicode) :
+    if isinstance(string,str) :
         return string
     else :
         try :
-            return unicode(string,"utf_8")
+            return str(string,"utf_8")
         except :
             try :
 #               print string, " est ecrit en cp1252"
-                return unicode(string,"cp1252")
+                return str(string,"cp1252")
             except :
                 return string       # Is this the good option ? Return False or an empty string ?
-                return u"inconnu"
+                return "inconnu"
 
 def print2(string, lineEnd = 0) :
     locmsg_s = time.strftime("%x, %X",time.localtime()) + " | "
-    if isinstance(string,unicode) :
-         print string.encode("cp1252")              # March 10th, 2012 - Averell
+    if isinstance(string,str) :
+         print(string.encode("cp1252"))              # March 10th, 2012 - Averell
          locmsg_s += string.encode("cp1252")
     else :
         try :
-            print string   # si on envoie de l'utf8, on aura de l'utf8   l'écran.
+            print(string)   # si on envoie de l'utf8, on aura de l'utf8   l'écran.
             locmsg_s += string
         except :
-            print "Non unicode string. Couldn't be printed"
+            print("Non unicode string. Couldn't be printed")
             locmsg_s += "Non unicode string. Couldn't be printed"
     locmsg_s += "\r\n"
     ftrace = open("Trace.log","a")
@@ -12401,17 +12423,17 @@ def alert(message, dummy = 0) :
             else :
                 message2 += part[0:300] + "\n"
 
-        dialog = gtk.MessageDialog(None,0,gtk.MESSAGE_INFO,gtk.BUTTONS_CLOSE,
+        dialog = Gtk.MessageDialog(None,0,Gtk.MessageType.INFO,Gtk.ButtonsType.CLOSE,
                                message2)
         dialog.run()
         dialog.destroy()
 
 def yes_no_dialog(message, dummy = 0) :
-        dialog = gtk.MessageDialog(None,0,gtk.MESSAGE_INFO,gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(None,0,Gtk.MessageType.INFO,Gtk.ButtonsType.YES_NO,
                                message)
         answer = dialog.run()
         dialog.destroy()
-        if answer == gtk.RESPONSE_YES :
+        if answer == Gtk.RESPONSE_YES :
             return True
         else :
             return False
@@ -12552,7 +12574,7 @@ if __name__ == '__main__' :
                 configname_u = unicode2(configname_s)
 
         tmp_u = unicode2(os.path.abspath("./"))
-        configdir_u = os.path.join(tmp_u, u"config", configname_u)
+        configdir_u = os.path.join(tmp_u, "config", configname_u)
 
 
         # Load plugins
@@ -12564,12 +12586,14 @@ if __name__ == '__main__' :
         # chargement de la configuration
 
         # convert file
-        # TODO : pas fini
         # magutils.php_array_to_py("config.php", "config.py")
+
         if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
+        #if False:
             # Load configuration via JSON
             with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
-                config = json.load(f, cls=json_decoder.StringJSONDecoder)
+                #config = json.load(f, cls=json_decoder.StringJSONDecoder)
+                config = json.load(f)
         else:
             f1 = open(os.path.join(configdir_u, "config.py"), "r")
             data = f1.read()
@@ -12731,7 +12755,7 @@ if __name__ == '__main__' :
             if (link == False):
                 string = _("MySQL server not found.\nVerify it is started or check your configuration.\nContinue ? ");
                 rep = yes_no_dialog(string, _("Server unreachable"));
-                if (rep <> -8):
+                if (rep != -8):
                     die ;
                 else:
                     mem['nodb'] = 1;
@@ -12779,7 +12803,7 @@ if __name__ == '__main__' :
         mem['detail_plein_ecran']=0;
         chars['index']=0;
 
-        gtk.rc_parse("couleurs.rc");
+        Gtk.rc_parse("couleurs.rc");
 
         utils = utilities()
 
@@ -12795,30 +12819,30 @@ if __name__ == '__main__' :
 
         # create automatic backup for sqlite
         if db_type == "sqlite" :
-            gtk.idle_add(mag.create_backup, True )
+            gi.repository.GLib.idle_add(mag.create_backup, True )
 
-        gtk.main()
+        Gtk.main()
 
-    except ScriptSg, instance :
+    except ScriptSg as instance :
         isExcept = True
         excMsg_s = "%s" % (instance)
         (excType, excValue, excTb) = sys.exc_info()
         tb_a = traceback.format_exception(excType, excValue, excTb)
 
-    except ScriptIo, instance :
+    except ScriptIo as instance :
         isExcept = True
         excMsg_s = "%s" % (instance)
         (excType, excValue, excTb) = sys.exc_info()
         tb_a = traceback.format_exception(excType, excValue, excTb)
 
-    except ScriptRt, instance :
+    except ScriptRt as instance :
         isExcept = True
         excMsg_s = "%s" % (instance)
         (excType, excValue, excTb) = sys.exc_info()
         tb_a = traceback.format_exception(excType, excValue, excTb)
 
-    except exceptions.SystemExit, instance :
-        sys.exit(instance)
+    #£ except exceptions.SystemExit as instance :
+    #    sys.exit(instance)
 
     except :
         isExcept = True
@@ -12830,9 +12854,9 @@ if __name__ == '__main__' :
     if isExcept :
         # record exception
 
-        print("\nEXC: %s\n" % (excMsg_s))
+        print(("\nEXC: %s\n" % (excMsg_s)))
         for line_s in tb_a :
-            print(line_s.strip())
+            print((line_s.strip()))
         print("\nERR: Exception reÃ§ue\n")
 
         dt = datetime.datetime.now()
@@ -12841,9 +12865,10 @@ if __name__ == '__main__' :
         for line_s in tb_a :
             l_msgerror += line_s.strip()
             l_msgerror += "\n"
-        print l_msgerror
+        print(l_msgerror)
 
-        dialog = gtk.MessageDialog(None,0,gtk.MESSAGE_ERROR,gtk.BUTTONS_CLOSE,l_msgerror)
+        dialog = Gtk.MessageDialog(None,0,Gtk.MessageType.ERROR,Gtk.ButtonsType.CLOSE,l_msgerror)
+
         dialog.run()
         dialog.destroy()
         sys.exit(1)

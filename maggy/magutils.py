@@ -45,25 +45,7 @@ def test_signal(object) :
 # GTK2-add ###################################################
 
 def get_store_length(store) :
-    # works only if all columns are str
-    if len(store) > 0 :
-        row = store[0]
-        length = len(row)
-    else :  # len(row) doesn't work if there is no row. Dirty workaround :
-            # we try to insert a row  until it works
-        for i in range(100) :
-            test = (["a"] * i)
-            try :
-                store.append(test)
-                length = len(test)
-                store.clear()
-                break
-            except :
-                pass
-
-    return length
-
-
+    return store.get_n_columns()
 
 # retourne l'array des iter d'un store. Pourrait être fait plus simplement en python.
 def array_iter(store) :
@@ -181,7 +163,7 @@ def get_text(widget, **kwargs) :
 
         buf = widget.get_buffer();
         (a,z) = buf.get_bounds();
-        text = buf.get_text(a,z);
+        text = buf.get_text(a,z, False);
 
 
     elif type_s == "GtkEntry" :
@@ -258,7 +240,7 @@ def set_text(widget, text) :
                     widget.set_active(i)
                 i += 1
         else:
-            print "no model for ComboBox %s" % widget.name
+            print("no model for ComboBox %s" % widget.name)
 
 
     elif type_s == "GtkComboBoxEntry" :
@@ -280,19 +262,29 @@ def set_text(widget, text) :
 
 
 
-def append(model,data,pad = "") :
+def append(model,data,pad = "", datatype = None) :
 
     ncol = model.get_n_columns();
     if data == None :
         data = []
-    if len(data) > ncol :
 
+    if datatype == "str":
+        values1 = []
+        for value in data:
+            values1.append(x2str(value))
+        data = values1
+
+    if len(data) > ncol :
         data = data[0:ncol]
     else :
         data = array_pad(data,ncol,"");
 
-    iter1 = model.append(data);
-    return iter1
+    try:
+        iter1 = model.append(x2str(data))
+        return iter1
+    except:
+        print("===> Erreur d'insertion pour ", data)
+
 
 
 
@@ -371,7 +363,7 @@ def widget_type(widget) :
 
     try :
         z = widget.class_path()
-        z =z.split(".")
+        z =z.path.split(".")
         return z[-1]
     except :
         return
@@ -397,21 +389,13 @@ def widget_group(container,arWidgets) :
     arObjects = []
     for key in arWidgets :
         widget = arWidgets[key]
-        try :
-            z = widget.path()
+        if hasattr(widget, "path"):
+            z1 = widget.path()
+            z = z1.path
             if (z.find(container + ".") == 0 ) or(z.find("." + container + ".") > 0) :
                 arObjects.append(widget)
-        except :
-##            a,b,c = sys.exc_info()
-##            for d in traceback.format_exception(a,b,c) :
-##                print d,
-##            print "error for :", key, widget
-            pass
-
 
     return arObjects
-
-
 
 def strpos(string, needle) :
     x = string.find(needle)
@@ -419,9 +403,28 @@ def strpos(string, needle) :
 class __________utilitaires________ :
     pass
 
+def x2str(value) :
+
+    def convert(value):
+        if isinstance(value, int) or isinstance(value, float):
+            value = str(value)
+        elif value == None:
+            value = ""
+        elif isinstance(value, bytes):
+            value=value.decode("utf8")                 # TODO first : is utf8 a good option ?
+        return value
+
+    if isinstance(value, list):
+        converted = []
+        for value1 in value:
+            converted.append(convert(value1))
+    else:
+        converted = convert(value)
+    return converted
+
 def printn(message) :
 
-    print message + "\n"
+    print(message + "\n")
 
 
 
@@ -429,7 +432,7 @@ def timer(x) :
 
     global memtimer
 
-    if x <> 'result' :
+    if x != 'result' :
 
         memtimer[x] = getmicrotime()
 
@@ -441,7 +444,7 @@ def timer(x) :
             time = memtimer[i] - memtimer[i-1]
             out +=("timer $i = $time\n")
 
-        print out
+        print(out)
         memtimer = []
         return out
 
@@ -479,7 +482,7 @@ def list_properties(object) :
     for key  in arProp :
         val = arProp[key ]
 
-        print key + "=>" + val + "\n"
+        print(key + "=>" + val + "\n")
 
 
 
@@ -586,7 +589,7 @@ def sql_error(link, req = "") :
             message+= "\n"+ limitLength(req)
 
         alert(message)
-        print "\n $message"
+        print("\n $message")
 
 
     if message2 > 0 :
@@ -603,7 +606,7 @@ def sql_error(link, req = "") :
             message2+= "\n"+ limitLength(req)
 
         alert(message2)
-        print "\n $message2  \n $req"
+        print("\n $message2  \n $req")
 
 
 
@@ -727,7 +730,7 @@ def db_restore() :
     database = config['database']['database']
 
     commande = "\"\""+ program + "\" -u $userLocale $password $database < " + escapeshellarg(file)+"\""
-    print commande
+    print(commande)
     unset(output)
     exec(commande,output)
     message = implode(chr(10),output)

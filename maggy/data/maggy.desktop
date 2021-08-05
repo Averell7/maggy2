@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=2.0
+Name=Maggy
+Comment=Database interface designer
+Type=Application
+Exec=maggy
+Icon=maggy
+Categories=Office;
+Terminal=false
+StartupNotify=false

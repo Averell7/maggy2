@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 #
 # Simple JSON editor that allows strings to be edited with embedded new lines
-from __future__ import generators, unicode_literals, print_function
+
 import sys
 
 import json_decoder
 
 if sys.version_info[0] < 3:
-    str = unicode
-    import Tkinter as tkinter
-    import ttk
-    import tkSimpleDialog as simpledialog
-    import tkFileDialog as filedialog
+    str = str
+    import tkinter as tkinter
+    import tkinter.ttk
+    import tkinter.simpledialog as simpledialog
+    import tkinter.filedialog as filedialog
 else:
     import tkinter
     import tkinter.ttk as ttk
@@ -479,7 +479,7 @@ class JSONEdit(GUIApplication.GUIApplication):
         self.pane.pack(fill=tkinter.BOTH, expand=True)
 
         self.treeview, self.treeview_scrolled = self.create_scrolled(
-            self.root, ttk.Treeview, True, True)
+            self.root, tkinter.ttk.Treeview, True, True)
         self.pane.add(self.treeview_scrolled)
         self.treeview.heading('#0', text='Document Tree')
 

@@ -22,7 +22,7 @@ sys.path.append(os.getenv("PYLIB"))
 # ENUMS ###################################################################
 ###########################################################################
 
-ok_e, warning_e, error_e = range(3)
+ok_e, warning_e, error_e = list(range(3))
 
 ###########################################################################
 # EXCEPTIONS ##############################################################
@@ -43,7 +43,7 @@ class ScriptRt(Exception) :
         @param reason_s : exception description
         """
 
-        if isinstance(reason_s, unicode) :
+        if isinstance(reason_s, str) :
             reason_s = reason_s.encode("utf-8")
         # ---- super ----
 

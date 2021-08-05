@@ -9,7 +9,7 @@ def convert_if_unicode(value):
         for v in value:
             values.append(convert_if_unicode(v))
         return values
-    elif isinstance(value, unicode):
+    elif isinstance(value, str):
         return value.encode(encoding)
     else:
         return value

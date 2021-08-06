@@ -8,6 +8,8 @@
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
+import sqlite3
+
 import json_decoder
 
 maggy_version = "2.3.0"
@@ -149,6 +151,18 @@ import time, datetime
 Windows ="ntx"
 osname = os.name
 #
+
+# Deepcopy Fixes
+# Allows pickling objects that are not normally pickable by converting them to None
+# The resulting copy won't be an exact copy
+import copyreg
+def _return_none(*args):
+        return None
+def _pickle_unpickable(instance):
+    return _return_none, (None, )
+copyreg.pickle(sqlite3.Connection, _pickle_unpickable)
+copyreg.pickle(sqlite3.Cursor, _pickle_unpickable)
+
 
 # ####################################################################
 #            PHP compatibility functions

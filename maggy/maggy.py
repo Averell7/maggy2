@@ -8,7 +8,7 @@
 ###########################################################################
 # VERSION #################################################################
 ###########################################################################
-import sqlite3
+# import sqlite3 --> not necessary; Franck set it lower : import sqlite3 as sqlite
 
 import json_decoder
 
@@ -160,8 +160,8 @@ def _return_none(*args):
         return None
 def _pickle_unpickable(instance):
     return _return_none, (None, )
-copyreg.pickle(sqlite3.Connection, _pickle_unpickable)
-copyreg.pickle(sqlite3.Cursor, _pickle_unpickable)
+copyreg.pickle(sqlite.Connection, _pickle_unpickable)
+copyreg.pickle(sqlite.Cursor, _pickle_unpickable)
 
 
 # ####################################################################
@@ -404,7 +404,7 @@ def verif(dict1, field1) :
 def convert_rtf_hexcode(string1) :
 
 
-    a = re.sub(r"\\'([0-9a-e]{2})", r"\x\1",  string1)
+    a = re.sub(r"\\'([0-9a-e]{2})", r"x\1",  string1)
 ##    f1 = io.StringIO()
 ##    f1.write( "b = '")
 ##    f1.write(a)

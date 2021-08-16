@@ -26,8 +26,8 @@
 """
 
 try:
-   from maggy2.maggy import main
+   from maggy.maggy import main
    main()
 except ImportError as e:
-   print('Error: Could not import pdfbooklet')
+   print('Error: Could not import maggy.main')
    print('Cause: %s' % e)

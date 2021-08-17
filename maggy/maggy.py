@@ -2167,8 +2167,9 @@ or the list does not exist."""))
 
             left.append_column(colnew)
 
-            left.enable_model_drag_source( Gdk.ModifierType.BUTTON1_MASK, self.TARGETS, Gdk.DragAction.COPY | Gdk.DragAction.MOVE)
+            left.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK, self.TARGETS, Gdk.DragAction.COPY)
             left.connect("drag_data_get", self.drag_data_get_data) #$left->connect("drag_data_get", array($this,"drag_data_get_data"));
+
 
             # ajout des colonnes additionnelles définies dans config / gateway_data
             # Il s'agit des colonnes de la liste de gauche
@@ -2371,7 +2372,7 @@ or the list does not exist."""))
         nom = model.get_value(iter1, 0)
 
         data1 = json.dumps([listpath, nom, id1])    #data1 = serialize([name, id, nom])
-        data.set_text(data1, -1)                #£ is -1 the right value ?
+        data.set(Gdk.TARGET_STRING, len(data1), [ord(d) for d in data1])
 
 
 
@@ -2444,7 +2445,6 @@ or the list does not exist."""))
         model = treeview.get_model()
         numcols = model.get_n_columns()
         info_depot = treeview.get_dest_row_at_pos(x, y)
-        #£ Data is not received. Why ?
         try:
             data1 = data.data
         except:

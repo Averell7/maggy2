@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.3.0 - juin 2021
+# version 2.3.0.10 - août 2021
 
 
 
@@ -10,7 +10,7 @@
 ###########################################################################
 # import sqlite3 --> not necessary; Franck set it lower : import sqlite3 as sqlite
 
-import json_decoder
+#£ import json_decoder
 
 maggy_version = "2.3.0"
 print("Maggy Version : ", maggy_version)
@@ -655,8 +655,8 @@ class SqliteUnicode :
 
     def collate(self,string1, string2):
 
-        string1 = str(string1,"utf_8")
-        string2 = str(string2,"utf_8")
+        #string1 = str(string1,"utf_8")
+        #string2 = str(string2,"utf_8")
         string1 = string1.lower()
         string2 = string2.lower()
 
@@ -672,8 +672,9 @@ class SqliteUnicode :
         string2 = self.re4.sub("o",string2)
         string2 = self.re5.sub("u",string2)
 
-        compare = cmp(string1, string2)
-
+        #£ compare = cmp(string1, string2)
+        # bad replacement, will work only if strings have the same length
+        compare = (string1  > string2) - (string1 < string2)
         return compare
 
     def concat_ws(self, *args) :
@@ -842,9 +843,9 @@ class Import_csv :
             chooser = Gtk.FileChooserDialog(title=_('_Open Configuration'),
                     action=Gtk.FILE_CHOOSER_ACTION_OPEN,
                     buttons=(Gtk.STOCK_CANCEL,
-                        Gtk.RESPONSE_CANCEL,
+                        Gtk.ResponseType.CANCEL,
                         Gtk.STOCK_OPEN,
-                        Gtk.RESPONSE_OK))
+                        Gtk.ResponseType.OK))
             chooser.set_current_folder(configdir_u)
             chooser.set_show_hidden(True)  #Test : does not work. Why ??
 
@@ -860,11 +861,11 @@ class Import_csv :
             chooser.set_filter(filter_ini)
 
             response = chooser.run()
-            if response == Gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 filename = chooser.get_filename()
                 filename_u = str(filename,"utf-8")            # convert utf-8 to unicode for internal use
 
-            elif response == Gtk.RESPONSE_CANCEL:
+            elif response == Gtk.ResponseType.CANCEL:
                 print((_('Closed, no files selected')))
                 chooser.destroy()
                 return
@@ -1417,9 +1418,9 @@ class db_utilities :
         chooser = Gtk.FileChooserDialog(title=_('_Open Configuration'),
                 action=Gtk.FILE_CHOOSER_ACTION_OPEN,
                 buttons=(Gtk.STOCK_CANCEL,
-                    Gtk.RESPONSE_CANCEL,
+                    Gtk.ResponseType.CANCEL,
                     Gtk.STOCK_OPEN,
-                    Gtk.RESPONSE_OK))
+                    Gtk.ResponseType.OK))
         chooser.set_current_folder(configdir_u)
         chooser.set_show_hidden(True)  #Test : does not work. Why ??
 
@@ -1436,11 +1437,11 @@ class db_utilities :
         chooser.set_filter(filter_ini)
 
         response = chooser.run()
-        if response == Gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             filename = chooser.get_filename()
             filename_u = str(filename,"utf-8")            # convert utf-8 to unicode for internal use
 
-        elif response == Gtk.RESPONSE_CANCEL:
+        elif response == Gtk.ResponseType.CANCEL:
             print((_('Closed, no files selected')))
             chooser.destroy()
             return
@@ -1658,14 +1659,14 @@ class explode_db :
 
     def explode_insert_in_chartreuse(self, list_noms) :
 
-        print "insert in chartreuse : %d records" % len(list_noms)
+        print ("insert in chartreuse : %d records" % len(list_noms))
         i = 0
         for data in list_noms :
             i += 1
             if i % 100 == 0:
                 while gtk.events_pending():
                     gtk.main_iteration()
-                print i,
+                print(i, end='')
             chartreuse = data[1]
             id_livre = data[0]
             #auteur = self.escape_quotes(auteur)
@@ -1692,7 +1693,7 @@ class explode_db :
 
 
                     else :
-                        print "Error for ", mychartreuse
+                        print("Error for ", mychartreuse)
                 except Exception as error:
                     if "UNIQUE constraint failed:" in error.message:
                         pass
@@ -2142,17 +2143,11 @@ class zoomx() :
             alert (_(" There is no Search list for this table.\n There is no way to populate the list"))
             return
 
-
-
-
         if magutils.widget_type(mag.arw[clists[0]]) != "GtkTreeView" :
             alert (clists[0] + _(""" is not a GtkTreeView.
 Either your control has not a valid name
 or the list does not exist."""))
             return
-
-
-
 
 
         targets = [ ['text/plain', 0, 1], ['TEXT', 0, 2], ['STRING', 0, 3] ]
@@ -2188,7 +2183,7 @@ or the list does not exist."""))
             type = config['xtabs'][config_list]['type']
             table_def = config['xtabs'][config_list]['table_def']
 
-            # Is there a definition in $config / gateway_data ?
+            # Is there a definition in config / gateway_data ?
             col_data = {}
             if 'gateway_data' in config :
                 if table in config['gateway_data'] :         # Is there are additional columns definition
@@ -2214,8 +2209,8 @@ or the list does not exist."""))
             left.connect("drag_data_get", self.drag_data_get_data) #$left->connect("drag_data_get", array($this,"drag_data_get_data"));
 
 
-            # added additional columns defined in config / gateway_data
-            # These are the columns in the list on the left
+            # add additional columns defined in config / gateway_data
+            # These are the columns in the list just on the left
 
             if col_data :
                 for  key  in col_data['cols']  :
@@ -2317,21 +2312,12 @@ or the list does not exist."""))
                         #model2 = combo.get_model()
                         for line in cursor :
                             txt = line[field]
-                            if not txt :
-                                txt = ""
+                            if txt == "" or txt == None:
+                                continue
                             combo.append_text(str(txt))
-
-
-
                     combo.set_active(0)
-                    #Â£     To be simple, we have used comboBoxText. This should be changed ?
-##                    entry = combo.get_child()
-##                    entry.connect('changed', self.additional_data,right,field,index)
                     index+= 1
                     mag.arw['zoom_combo'+ str(index)] = combo
-
-
-
 
         # Connect the buttons
         self.arZoom['insertion'].connect('clicked', self.insertionx )
@@ -2414,7 +2400,7 @@ or the list does not exist."""))
             id1 = ""
         nom = model.get_value(iter1, 0)
 
-        data1 = json.dumps([listpath, nom, id1])    #data1 = serialize([name, id, nom])
+        data1 = json.dumps([listpath, nom, id1])
         data.set(Gdk.TARGET_STRING, len(data1), [ord(d) for d in data1])
 
 
@@ -3073,6 +3059,7 @@ class maglist() :
         #global maggy, arw
         #maggy = mag
         #self.arw = arw
+        self.ok_list_disable = False
         pass
 
 
@@ -3303,16 +3290,6 @@ class maglist() :
                         popup_condition[key].append(list(row.keys())[0])
 
 
-
-
-
-
-
-
-
-
-
-
     def configure_list(self, name) :
 
         global listes, cr, config, config_info, tab_conversion, checkbox_list, periph_tables;
@@ -3334,14 +3311,9 @@ class maglist() :
         else :
             hauteur = 12
 
-        # doit être un entier, sinon erreur
         if 'font_size' in config['ini']['lists'] :
+            points = int(config['ini']['lists']['font_size'])
 
-            points = int(config['ini']['lists']['font_size']);
-
-        # must be a double
-        else :
-            points = int(10);
 
         cr = {}
         cr[name] = Gtk.CellRendererText();
@@ -3450,14 +3422,9 @@ class maglist() :
             val = table_data['cols'][key ]
             if 'field' in val :
                 if val['field'] == ref_field :
-
-
                     ref_column = int(key)
                     if ref_column > 0 :
                         col.set_cell_data_func(cr[name], self.renvois, ref_column);
-
-
-
 
         treeview.show();
 
@@ -3711,9 +3678,11 @@ class maglist() :
                     selection[groupe] = []
                 selection[groupe].append(idlivre)
 
-
-
+        self.ok_list_disable = False
+        sel.unselect_all()
         store.clear();
+        self.ok_list_disable = False
+
         for i in range(0, len(mot)) : #(i=0; i<len(word); i+= 1)
 ## if mot[i] == "" :
 ## word[i] = "a"
@@ -3754,12 +3723,6 @@ class maglist() :
                 if mot!="" :
                     cree_listes(mot.strip(),table,champ,liste,complement,-1,selection)
 
-
-
-
-
-
-
     # end of function refresh_list
 
     """==============================================================================
@@ -3792,8 +3755,9 @@ class maglist() :
             limite = 100;
 
         # N.B. : in the sqlite version, order by has been removed and should be put in complements
+        # TODO : why ? presently we restored order by in its normal place
         if db_type == "sqlite" :
-            req="select * from %s where %s like '%s%%' %s  collate france limit %s" % (fromx, champ, mot, complement, str(limite));
+            req="select * from %s where %s like '%s%%' %s  order by %s collate france limit %s" % (fromx, champ, mot, complement, champ, str(limite));
         elif db_type == "mysql" :
             req="select * from %s where %s like '%s%%' %s order by %s limit %s" % (fromx, champ, mot, complement, champ, str(limite));
         elif db_type == "accdb" :
@@ -3847,6 +3811,7 @@ class maglist() :
 
             for key  in coldef :
                 val = coldef[key ]
+                key_i = int(key)        # json does not store keys as integers
                 if 'field' in val :
                     field = val['field'];
                 else :                  # incomplete configuration. Non fatal error
@@ -3859,21 +3824,21 @@ class maglist() :
                         temp = "i_data_" + central_table;
                     if not db_type == "accdb" :          # TODO: with accdb, error: Row object has no attribute 'keys
                         if temp in list(fiche.keys()) :
-                            values[int(key)] = self.compter(fiche[temp])
+                            values[key_i] = self.compter(fiche[temp])
 
                 elif field == "" :
-                    values[key] = "";
+                    values[key_i] = "";
 
                 elif "," in field :
                     out = "";
                     for f in field.split(",") :
                         if fiche[f] :
                             out += fiche[f];
-                    values[key] = to_utf8(out)
+                    values[key_i] = to_utf8(out)
 
                 else :
                     try :       # TODO problem here with archives
-                        values[key] = to_utf8(fiche[field])
+                        values[key_i] = to_utf8(fiche[field])
                     except :
                         debug = "juste  pour avoir un point d'arrêt"
                         pass
@@ -4154,7 +4119,13 @@ class maglist() :
 
         global mem, config, config_info, popup_saisie, listes, query
         global tab_conversion, periph_tables, treeview_data, affichage;
-        # print ("====>  ok_liste")
+        try:
+            self.i += 1
+        except:
+            self.i = 1
+        #print ("====>  ok_liste", str(self.i))
+        if self.ok_list_disable == True:
+            return
         listes_combinees = []
         query = {}
         # statements
@@ -4298,14 +4269,6 @@ class maglist() :
 
             self.choisir_affichage(result,details);
             self.chercher();
-            # contournement d'une anomalie : à la première recherche, detail n'est pas lancé.
-            """if isset(mem['bug_demarrage']) == False :
-
-                Detail(self.arw['s_list20']);
-                mem['bug_demarrage'] = True;
-
-            """
-
 
             details_tab = affichage[page]['details_tab'];
             if isinstance(details_tab, str) :
@@ -4804,7 +4767,10 @@ class maglist() :
             ctree.expand_row(path,True);
 
 
-
+    """
+        function actualiser : this function refreshes the list of results of a searchlist row.
+        it is useful to be able to see the changes made in the edit window.
+    """
     def actualiser(self, mylist) :
 
         global listes  ;
@@ -4834,8 +4800,6 @@ class maglist() :
     FONCTION   : index_maj
     DESCRIPTION: Met à jour le champ ordre de la table thèmes pour refléter les changements faits dans l'interface
     et assurer qu'ils seront conservés au prochain chargement.
-
-
     ==============================================================================
     """
 
@@ -6951,12 +6915,6 @@ class edit() :
                 question = yes_no_dialog ("Au moins %d champs modifiés mais pas enregistrés. Enregistrer ?" % zz1)
                 if  question == True :
                     self.update_fiche()
-
-
-
-
-
-
 
 
     """=================================================================================================
@@ -9433,10 +9391,10 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         v2(config["ini"], "gui", "start_tab")
         start_s = config["ini"]["gui"]["start_tab"]
         try :
-            if int(start_s > 0) :
+            if int(start_s) > 0 :
                 self.montrer(start_s)
         except :        # undefined or invalid
-            pass        # TODO : message to signal configuration is invalid
+            alert (_("The value for the tab shown at startup is invalid :"), start_s)
 
         print ("end of ini")
 
@@ -9669,6 +9627,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             print("Error for : ", req)
 
         sql_error(link,req);
+        result_a = cursor.fetchall()
 
         if ajouter == 0 :
             store.clear();
@@ -9723,38 +9682,8 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 
             mem['config_liste'][page] = 1;
-
-
-
         #clist.freeze_child_notify(); # no concrete effect
 
-## result_a = cursor.fetchall()
-## tt("b")
-## i = 0
-## for z in result_a :
-## data1 = []
-## if db_type == "mysql":
-## temp1 = cursor.description
-## fields_list = []
-## for value in temp1 :
-## fields_list.append(value[0])
-## for a in fields_list:
-## data1.append(z[a])
-## else :
-## for a in z :
-## data1.append(a)
-## append(store,data1);
-## if i % 100 == 0 :
-## status_text = str(i) + _(" records")
-## self.arw["status"].set_text(status_text);
-##
-## while (Gtk.events_pending()) :
-## Gtk.main_iteration();
-## i += 1
-## tt("c")
-
-
-        result_a = cursor.fetchall()
 
         store.clear()
 
@@ -10482,9 +10411,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         #printfile = MessageBox("Name of the output file ", "output file",10001,None,perso['repertoire_impression']);
 
         dialog = Gtk.FileChooserDialog("File Save", None, Gtk.FILE_CHOOSER_ACTION_SAVE,
-        (Gtk.STOCK_OK, Gtk.RESPONSE_OK), None);
+        (Gtk.STOCK_OK, Gtk.ResponseType.OK), None);
         dialog.show_all();
-        if dialog.run() == Gtk.RESPONSE_OK :
+        if dialog.run() == Gtk.ResponseType.OK :
             file1 = dialog.get_filename();      # get the input filename
 
 
@@ -10659,9 +10588,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         #printfile = MessageBox("Name of the output file ", "output file",10001,None,perso['repertoire_impression']);
 
         dialog = Gtk.FileChooserDialog("File Save", None, Gtk.FILE_CHOOSER_ACTION_SAVE, # note 2
-        [Gtk.STOCK_OK, Gtk.RESPONSE_OK], None);
+        [Gtk.STOCK_OK, Gtk.ResponseType.OK], None);
         dialog.show_all();
-        if dialog.run() == Gtk.RESPONSE_OK :
+        if dialog.run() == Gtk.ResponseType.OK :
             file = dialog.get_filename();
             # get the input filename
 
@@ -10999,25 +10928,16 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         RETOURNE :   rien
         ==============================================================================
         """
-
         global  mem;
-
-
 
         x = fonte.get_size();
         if action == "+" :
             x = x + incr;
-
         else :
-
             x = x - incr;
-
         fonte.set_size(x);
 
-
         for z in objets :
-
-
             val = objets[z]
             type = widget_type(val);
             if type in ["GtkButton", "GtkComboBox", "GtkComboBoxEntry"]:
@@ -11028,21 +10948,14 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             except :
                 pass
 
-
-
     def font_up(self, widget, event = None) :
         #for group in[self.arTextView, self.arEntries] :
         for group in[self.arw] :
-
             self.police(group, self.fonte1, "+", 1000)
-
-
 
     def font_down(self, widget, event = None) :
         for group in[self.arw] :
             self.police(group, self.fonte1, "-", 1000)
-
-
 
     def reinit_list(self, widget) :
 
@@ -11695,9 +11608,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         chooser = Gtk.FileChooserDialog(title=_('Save database...'),
                 action=Gtk.FILE_CHOOSER_ACTION_SAVE,
                 buttons=(Gtk.STOCK_CANCEL,
-                    Gtk.RESPONSE_CANCEL,
+                    Gtk.ResponseType.CANCEL,
                     Gtk.STOCK_SAVE,
-                    Gtk.RESPONSE_ACCEPT))
+                    Gtk.ResponseType.ACCEPT))
         chooser.set_do_overwrite_confirmation(True)
         #chooser.set_current_folder(???)
         dirname_u,filename_u = os.path.split(db_file)
@@ -11710,11 +11623,11 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         response = chooser.run()
 
-        if response == Gtk.RESPONSE_CANCEL:
+        if response == Gtk.ResponseType.CANCEL:
             chooser.destroy()
             return
 
-        elif response == Gtk.RESPONSE_ACCEPT:
+        elif response == Gtk.ResponseType.ACCEPT:
             filename = chooser.get_filename()
             filename_u = str(filename, "utf-8")
             chooser.destroy()
@@ -11746,9 +11659,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             chooser = Gtk.FileChooserDialog(title=_('_Open Database'),
                     action=Gtk.FILE_CHOOSER_ACTION_OPEN,
                     buttons=(Gtk.STOCK_CANCEL,
-                        Gtk.RESPONSE_CANCEL,
+                        Gtk.ResponseType.CANCEL,
                         Gtk.STOCK_OPEN,
-                        Gtk.RESPONSE_OK))
+                        Gtk.ResponseType.OK))
             chooser.set_current_folder(configdir_u)
             chooser.set_show_hidden(True)  #Test : does not work. Why ??
 
@@ -11766,7 +11679,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             chooser.set_filter(filter_ini)
 
             response = chooser.run()
-            if response == Gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 filename = chooser.get_filename()
                 filename_u = str(filename,"utf-8")            # convert utf-8 to unicode for internal use
 
@@ -11774,7 +11687,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                     print("====>", filename_u, " zipped")
 
 
-            elif response == Gtk.RESPONSE_CANCEL:
+            elif response == Gtk.ResponseType.CANCEL:
                 print((_('Closed, no files selected')))
                 chooser.destroy()
                 return
@@ -11923,7 +11836,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         self.montrer("s_aboutdialog1",3);
 
     def montrer(self, widget, mode = 0, resize = 0) :
-        # debug : resize était à 0. Ce mécanisme ne marche pas. Il devrait faire que le redimentionnement n'ait
+        # debug : resize était à 0. This does not work. It should do that redimensioning happens
         # only the first time, so that if you resize within a session
         # it is preserved. With 1, each time you close and reopen, the saved size is restored.
         # The easiest way would be to do this resize
@@ -11994,17 +11907,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         # if full_screen==2:
             win.fullscreen();
         """
-
-
-
-
-
-
-
-# End of Class Restore()
-
-
-
 
 
 
@@ -12356,24 +12258,13 @@ def save_settings(widget = "") :
 
         global settings, config;
 
-## # Backup configuration in JSON
-## if os.path.exists(os.path.join(configdir_u, 'config.json')):
-## with open(os.path.join(configdir_u, 'config.json')0, 'r') as f:
-## json_data = json.load(f, cls=json_decoder.StringJSONDecoder)
-##
-## if json_data:
-## with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
-## f.write(json.dumps(json_data, indent=3 ))
+         # Backup configuration in JSON
+        if os.path.exists(os.path.join(configdir_u, 'config.json')):
+            shutil.copyfile(os.path.join(configdir_u, 'config.json'), os.path.join(configdir_u, 'config.json.bak'))
 
-        #creation of a backup.
-        # procedure a bit heavy but avoids the hell of the " for shell commands
-        f1 = open(os.path.join(configdir_u, "config.py"), "r")
-        backup = f1.read()
-        f1.close()
-
-        f2 = open(os.path.join(configdir_u, "config.bak"),"w")
-        f2.write(backup);
-        f2.close()
+        # Backup configuration in config.py
+        if os.path.exists(os.path.join(configdir_u, 'config.py')):
+            shutil.copyfile(os.path.join(configdir_u, "config.py"), os.path.join(configdir_u, "config.bak"))
 
         pp = pprint.PrettyPrinter(indent = 4, width = 100)
         data1 = pp.pformat(config)
@@ -12381,8 +12272,8 @@ def save_settings(widget = "") :
         f3.write(data1)
         f3.close()
 
-## with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
-## f.write(json.dumps(OrderedDict(config), indent=3, encoding=json_decoder.encoding, sort_keys=True))
+        with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
+            f.write(json.dumps(OrderedDict(config), indent=3, ))
 
 
 
@@ -12489,12 +12380,10 @@ def yes_no_dialog(message, dummy = 0) :
                                message)
         answer = dialog.run()
         dialog.destroy()
-        if answer == Gtk.RESPONSE_ACCEPT :
+        if answer == Gtk.ResponseType.YES :
             return True
         else :
             return False
-
-
 
 def get_sel_row_data(treeview,row,col) :
 
@@ -12641,15 +12530,12 @@ if __name__ == '__main__' :
 
         # load the configuration
 
-        # convert file
-        # magutils.php_array_to_py("config.php", "config.py")
-
         if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
-        #if False:
+        # if False:
             # Load configuration via JSON
             with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
                 #config = json.load(f, cls=json_decoder.StringJSONDecoder)
-                config = json.load(f)
+                config = json.load(f,  object_pairs_hook=OrderedDict)
         else:
             f1 = open(os.path.join(configdir_u, "config.py"), "r")
             data = f1.read()

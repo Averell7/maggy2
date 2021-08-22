@@ -24,7 +24,6 @@ import json
 import subprocess
 from collections import OrderedDict
 
-import json_decoder
 from tools import nested_dict_search
 
 """
@@ -49,6 +48,7 @@ import pprint
 import re
 from copy import deepcopy
 from optparse import OptionParser
+import shutil
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -551,7 +551,7 @@ class utilities:
             return None
 
     def entry_update(self, widget, *params):
-        category_s, field_s = widget.name.split("@")
+        category_s, field_s = widget.get_name().split("@")
         response = magutils.get_text(widget)
 
         if category_s in ["central", "peripheral"]:
@@ -607,19 +607,19 @@ class Treeview_handle:
         dialog = ask_for_input()
         name = dialog.run()
 
-        if treeview.name == "search_lists":
+        if treeview.get_name() == "search_lists":
             self.config["xtabs"][name] = {}
-        elif treeview.name == "result_lists":
+        elif treeview.get_name() == "result_lists":
             self.config["result"][name] = {}
-        elif treeview.name == "inversion_treeview":
+        elif treeview.get_name() == "inversion_treeview":
             self.config["inversion"][name] = {}
-        elif treeview.name == "combobox_treeview":
+        elif treeview.get_name() == "combobox_treeview":
             self.config["combobox"][name] = {}
-        elif treeview.name == "details_list":
+        elif treeview.get_name() == "details_list":
             self.config["details"][name] = {}
-        elif treeview.name == "popup_list":
+        elif treeview.get_name() == "popup_list":
             self.config["popup"][name] = {}
-        elif treeview.name == "gateway_data":
+        elif treeview.get_name() == "gateway_data":
             self.config["gateway_data"][name] = {}
 
         model = treeview.get_model()
@@ -629,19 +629,19 @@ class Treeview_handle:
     def treeview2_select(self, treeview):
 
         try:
-            if treeview.name == "treeview6":
+            if treeview.get_name() == "treeview6":
                 name = self.search_active
                 use_config = self.config["xtabs"][name]
 
-            elif treeview.name == "treeview5":
+            elif treeview.get_name() == "treeview5":
                 name = self.result_active
                 use_config = self.config["result"][name]
 
-            elif treeview.name == "treeview7":  # Sort
+            elif treeview.get_name() == "treeview7":  # Sort
                 name = self.result_active
                 use_config = self.config["result"][name]
 
-            elif treeview.name == "gateway_details":  # Sort
+            elif treeview.get_name() == "gateway_details":  # Sort
                 name = self.gateway_active
                 use_config = self.config["gateway_data"][name]
 
@@ -668,25 +668,25 @@ class Treeview_handle:
         sel = treeview.get_selection()
         model, iter1 = sel.get_selected()
         name = model.get_value(iter1, 0)
-        if treeview.name == "search_lists":
+        if treeview.get_name() == "search_lists":
             del self.config["xtabs"][name]
             model.remove(iter1)
-        elif treeview.name == "result_lists":
+        elif treeview.get_name() == "result_lists":
             del self.config["result"][name]
             model.remove(iter1)
-        elif treeview.name == "inversion_treeview":
+        elif treeview.get_name() == "inversion_treeview":
             del self.config["inversion"][name]
             model.remove(iter1)
-        elif treeview.name == "combobox_treeview":
+        elif treeview.get_name() == "combobox_treeview":
             del self.config["combobox"][name]
             model.remove(iter1)
-        elif treeview.name == "details_list":
+        elif treeview.get_name() == "details_list":
             del self.config["details"][name]
             model.remove(iter1)
-        elif treeview.name == "popup_list":
+        elif treeview.get_name() == "popup_list":
             del self.config["popup"][name]
             model.remove(iter1)
-        elif treeview.name == "gateway_data":
+        elif treeview.get_name() == "gateway_data":
             del self.config["gateway_data"][name]
             model.remove(iter1)
 
@@ -699,20 +699,20 @@ class Treeview_handle:
         active_row = arpaths[0][0]
         model, iter1 = sel.get_selected()
 
-        if treeview.name == "search_lists":
+        if treeview.get_name() == "search_lists":
             name = self.search_active
             del self.config["xtabs"][name]['cols'][active_row]
             model.remove(iter1)
-        elif treeview.name == "treeview5":
+        elif treeview.get_name() == "treeview5":
             name = self.result_active
             del self.config["result"][name]['cols'][active_row]
             model.remove(iter1)
-        elif treeview.name == "gateway_details":
+        elif treeview.get_name() == "gateway_details":
             name = self.gateway_active
             del self.config["gateway_data"][name]['cols'][active_row]
             model.remove(iter1)
         else:
-            alert(treeview.name + " not found in code; call programmer")
+            alert(treeview.get_name() + " not found in code; call programmer")
 
         self.treeview_renum(treeview)
 
@@ -992,10 +992,12 @@ class Restore(utilities, Treeview_handle):
         colmenu.set_resizable(True)
         self.arw['database_tree'].append_column(colmenu)
 
-        if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
-            # Load configuration via JSON
-            with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
-                self.load_ini(json_data=json.load(f, cls=json_decoder.StringJSONDecoder))
+        if False:
+            pass
+        #£ if os.path.exists(os.path.join('./config', configname_u, 'config.json')):
+        #£    # Load configuration via JSON
+        #£    with open(os.path.join('./config', configname_u, 'config.json'), 'r') as f:
+        #£        self.load_ini(json_data=json.load(f, cls=json_decoder.StringJSONDecoder))
         else:
             # Load configuration via python file
             myinifile = os.path.join("./config", configname_u, "config.py")
@@ -1308,24 +1310,11 @@ class Restore(utilities, Treeview_handle):
 
         # Backup configuration in JSON
         if os.path.exists(os.path.join(configdir_u, 'config.json')):
-            with open(os.path.join(configdir_u, 'config.json'), 'r') as f:
-                json_data = json.load(f, cls=json_decoder.StringJSONDecoder)
-
-            if json_data:
-                with open(os.path.join(configdir_u, 'config.json.bak'), 'w') as f:
-                    f.write(json.dumps(OrderedDict(json_data), indent=3, encoding=json_decoder.encoding))
-
+            shutil.copyfile(os.path.join(configdir_u, 'config.json'), os.path.join(configdir_u, 'config.json.bak'))
 
         # Backup configuration in config.py
-        # procÃ©dure un peu lourde mais qui Ã©vite l'enfer des " pour les commandes shell
         if os.path.exists(os.path.join(configdir_u, 'config.py')):
-            f1 = open(os.path.join(configdir_u, "config.py"), "r")
-            backup = f1.read()
-            f1.close()
-
-            f2 = open(os.path.join(configdir_u, "config.bak"), "w")
-            f2.write(backup)
-            f2.close()
+            shutil.copyfile(os.path.join(configdir_u, "config.py"), os.path.join(configdir_u, "config.bak"))
 
         pp = pprint.PrettyPrinter(indent=4, width=100)
         out = pp.pformat(self.config)
@@ -1336,7 +1325,9 @@ class Restore(utilities, Treeview_handle):
         f3.close()
 
         with open(os.path.join(configdir_u, 'config.json'), 'w') as f:
-            f.write(json.dumps(OrderedDict(self.config), indent=3, encoding=json_decoder.encoding, sort_keys=True))
+            f.write(json.dumps(OrderedDict(self.config), indent=3, sort_keys=True))
+
+        alert (_("configuration saved"))
 
     def update_settings(self, widget):
 
@@ -1953,7 +1944,7 @@ class Restore(utilities, Treeview_handle):
     def load_chooser_store(self, widget, data=None, active=None):
         self.block_signals = True
         if data == None:
-            data = self.get_data_for_widget(widget.name)
+            data = self.get_data_for_widget(widget.get_name())
 
         model = widget.get_model()
         model.clear()
@@ -2089,13 +2080,13 @@ class Restore(utilities, Treeview_handle):
             y = self.arw2["s_notebook3"].children()
             data = []
             for a in y:
-                data.append(a.name)
+                data.append(a.get_name())
 
         elif widget_name in ["central@edit"]:  # list of containers of the tabs of s_notebook3
             y = self.arw2["s_notebook4"].children()
             data = []
             for a in y:
-                data.append(a.name)
+                data.append(a.get_name())
 
         return data
 
@@ -2105,7 +2096,7 @@ class Restore(utilities, Treeview_handle):
         self.chooser_widget_source = widget
 
         if data == None:
-            data = self.get_data_for_widget(widget.name)
+            data = self.get_data_for_widget(widget.get_name())
 
         model = self.arw["treeview8"].get_model()
         model.clear()
@@ -2136,7 +2127,7 @@ class Restore(utilities, Treeview_handle):
             else:
                 response = widget.get_model().get_value(active_iter, 0)
 
-            temp1 = widget.name.split("@")
+            temp1 = widget.get_name().split("@")
             category_s = temp1[0]
             field_s = temp1[1]
             if category_s in ['xtabs']:
@@ -2203,7 +2194,7 @@ class Restore(utilities, Treeview_handle):
             response = get_sel_row_data(self.arw["treeview8"], 0, 0)
             widget.set_text(response)
 
-            temp1 = widget.name.split("@")
+            temp1 = widget.get_name().split("@")
             category_s = temp1[0]
             field_s = temp1[1]
 
@@ -2234,12 +2225,12 @@ class Restore(utilities, Treeview_handle):
 
 
         elif widget_type == "GtkTreeView":
-            if widget.name == "treeview6":  # Search lists
+            if widget.get_name() == "treeview6":  # Search lists
                 (row, col, treeview) = self.search_edit_cell
                 response = get_sel_row_data(self.arw["treeview8"], 0, 0)
                 self.edit_list_search("", row, response, col, treeview)
 
-            elif widget.name == "treeview5":  # Result lists
+            elif widget.get_name() == "treeview5":  # Result lists
                 (row, col, treeview) = self.search_edit_cell
                 response = get_sel_row_data(self.arw["treeview8"], 0, 0)
                 self.edit_list_search("", row, response, col, treeview)
@@ -2275,15 +2266,15 @@ class Restore(utilities, Treeview_handle):
         sel = treeview.get_selection()
         model, iter1 = sel.get_selected()
         name = model.get_value(iter1, 0)
-        if treeview.name == "search_lists":
+        if treeview.get_name() == "search_lists":
             del self.config["xtabs"][name]
-        elif treeview.name == "result_lists":
+        elif treeview.get_name() == "result_lists":
             del self.config["result"][name]
-        elif treeview.name == "inversion_treeview":
+        elif treeview.get_name() == "inversion_treeview":
             del self.config["inversion"][name]
-        elif treeview.name == "combobox_treeview":
+        elif treeview.get_name() == "combobox_treeview":
             del self.config["combobox"][name]
-        elif treeview.name == "details_list":
+        elif treeview.get_name() == "details_list":
             del self.config["details"][name]
         model.remove(iter1)
 

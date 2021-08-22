@@ -1,9 +1,38 @@
-{   'central': {   'completex': {   'cols': {   },
+{   'central': {   'completex': {   'cols': {},
                                     'details': 'normal',
                                     'edit': 'vbox_saisie1',
                                     'edit tab': '1',
                                     'from': 'complete',
-                                    'from_full': "complete      left join concerne c0 on (complete.id_livre=c0.id_livre) left join personnes p0 on (c0.id_personne=p0.id_personne)     left join concerne c1 on (complete.id_livre=c1.id_livre and c1.fonction='auteur') left join personnes p1 on (c1.id_personne=p1.id_personne)     left join concerne c2 on (complete.id_livre=c2.id_livre and c2.fonction='collaborateur') left join personnes p2 on (c2.id_personne=p2.id_personne)     left join concerne c3 on (complete.id_livre=c3.id_livre and c3.fonction='vedette') left join personnes p3 on (c3.id_personne=p3.id_personne)     left join concerne c4 on (complete.id_livre=c4.id_livre and c4.fonction='biographie') left join personnes p4 on (c4.id_personne=p4.id_personne)     left join sujet on (complete.id_livre=sujet.id_livre) left join themes using (id_theme)     left join parle on (complete.id_livre=parle.id_livre) left join langues using (id_langue)     left join maison on (complete.id_livre=maison.id_livre) left join chartreuses using (id_chartreuse)",
+                                    'from_full': 'complete      left join concerne c0 on '
+                                                 '(complete.id_livre=c0.id_livre) left join '
+                                                 'personnes p0 on '
+                                                 '(c0.id_personne=p0.id_personne)     left '
+                                                 'join concerne c1 on '
+                                                 '(complete.id_livre=c1.id_livre and '
+                                                 "c1.fonction='auteur') left join personnes p1 "
+                                                 'on (c1.id_personne=p1.id_personne)     left '
+                                                 'join concerne c2 on '
+                                                 '(complete.id_livre=c2.id_livre and '
+                                                 "c2.fonction='collaborateur') left join "
+                                                 'personnes p2 on '
+                                                 '(c2.id_personne=p2.id_personne)     left '
+                                                 'join concerne c3 on '
+                                                 '(complete.id_livre=c3.id_livre and '
+                                                 "c3.fonction='vedette') left join personnes "
+                                                 'p3 on (c3.id_personne=p3.id_personne)     '
+                                                 'left join concerne c4 on '
+                                                 '(complete.id_livre=c4.id_livre and '
+                                                 "c4.fonction='biographie') left join "
+                                                 'personnes p4 on '
+                                                 '(c4.id_personne=p4.id_personne)     left '
+                                                 'join sujet on '
+                                                 '(complete.id_livre=sujet.id_livre) left join '
+                                                 'themes using (id_theme)     left join parle '
+                                                 'on (complete.id_livre=parle.id_livre) left '
+                                                 'join langues using (id_langue)     left join '
+                                                 'maison on '
+                                                 '(complete.id_livre=maison.id_livre) left '
+                                                 'join chartreuses using (id_chartreuse)',
                                     'id_main': 'id_livre',
                                     'result': 'complete',
                                     'table': 'complete',
@@ -11,28 +40,32 @@
     'combobox': {   'Local': {   'combobox': 'combo_localisation',
                                  'entry': '',
                                  'group': 'cotes',
-                                 'query': 'select distinct localisation from complete order by localisation'},
+                                 'query': 'select distinct localisation from complete order by '
+                                          'localisation'},
                     'format': {   'combobox': 'combo_format',
                                   'entry': '',
                                   'group': 'cotes',
-                                  'query': 'select distinct format from complete order by format'},
+                                  'query': 'select distinct format from complete order by '
+                                           'format'},
                     'notes': {   'combobox': 'combo_notes',
                                  'group': 'cotes',
                                  'query': 'select distinct notes from complete order by notes'},
-                    'num√\xa9ro': {   'combobox': 'entry_num', 'group': 'cotes'},
+                    'num√©ro': {'combobox': 'entry_num', 'group': 'cotes'},
                     'section': {   'combobox': 'combo_section',
                                    'entry': '',
                                    'group': 'cotes',
-                                   'query': 'select distinct section from complete order by section'}},
-    'details': {   'normal': {   'container': 'vbox2', 'details_tab': '1'}},
-    'edit_lists': {   },
-    'gateway_data': {   'chartreuses': {   'cols': {   }, 'gateway': {   }, 'width': ''},
+                                   'query': 'select distinct section from complete order by '
+                                            'section'}},
+    'details': {'normal': {'container': 'vbox2', 'details_tab': '1'}},
+    'edit_lists': {},
+    'fieldlist': {},
+    'gateway_data': {   'chartreuses': {'cols': {}, 'gateway': {}, 'width': ''},
                         'collections': {   'cols': {   0: {   'field': 'numero',
-                                                              'title': 'Num√\xa9ro',
+                                                              'title': 'Num√©ro',
                                                               'type': 'list',
                                                               'width': 80}},
                                            'gateway': 'serie'},
-                        'langues': {   'cols': {   }, 'gateway': {   }},
+                        'langues': {'cols': {}, 'gateway': {}},
                         'personnes': {   'cols': {   0: {   'field': 'fonction',
                                                             'title': 'fonction',
                                                             'type': 'list',
@@ -43,7 +76,7 @@
                                                             'width': '80'}},
                                          'gateway': 'concerne',
                                          'width': '200'},
-                        'themes': {   'cols': {   }, 'gateway': {   }}},
+                        'themes': {'cols': {}, 'gateway': {}}},
     'ini': {   'Hpaned': {   'hpaned1': 477,
                              'hpaned10': 494,
                              'hpaned3': 481,
@@ -64,27 +97,27 @@
                                'pass': '',
                                'sqlite': '',
                                'user': ''},
-               'gui': {   'language': None, 'start_tab': '2'},
-               'input': {   'container': None, 'separator': '#'},
+               'gui': {'language': None, 'start_tab': '2'},
+               'input': {'container': None, 'separator': '#'},
                'lists': {   'font': 'Arial',
                             'font_size': '10',
                             'line_height': '18',
                             'max_lines': '150',
                             'type_delay': '1000'},
-               'output': {   'field_separator': '|'},
-               'position': {   'null': {   'h': 582, 'w': 277, 'x': 842, 'y': 101},
-                               's_columns': {   'h': 391, 'w': 158, 'x': 1084, 'y': 233},
-                               's_combine': {   'h': 420, 'w': 392, 'x': 176, 'y': 176},
-                               's_history': {   'h': 251, 'w': 467, 'x': 528, 'y': 286},
-                               's_options': {   'h': 600, 'w': 800, 'x': 197, 'y': 100},
-                               's_requetes': {   'h': 514, 'w': 730, 'x': 181, 'y': 100},
-                               's_tri': {   'h': 484, 'w': 342, 'x': 650, 'y': 311},
-                               's_window': {   'h': 566, 'w': 1073, 'x': 207, 'y': 45},
-                               's_window0': {   'h': 671, 'w': 1024, 'x': -4, 'y': -4},
-                               'window0': {   'h': 602, 'w': 51, 'x': 0, 'y': 0},
-                               'window1': {   'h': 671, 'w': 1024, 'x': -4, 'y': -4}},
-               'zoom1': {   'h': 644, 'w': 990, 'x': 0, 'y': 0},
-               'zoom2': {   'h': 144, 'w': 1008, 'x': 8, 'y': 742}},
+               'output': {'field_separator': '|'},
+               'position': {   'null': {'h': 582, 'w': 277, 'x': 842, 'y': 101},
+                               's_columns': {'h': 391, 'w': 158, 'x': 1084, 'y': 233},
+                               's_combine': {'h': 420, 'w': 392, 'x': 176, 'y': 176},
+                               's_history': {'h': 251, 'w': 467, 'x': 528, 'y': 286},
+                               's_options': {'h': 600, 'w': 800, 'x': 197, 'y': 100},
+                               's_requetes': {'h': 514, 'w': 730, 'x': 181, 'y': 100},
+                               's_tri': {'h': 484, 'w': 342, 'x': 650, 'y': 311},
+                               's_window': {'h': 566, 'w': 1073, 'x': 207, 'y': 45},
+                               's_window0': {'h': 671, 'w': 1024, 'x': -4, 'y': -4},
+                               'window0': {'h': 602, 'w': 51, 'x': 0, 'y': 0},
+                               'window1': {'h': 671, 'w': 1024, 'x': -4, 'y': -4}},
+               'zoom1': {'h': 594, 'w': 990, 'x': 1335, 'y': 273},
+               'zoom2': {'h': 144, 'w': 1008, 'x': 8, 'y': 742}},
     'inversion': {   'auteur': {   'central_field': 'auteur',
                                    'condition': 'fonction like "auteur%"',
                                    'content': '',
@@ -105,6 +138,7 @@
                                     'content': '',
                                     'invert_field': 'i_vedette',
                                     'table_def': 'personnes'}},
+    'lists': {},
     'periph_tables': {   0: 'personnes',
                          1: 'chartreuses',
                          2: 'langues',
@@ -145,7 +179,7 @@
                                      'table': 'langues',
                                      'table_type': 'peripheral2'},
                       'personnes': {   'central_def': 'completex',
-                                       'cols': {   0: {   'width': '120'},
+                                       'cols': {   0: {'width': '120'},
                                                    1: {   'field': 'fonction',
                                                           'title': 'fonction',
                                                           'type': 'list',
@@ -163,7 +197,7 @@
                                        'search_lists': 'clist3',
                                        'table': 'personnes',
                                        'table_type': 'peripheral2'},
-                      's_predef_queries': {   'central_def': {   },
+                      's_predef_queries': {   'central_def': {},
                                               'cols': None,
                                               'config_name': 's_predef_queries',
                                               'edit': '',
@@ -186,29 +220,60 @@
                                     'table': 'themes',
                                     'table_type': 'peripheral2'}},
     'popup': {   'chartreuses': {   'code': '[historique]',
-                                    'condition': 'select chartreuse from chartreuses where historique is not null',
+                                    'condition': 'select chartreuse from chartreuses where '
+                                                 'historique is not null',
                                     'query': '',
                                     'table_def': 'chartreuses',
                                     'type': 'text'},
                  'personnes': {   'code': '[presentation]',
-                                  'condition': 'select nom from personnes where presentation is not null',
+                                  'condition': 'select nom from personnes where presentation '
+                                               'is not null',
                                   'query': '',
                                   'table_def': 'personnes',
                                   'type': 'text'},
-                 'photo': {   'code': '', 'condition': '', 'query': 'images', 'type': 'photo'}},
-    'print': {   'fiche compl√\xa8te html': {   'after': '  </tbody> </table> <br> </body> </html> ',
-                                                'before': '<html> <head>   <meta content="text/html; charset=UTF-8"  http-equiv="content-type">   <title>fiches completes</title> </head> <body> <table style="text-align: left; width: 100%;" border="1"  cellpadding="2" cellspacing="2">   <tbody> ',
-                                                'code': '    <tr>       <td colspan="1" rowspan="2">[section]<br> [num] <font size="-2">[exposant]<br>       </font>[format]</td>       <td>[g_personnes]</td>     </tr>     <tr>       <td>[titre, after=<br> ][sous_titre, after =<br> ][complement,after=<br> ]<br>       </td>     </tr>     <tr>       <td colspan="2" rowspan="1">[lieu], [editeur], [date], [volumes] vol.,&nbsp; [pages] ,&nbsp;&nbsp; [hauteur] ,&nbsp;&nbsp;&nbsp; [illustrations]</td>     </tr>     <tr>       <td colspan="2" rowspan="1">[traduction, after=<br> ][contenu, after=<br> ][remarques]</td>     </tr> ',
-                                                'extension': 'html  ',
-                                                'type': ''},
+                 'photo': {'code': '', 'condition': '', 'query': 'images', 'type': 'photo'}},
+    'print': {   'fiche compl√®te html': {   'after': '  </tbody> </table> <br> </body> '
+                                                      '</html> ',
+                                             'before': '<html> <head>   <meta '
+                                                       'content="text/html; charset=UTF-8"  '
+                                                       'http-equiv="content-type">   '
+                                                       '<title>fiches completes</title> '
+                                                       '</head> <body> <table '
+                                                       'style="text-align: left; width: 100%;" '
+                                                       'border="1"  cellpadding="2" '
+                                                       'cellspacing="2">   <tbody> ',
+                                             'code': '    <tr>       <td colspan="1" '
+                                                     'rowspan="2">[section]<br> [num] <font '
+                                                     'size="-2">[exposant]<br>       '
+                                                     '</font>[format]</td>       '
+                                                     '<td>[g_personnes]</td>     </tr>     '
+                                                     '<tr>       <td>[titre, after=<br> '
+                                                     '][sous_titre, after =<br> '
+                                                     '][complement,after=<br> ]<br>       '
+                                                     '</td>     </tr>     <tr>       <td '
+                                                     'colspan="2" rowspan="1">[lieu], '
+                                                     '[editeur], [date], [volumes] vol.,&nbsp; '
+                                                     '[pages] ,&nbsp;&nbsp; [hauteur] '
+                                                     ',&nbsp;&nbsp;&nbsp; '
+                                                     '[illustrations]</td>     </tr>     '
+                                                     '<tr>       <td colspan="2" '
+                                                     'rowspan="1">[traduction, after=<br> '
+                                                     '][contenu, after=<br> '
+                                                     '][remarques]</td>     </tr> ',
+                                             'extension': 'html  ',
+                                             'type': ''},
                  'test rtf': {   'after': '}        ',
                                  'before': '{\\rtf1 ',
-                                 'code': '\\trowd\\trgaph70\\cellx1500\\cellx5000\\cellx11000\\cellx12000\\cellx13500\\cellx15000 \\pard\\intbl [section] [num] [format]\\cell [auteur]\\cell [titre]\\cell \\cell \\cell [siecle] \\cell \\pard\\intbl\\row\\pard ',
+                                 'code': '\\trowd\\trgaph70\\cellx1500\\cellx5000\\cellx11000\\cellx12000\\cellx13500\\cellx15000 '
+                                         '\\pard\\intbl [section] [num] [format]\\cell '
+                                         '[auteur]\\cell [titre]\\cell \\cell \\cell [siecle] '
+                                         '\\cell \\pard\\intbl\\row\\pard ',
                                  'extension': 'rtf',
                                  'type': ''},
                  'texte pur': {   'after': '',
                                   'before': '',
-                                  'code': '[section] [num] [format]\t[auteur, after=;] [titre] [date]  ',
+                                  'code': '[section] [num] [format]\t[auteur, after=;] [titre] '
+                                          '[date]  ',
                                   'extension': '',
                                   'type': ''}},
     'result': {   'complete': {   'cols': {   0: {   'field': 'id_livre',
@@ -285,13 +350,13 @@
                                                       'width': 30},
                                               14: {   'field': 'editeur',
                                                       'options': '',
-                                                      'title': '√\xa9diteur',
+                                                      'title': '√©diteur',
                                                       'visible': 0,
                                                       'width': 40},
                                               15: {   'alias': '',
                                                       'field': 'annee',
                                                       'options': '',
-                                                      'title': 'ann√\xa9e',
+                                                      'title': 'ann√©e',
                                                       'visible': '1',
                                                       'width': '80'},
                                               16: {   'alias': '',
@@ -330,7 +395,7 @@
                                               22: {   'alias': '',
                                                       'field': 'g_themes',
                                                       'options': '',
-                                                      'title': 'th√\xa8me',
+                                                      'title': 'th√®me',
                                                       'visible': '0',
                                                       'width': '70'},
                                               23: {   'alias': '',
@@ -352,13 +417,13 @@
                                               26: {   'alias': '',
                                                       'field': 'format',
                                                       'options': '',
-                                                      'title': 'ann√\xa9e',
+                                                      'title': 'ann√©e',
                                                       'visible': 0,
                                                       'width': 50},
-                                              27: {   'alias': 'siecle = si√\xa8cle',
+                                              27: {   'alias': 'siecle = si√®cle',
                                                       'field': 'siecle',
                                                       'options': '',
-                                                      'title': 'si√\xa8cle',
+                                                      'title': 'si√®cle',
                                                       'visible': 0,
                                                       'width': 30},
                                               28: {   'field': 'datemodification',
@@ -366,7 +431,7 @@
                                                       'title': 'datemodification',
                                                       'visible': 0,
                                                       'width': 70},
-                                              29: {   }},
+                                              29: {}},
                                   'from': 'complete',
                                   'sort': None},
                   'complete_aut_ord': {   'cols': {   0: {   'field': 'complete.id_livre',
@@ -393,7 +458,8 @@
                                                       7: {   'field': 'localisation as local',
                                                              'visible': 1,
                                                              'width': 25},
-                                                      8: {   'field': 'group_concat(distinct p1.nom) as auteur',
+                                                      8: {   'field': 'group_concat(distinct '
+                                                                      'p1.nom) as auteur',
                                                              'visible': 1,
                                                              'width': 280},
                                                       9: {   'field': 'titre',
@@ -423,7 +489,7 @@
                                                       17: {   'field': 'complete.lieu',
                                                               'visible': 0,
                                                               'width': 40},
-                                                      18: {   'field': 'editeur as √\xa9diteur',
+                                                      18: {   'field': 'editeur as √©diteur',
                                                               'visible': 1,
                                                               'width': 40},
                                                       19: {   'field': 'annee',
@@ -444,7 +510,7 @@
                                                       24: {   'field': 'langue',
                                                               'visible': 0,
                                                               'width': 200},
-                                                      25: {   'field': 'theme as th√\xa8me',
+                                                      25: {   'field': 'theme as th√®me',
                                                               'visible': 0,
                                                               'width': 100},
                                                       26: {   'field': 'chartreuse',
@@ -465,10 +531,10 @@
                                                       31: {   'field': 'date',
                                                               'visible': 0,
                                                               'width': 30},
-                                                      32: {   'field': 'annee as ann√\xa9e',
+                                                      32: {   'field': 'annee as ann√©e',
                                                               'visible': 0,
                                                               'width': 20},
-                                                      33: {   'field': 'siecle as si√\xa8cle',
+                                                      33: {   'field': 'siecle as si√®cle',
                                                               'visible': 0,
                                                               'width': 30},
                                                       34: {   'field': 'tri_cote',
@@ -480,18 +546,21 @@
                                                       36: {   'field': 'datemodification',
                                                               'visible': 0,
                                                               'width': 10}},
-                                          'from': "complete         left join concerne c1 on (complete.id_livre=c1.id_livre and c1.fonction='auteur') left join personnes p1 using (id_personne)  ",
-                                          'sort': {   0: {   'name': 'si√\xa8cle nd',
+                                          'from': 'complete         left join concerne c1 on '
+                                                  '(complete.id_livre=c1.id_livre and '
+                                                  "c1.fonction='auteur') left join personnes "
+                                                  'p1 using (id_personne)  ',
+                                          'sort': {   0: {   'name': 'si√®cle nd',
                                                              'sort1': 'auteur',
                                                              'sort2': 'titre__etc'},
-                                                      1: {   'name': 'tri_cote'},
+                                                      1: {'name': 'tri_cote'},
                                                       2: {   'name': 'auteur',
                                                              'sort1': 'titre__etc',
-                                                             'sort2': 'ann√\xa9e dn'},
+                                                             'sort2': 'ann√©e dn'},
                                                       3: {   'name': 'titre__etc',
-                                                             'sort1': 'ann√\xa9e nd',
+                                                             'sort1': 'ann√©e nd',
                                                              'sort2': 'id_livre'},
-                                                      4: {   'name': 'ann√\xa9e nd',
+                                                      4: {   'name': 'ann√©e nd',
                                                              'sort1': 'auteur',
                                                              'sort2': 'titre__etc'},
                                                       5: None}}},
@@ -499,11 +568,11 @@
     'words': {   'mots': {   'Exclude': '',
                              'central_def': 'completex',
                              'config_name': 'mots',
-                             'fields': {   0: {   'field': 'titre'},
-                                           1: {   'field': 'remarques'},
-                                           2: {   'field': 'traduction'},
-                                           3: {   'field': 'sous_titre'},
-                                           4: {   'field': 'complement'}},
+                             'fields': {   0: {'field': 'titre'},
+                                           1: {'field': 'remarques'},
+                                           2: {'field': 'traduction'},
+                                           3: {'field': 'sous_titre'},
+                                           4: {'field': 'complement'}},
                              'id_type': 'id_mot',
                              'main_field': 'mot',
                              'table': 'mots',
@@ -698,7 +767,7 @@
                                                     'name': 'biographie'},
                                              3: {   'checkbox': 'check_pers_etude',
                                                     'field': 'i_vedette',
-                                                    'name': '√\xa9tude'},
+                                                    'name': '√©tude'},
                                              4: {   'checkbox': 'check_pers_coll',
                                                     'field': 'i_collaborateur',
                                                     'name': 'collaborateur'}},
@@ -707,11 +776,11 @@
                                                    'options': '',
                                                    'title': 'Personne',
                                                    'width': '250'},
-                                            1: {   'detail': 'renvoi3', 'field': 'renvoi'},
+                                            1: {'detail': 'renvoi3', 'field': 'renvoi'},
                                             2: {   'detail': 'presentation3',
                                                    'field': 'presentation',
                                                    'options': '',
-                                                   'title': 'Pr√\xa9sentation',
+                                                   'title': 'Pr√©sentation',
                                                    'width': '100'},
                                             3: {   'field': '#i_auteur',
                                                    'title': 'A',
@@ -725,7 +794,7 @@
                                             6: {   'field': '#i_vedette',
                                                    'title': 'V',
                                                    'width': '40'},
-                                            7: {   'field': '#', 'title': 'T', 'width': '40'}},
+                                            7: {'field': '#', 'title': 'T', 'width': '40'}},
                                 'complement': '',
                                 'config_name': 'persons',
                                 'details_def': 'normal',
@@ -743,10 +812,10 @@
                                                     'field': 'nom',
                                                     'title': 'Personne',
                                                     'width': '250'},
-                                             1: {   'detail': 'renvoi3', 'field': 'renvoi'},
+                                             1: {'detail': 'renvoi3', 'field': 'renvoi'},
                                              2: {   'detail': '',
                                                     'field': 'presentation',
-                                                    'title': 'Pr√\xa9sentation',
+                                                    'title': 'Pr√©sentation',
                                                     'width': '100'},
                                              3: {   'field': '#i_auteur',
                                                     'title': 'A',
@@ -760,7 +829,7 @@
                                              6: {   'field': '#i_vedette',
                                                     'title': 'V',
                                                     'width': '40'},
-                                             7: {   'field': '#', 'title': 'T', 'width': '40'}},
+                                             7: {'field': '#', 'title': 'T', 'width': '40'}},
                                  'complement': '',
                                  'config_name': 'persons2',
                                  'details_def': 'normal',
@@ -900,15 +969,15 @@
                                      'type': 'tree'},
                  'words': {   'central_table': 'complete',
                               'check': None,
-                              'cols': {   0: {   'field': 'id_mot'},
-                                          1: {   'field': 'mot', 'title': 'Mot', 'width': '150'},
+                              'cols': {   0: {'field': 'id_mot'},
+                                          1: {'field': 'mot', 'title': 'Mot', 'width': '150'},
                                           2: {   'detail': '',
                                                  'field': '#i_titre',
                                                  'title': 'Titre',
                                                  'width': '50'},
                                           3: {   'detail': '',
                                                  'field': '#i_complement',
-                                                 'title': 'Compl√\xa9ment',
+                                                 'title': 'Compl√©ment',
                                                  'width': '50'},
                                           4: {   'detail': '',
                                                  'field': '#i_traduction',
@@ -940,15 +1009,15 @@
                               'type': 'list'},
                  'words2': {   'central_table': 'complete',
                                'check': None,
-                               'cols': {   0: {   'field': 'id_mot'},
-                                           1: {   'field': 'mot', 'title': 'Mot', 'width': '150'},
+                               'cols': {   0: {'field': 'id_mot'},
+                                           1: {'field': 'mot', 'title': 'Mot', 'width': '150'},
                                            2: {   'detail': '',
                                                   'field': '#i_titre',
                                                   'title': 'Titre',
                                                   'width': '50'},
                                            3: {   'detail': '',
                                                   'field': '#i_complement',
-                                                  'title': 'Compl√\xa9ment',
+                                                  'title': 'Compl√©ment',
                                                   'width': '50'},
                                            4: {   'detail': '',
                                                   'field': '#i_traduction',

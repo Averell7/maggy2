@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.3.0.10 - août 2021
+# version 2.3.0.11 - août 2021
 
 
 
@@ -113,7 +113,10 @@ Gtk.rc_parse("./gtkrc")
 sys.path.insert(0, os.path.dirname(__file__))
 
 try :
-    import _mysql
+    try:
+        import _mysql
+    except ImportError:
+        from MySQLdb import _mysql
     import MySQLdb
     from MySQLdb import cursors
 except :
@@ -143,11 +146,13 @@ elib_intl3.install("maggy2", "share/locale")
 
 import magutils
 from magutils import *
+from ScriptExcept import *
+
 
 # import path
 sys.path.append(os.getenv("PYLIB"))
 
-from ScriptExcept import *
+
 import time, datetime
 #
 Windows ="ntx"
@@ -2615,11 +2620,10 @@ or the list does not exist."""))
 
         for  z in ['1','2','3','4','5','6','7','8','9']  :
             if 'zoom_combo'+z in mag.arw:
-                #try :
-                    text = get_sel_row_data(treeview,0,int(int(z) + 1))
-                    mag.arw['zoom_combo'+z].set_active(text)
-                #except :
-                #    print("echec")
+                text = get_sel_row_data(treeview,0,int(int(z) + 1))
+                model = mag.arw['zoom_combo'+z].get_model()
+                mag.arw['zoom_combo'+z].set_active(2)
+
 
 
 
@@ -12293,6 +12297,7 @@ def unicode2(string) :
     if isinstance(string,str) :
         return string
     else :
+        print("unicode2 has been used")
         try :
             return str(string,"utf_8")
         except :
@@ -12461,10 +12466,12 @@ def main():
         "\tbackup filesystem"
     isExcept = False
     excMsg_s = ""
-    global mem, config, mag, ml, affichage, alias
+    global chars, config, myfunctions, mag, ml, alias
     global col_view,fonte1, fonte2;    #???
-    global config_info
-    global db_structure
+    global config_info, configdir_u, configname_u, config_defaults, config_dialog, con
+    global db_structure, db_type, db_active
+    global mem, resultat, affichage
+    global arw, query, cr_editable, stores, modelsort, checkbox_list
 
 
     mem = {}
@@ -12518,12 +12525,13 @@ def main():
 
         if not configname_u :           # ask for config
                 config_dialog = ask_for_config()
-                configname_s = config_dialog.run()
-                configname_u = unicode2(configname_s)
+                configname_u = config_dialog.run()
 
         tmp_u = unicode2(os.path.abspath("./"))
-        configdir_u = os.path.join(tmp_u, "config", configname_u)
-
+        if os.name == "nt":
+            configdir_u = os.path.join(tmp_u, "config", configname_u)
+        else:
+           configdir_u = "/usr/share/maggy/config/" + configname_u
 
         # load plugins
 
@@ -12553,7 +12561,6 @@ def main():
         except :
             config['ini']['output']['field_separator'] = "|"  # else , default value
         mem["config"]="config.py"
-
 
         # change in the dictionary structure, from version 2
         # TODO : the field periph_tables is normally created by he program and should not be in the config ?
@@ -12728,7 +12735,6 @@ def main():
 ## die(_("Problem with the database Verify your parameters in the Parameters tab of the Options dialog"));
 
 
-
         config_defaults();
         verify_config()
         first_config();
@@ -12751,16 +12757,10 @@ def main():
         Gtk.rc_parse("couleurs.rc");
 
         utils = utilities()
-
-        t1 = time.time()
-
-
+        print ("strat Maggy")
         mag = Maggy()
         if not db_type == "accdb" :
             csv = Import_csv()
-        t2 = time.time()
-        #print " time5: ", int(t2-t1)
-        t1 = t2
 
         # create automatic backup for sqlite
         if db_type == "sqlite" :
@@ -12820,7 +12820,6 @@ def main():
 
     else :
         sys.exit(0)
-
 
 
 if __name__ == '__main__' :

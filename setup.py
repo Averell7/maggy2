@@ -37,13 +37,13 @@ from distutils.core import setup
 
 
 
-data_files=[('share/maggy/data', glob.glob('maggy/data/*.*')),
-            ('share/maggy/config', glob.glob('maggy/config/*.*')),
-            ('share/maggy/documentation', glob.glob('maggy/documentation/*.*')),          
+data_files=[('/usr/share/maggy/data', glob.glob('maggy/data/*.*')),
+            ('/usr/share/maggy/config/demo2', glob.glob('maggy/config/demo2/*.*')),
+            ('/usr/share/maggy/documentation', glob.glob('maggy/documentation/*.*')),          
             ('/usr/share/applications', ['maggy/data/maggy.desktop']),
             ('/usr/share/locale/fr/LC_MESSAGES', glob.glob('maggy/locale/fr/LC_MESSAGES/*.*')),
-            ('share/pixmaps', ['maggy/data/maggy$.png']),
-            ('share/maggy/icons/hicolor/scalable', ['maggy/data/maggy$.svg'])]
+            ('/usr/share/pixmaps', ['maggy/data/maggy$.png']),
+            ('/usr/share/maggy/icons/hicolor/scalable', ['maggy/data/maggy$.svg'])]
 
 
 """

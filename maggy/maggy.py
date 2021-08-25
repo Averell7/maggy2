@@ -79,7 +79,6 @@ for letter in "([<>…" :
 ###########################################################################
 
 import os, sys
-sys.path.append(os.path.abspath("./"))
 import copy     # for deep copies (copy without reference)
 import re, glob
 from collections import OrderedDict
@@ -111,8 +110,13 @@ from gi.repository import cairo
 
 Gtk.rc_parse("./gtkrc")
 
+sys.path.insert(0, os.path.dirname(__file__))
+
 try :
-    import _mysql
+    try:
+        import _mysql
+    except ImportError:
+        from MySQLdb import _mysql
     import MySQLdb
     from MySQLdb import cursors
 except :
@@ -2200,7 +2204,7 @@ or the list does not exist."""))
             # added first column
             colnew= Gtk.TreeViewColumn("", cell_renderer_left, text=0)
             if "width" in col_data :
-                if int(col_data['width']) > 0 :
+                if int(col_data['width'] or 0) > 0:
                     # if width is defined
                     colnew.set_sizing(2)             # 2 = GTK_TREE_VIEW_COLUMN_FIXED
                     colnew.set_fixed_width(int(col_data['width']))
@@ -2299,11 +2303,9 @@ or the list does not exist."""))
                     #combo.child.connect('changed', self.changed_cb)
                     combo.set_active(0)
 
-
-                    #Â£  gtk_alignment_set has been deprecated since version 3.14 and should not be used in newly-written code. Use GtkWidget alignment and margin properties
-                    #Â£ alignment = Gtk.Alignment(0.5, 0, 0, 0) # note 2
                     #alignment.add(combo)
                     #self.arZoom['vbox_data'].pack_start(alignment,label, True, True, 0)
+                    combo.set_halign(Gtk.Align.CENTER)
                     self.arZoom['vbox_data'].pack_start(combo, True, True, 0)
 
                     field = val['field']
@@ -9402,6 +9404,9 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
 # self.arw["button8"].connect("clicked", test.toto )
 
+    def presentation(self, *args):
+        """Unused signal"""
+        return
 
     def delete_event(self, window, event,param =1)   :
 
@@ -12453,8 +12458,8 @@ def BOM(file_f) :
 # MAIN ####################################################################
 ###########################################################################
 
-def main():
 
+def main():
     # init
     usage_s = \
         "%prog [options]\n" + \

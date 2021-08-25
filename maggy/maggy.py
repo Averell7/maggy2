@@ -79,7 +79,7 @@ for letter in "([<>…" :
 ###########################################################################
 
 import os, sys
-sys.path.append(os.path.join(os.path.abspath("./"), "maggy"))
+sys.path.append(os.path.abspath("./"))
 import copy     # for deep copies (copy without reference)
 import re, glob
 from collections import OrderedDict

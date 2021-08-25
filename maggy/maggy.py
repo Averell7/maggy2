@@ -110,6 +110,8 @@ from gi.repository import cairo
 
 Gtk.rc_parse("./gtkrc")
 
+sys.path.insert(0, os.path.dirname(__file__))
+
 try :
     import _mysql
     import MySQLdb
@@ -12451,8 +12453,8 @@ def BOM(file_f) :
 # MAIN ####################################################################
 ###########################################################################
 
-if __name__ == '__main__' :
 
+def main():
     # init
     usage_s = \
         "%prog [options]\n" + \
@@ -12821,5 +12823,7 @@ if __name__ == '__main__' :
 
 
 
+if __name__ == '__main__' :
+    main()
 
 # eof

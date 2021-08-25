@@ -38,7 +38,7 @@ from distutils.core import setup
 
 
 data_files=[('/usr/share/maggy/data', glob.glob('maggy/data/*.*')),
-            ('/usr/share/maggy/config', glob.glob('maggy/config/*.*')),
+            ('/usr/share/maggy/config/demo2', glob.glob('maggy/config/demo2/*.*')),
             ('/usr/share/maggy/documentation', glob.glob('maggy/documentation/*.*')),          
             ('/usr/share/applications', ['maggy/data/maggy.desktop']),
             ('/usr/share/locale/fr/LC_MESSAGES', glob.glob('maggy/locale/fr/LC_MESSAGES/*.*')),

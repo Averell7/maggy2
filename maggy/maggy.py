@@ -12517,6 +12517,12 @@ def main():
             help="specify ini/task file",
             metavar="ini")
 
+    parser.add_option(
+            "--directory",
+            dest="directory",
+            help="specify configuration directory",
+            metavar="directory")
+
     # get opt
     (option_v, arg_a) = parser.parse_args()
 
@@ -12534,10 +12540,14 @@ def main():
                 configname_u = config_dialog.run()
 
         tmp_u = unicode2(os.path.abspath("./"))
-        if os.name == "nt":
-            configdir_u = os.path.join(tmp_u, "config", configname_u)
+
+        if not option_v.directory:
+            if os.name == "nt":
+                configdir_u = os.path.join(tmp_u, "config", configname_u)
+            else:
+               configdir_u = "/usr/share/maggy/config/" + configname_u
         else:
-           configdir_u = "/usr/share/maggy/config/" + configname_u
+            configdir_u = os.path.join(os.path.abspath(option_v.directory), configname_u)
 
         # load plugins
 

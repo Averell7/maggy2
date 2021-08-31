@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.3.0.11 - août 2021
+# version 2.3.0.12 - août 2021
 
 
 
@@ -12,7 +12,7 @@
 
 #£ import json_decoder
 
-maggy_version = "2.3.0"
+maggy_version = "2.3.0.12"
 print("Maggy Version : ", maggy_version)
 """
 In this version :

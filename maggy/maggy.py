@@ -159,6 +159,9 @@ Windows ="ntx"
 osname = os.name
 #
 
+# Globals
+db_file = None
+
 # Deepcopy Fixes
 # Allows pickling objects that are not normally pickable by converting them to None
 # The resulting copy won't be an exact copy
@@ -3682,9 +3685,10 @@ class maglist() :
                     selection[groupe] = []
                 selection[groupe].append(idlivre)
 
-        self.ok_list_disable = False
+        treeview.set_model(None)
+        self.ok_list_disable = True
         sel.unselect_all()
-        store.clear();
+        store.clear()
         self.ok_list_disable = False
 
         for i in range(0, len(mot)) : #(i=0; i<len(word); i+= 1)
@@ -3726,6 +3730,8 @@ class maglist() :
 
                 if mot!="" :
                     cree_listes(mot.strip(),table,champ,liste,complement,-1,selection)
+
+        treeview.set_model(store)
 
     # end of function refresh_list
 
@@ -12611,6 +12617,7 @@ def main():
         db_file_accdb = os.path.join(configdir_u, configname_u + ".accdb")
 
 
+        global db_file
         if os.path.isfile(db_file_sqlite) :
             db_type = "sqlite"
             db_file = db_file_sqlite

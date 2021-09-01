@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.3.0.12 - août 2021
+# version 2.3.0.11 - août 2021
 
 
 
@@ -12,7 +12,7 @@
 
 #£ import json_decoder
 
-maggy_version = "2.3.0.12"
+maggy_version = "2.3.0"
 print("Maggy Version : ", maggy_version)
 """
 In this version :
@@ -92,6 +92,7 @@ import pickle       # serialize but unreadable
 import json         # serialize in a readable form
 import zipfile
 import io
+import shutil
 #from collections import OrderedDict
 import pprint
 
@@ -3025,15 +3026,17 @@ class Prompt2A :
 
 
 class ask_for_config:
-    def __init__(self) :
+    def __init__(self, sharedir) :
         #dialog = Gtk.Dialog(title=None, parent=None, flags=0, buttons=None)
         self.dialog = Gtk.Dialog(title='Configuration choice', parent=None, flags=Gtk.DialogFlags.MODAL, buttons=("OK", 1, "Cancel", 0));
         self.combo = Gtk.ComboBoxText();
-        temp = glob.glob("config/*");
+        temp = glob.glob(os.path.join(sharedir, "config" + "/*"))
+
 
         for val in temp :
             if os.path.isdir(val) :
                 dir_name = val[7:]
+                dir_name = os.path.split(val)[1]
                 if dir_name[0:1] != "#" :
                     self.combo.append_text(dir_name);
         self.combo.set_active(0);
@@ -3424,7 +3427,6 @@ class maglist() :
 
         col = treeview.get_column(0);
         ref_field = get_option("r",table_data['options']);  # field specified for cross-reference in definition table
-        #print "===>", ref_field
         for key  in table_data['cols'] :
             val = table_data['cols'][key ]
             if 'field' in val :
@@ -3686,10 +3688,10 @@ class maglist() :
                 selection[groupe].append(idlivre)
 
         treeview.set_model(None)
-        self.ok_list_disable = True
-        sel.unselect_all()
+       
+        
         store.clear()
-        self.ok_list_disable = False
+        
 
         for i in range(0, len(mot)) : #(i=0; i<len(word); i+= 1)
 ## if mot[i] == "" :
@@ -4133,9 +4135,7 @@ class maglist() :
             self.i += 1
         except:
             self.i = 1
-        #print ("====>  ok_liste", str(self.i))
-        if self.ok_list_disable == True:
-            return
+
         listes_combinees = []
         query = {}
         # statements
@@ -8835,7 +8835,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         #dataHelp = fHelp.read(5000)
         #fHelp.close()
 
-        global stores, affichage, configdir_u
+        global stores, affichage, configdir_u, sharedir
         self.colonnes_resultat = {}
         self.configdir_u = configdir_u
         self.separator  = config["ini"]["output"]["field_separator"]
@@ -8892,7 +8892,7 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
 
         # Build system windows
         self.widgets2 = Gtk.Builder()
-        self.widgets2.add_from_file('./data/maggy.glade')
+        self.widgets2.add_from_file(os.path.join(sharedir, 'data/maggy.glade'))
         arWidgets2 = self.widgets2.get_objects()
 
         for z in arWidgets2 :
@@ -9406,7 +9406,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         except :        # undefined or invalid
             alert (_("The value for the tab shown at startup is invalid :"), start_s)
 
-        print ("end of ini")
 
 # self.arw["button8"].connect("clicked", test.toto )
 
@@ -12474,7 +12473,7 @@ def main():
     excMsg_s = ""
     global chars, config, myfunctions, mag, ml, alias
     global col_view,fonte1, fonte2;    #???
-    global config_info, configdir_u, configname_u, config_defaults, config_dialog, con
+    global config_info, configdir_u, configname_u, sharedir, config_defaults, config_dialog, con
     global db_structure, db_type, db_active
     global mem, resultat, affichage
     global arw, query, cr_editable, stores, modelsort, checkbox_list
@@ -12526,6 +12525,11 @@ def main():
     # get opt
     (option_v, arg_a) = parser.parse_args()
 
+    if os.name == "nt":
+        sharedir = os.path.abspath("./")
+    else:
+       sharedir = "/usr/share/maggy"
+
     try :
 
         # get the configuration
@@ -12536,7 +12540,7 @@ def main():
                 configname_u = unicode2(arg_a[0])
 
         if not configname_u :           # ask for config
-                config_dialog = ask_for_config()
+                config_dialog = ask_for_config(sharedir)
                 configname_u = config_dialog.run()
 
         tmp_u = unicode2(os.path.abspath("./"))
@@ -12774,7 +12778,6 @@ def main():
         Gtk.rc_parse("couleurs.rc");
 
         utils = utilities()
-        print ("strat Maggy")
         mag = Maggy()
         if not db_type == "accdb" :
             csv = Import_csv()

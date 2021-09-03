@@ -49,14 +49,6 @@ class UserFunctions :
             self.arw["button_cote"].connect("clicked", self.chercher_cote)
         except :
             print("bouton pour les cotes manquant. Voir dans UserFunctions.py")
-        try :
-            self.arw["save_perso"].connect("clicked", self.save_perso)
-        except :
-            print("bouton pour les notes personnelles manquant. Voir dans UserFunctions.py")
-        try :
-            self.arw["numeric_version"].connect("clicked", self.check_numeric_version)
-        except :
-            print("bouton pour les versions numériques manquant. Voir dans UserFunctions.py")
 
 
         try :
@@ -355,38 +347,6 @@ class UserFunctions :
 
 
 
-# ============ Gestion des commentaires personnels =============================
-
-    def save_perso(self, widget) :
-
-        data1 = get_text(self.arw["textperso1"])[8:]    # on ignore le mot "Notes : " au début
-        data2 = get_text(self.arw["textperso2"])[8:]
-        id_livre = self.mem["selected_record"]
-        # créer l'identifiant s'il n'existe pas
-        req1 = "INSERT OR IGNORE INTO comments (id_livre) VALUES (%d)" % int(id_livre)
-        # mettre à  jour les données
-        req2 = "update comments set perso1 = '%s', perso2 = '%s' where id_livre = %d" % (data1, data2, int(id_livre))
-        self.cursor2.execute(req1)
-        self.cursor2.execute(req2)
-        self.link2.commit()
-
-
-    def after_details(self, id_livre):
-
-        req1 = "select * from complete where id_livre = %s" % str(id_livre)
-        self.cursor.execute(req1)
-        row = self.cursor.fetchone()
-        if row:
-            req2 = "select * from comments where id_livre = %s" % str(id_livre)
-            self.cursor2.execute(req2)
-            row = self.cursor2.fetchone()
-            if row:
-                a = row["perso1"]
-                b = row["perso2"]
-                text1 = get_text(self.arw["textperso1"])
-                text2 = get_text(self.arw["textperso2"])
-                set_text(self.arw["textperso1"], text1 + a)
-                set_text(self.arw["textperso2"], text2 + b)
 # =====================================================================================
 
 

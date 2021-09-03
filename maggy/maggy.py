@@ -3459,7 +3459,7 @@ class maglist() :
 
         cross_ref_color_f = self.colors['s_reference']['f'];
         cross_ref_color_b = self.colors['s_reference']['b'];
-        renvoi = model.get_value(iter, colrenvoi);
+        renvoi = model.get_value(iter, int(colrenvoi));
 
 
         if renvoi and len(renvoi) > 0 :
@@ -6368,7 +6368,7 @@ class edit() :
         if event == None or event.button == 1 :
 
             zoom = zoomx(widget)
-            return True
+            # return True
 
 
 
@@ -8827,6 +8827,8 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
             ('MODEL_ROW_EXTERN', Gtk.TargetFlags.OTHER_APP, MODEL_ROW_EXTERN),
             ('MODEL_ROW_MOTION', 0, MODEL_ROW_MOTION)]
 
+    myfunctions = None
+
     def __init__(self):
         t1 = time.time()
         # Load the On line Help with the appropriate language
@@ -8887,8 +8889,17 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 z.set_name(name)
 
         self.arw = arw
+        other_signals = []
 
-        self.widgets.connect_signals(self)
+        def connect_signals(builder, gobj, signal_name, handler_name, connect_obj, flags, obj_or_map):
+            if hasattr(obj_or_map, handler_name):
+                gobj.connect(signal_name, getattr(obj_or_map, handler_name, None))
+            else:
+                other_signals.append((gobj, signal_name, handler_name))
+
+        self.widgets.connect_signals_full(connect_signals, self)
+
+        # self.widgets.connect_signals(self)
 
         # Build system windows
         self.widgets2 = Gtk.Builder()
@@ -9396,6 +9407,11 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
                 alert(_("UserFunctions has errors. Impossible to load. \nPlease check your 'userfunctions.py' file. The error is :\n\n %s" % message))
                 print(message)
 
+            if self.myfunctions and other_signals:
+                for (gobj, signal_name, handler_name) in other_signals:
+                    if hasattr(self.myfunctions, handler_name):
+                        gobj.connect(signal_name, getattr(self.myfunctions, handler_name))
+
 
         # show the tab defined in the configuration
         v2(config["ini"], "gui", "start_tab")
@@ -9409,10 +9425,6 @@ class Maggy(maglist, edit, complex_queries, predef_queries, explode_db, db_utili
         print ("end of ini")
 
 # self.arw["button8"].connect("clicked", test.toto )
-
-    def presentation(self, *args):
-        """Unused signal"""
-        return
 
     def delete_event(self, window, event,param =1)   :
 

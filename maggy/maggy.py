@@ -2625,7 +2625,9 @@ or the list does not exist."""))
             if 'zoom_combo'+z in mag.arw:
                 text = get_sel_row_data(treeview,0,int(int(z) + 1))
                 model = mag.arw['zoom_combo'+z].get_model()
-                mag.arw['zoom_combo'+z].set_active(2)
+                for item in model:
+                    if model.get_value(item.iter, 0) == text:
+                        mag.arw['zoom_combo'+z].set_active_iter(item.iter)
 
 
 

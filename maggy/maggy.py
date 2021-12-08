@@ -1607,7 +1607,7 @@ class explode_db :
                 result = cursor.fetchone()
                 if result :
                     id_personne = result[0]
-                    myfonction = self.escape_quotes(fonction).encode("utf-8")
+                    myfonction = self.escape_quotes(fonction)
                     query = "insert into concerne (id_livre, id_personne, fonction) values (%s,%s,'%s')" % (id_livre, id_personne, myfonction)
                     #print query
                     try:
@@ -1801,7 +1801,7 @@ class explode_db :
             for mytheme in sep :
                 mytheme = mytheme.strip()
                 mytheme = mytheme.replace("'", "''")
-                query = "select id_theme from themes where theme like '%" + mytheme + "%' "
+                query = "select id_theme from themes where theme like '" + mytheme + "' "
                 try :
                     cursor.execute(query)
                     result = cursor.fetchone()
@@ -1822,9 +1822,9 @@ class explode_db :
                     else :
                         print("\n ===========> Error for ", mytheme)
                 except Exception as error:
-                    if "UNIQUE constraint failed:" in error.message:
-                        pass
-                    else:
+##                    if "UNIQUE constraint failed:" in error.message:
+##                        pass
+##                    else:
                         print("\nDidn't work:", error, "Query was : \n", query)
         link.commit()
 
@@ -3083,7 +3083,7 @@ class maglist() :
 
         self.build_listes_errors = []
 
-
+        print ("====> build listes")
         # create lists
 
         # deleted because it takes a lot of time. For the first sort, MySQL can take care of it
@@ -3157,13 +3157,13 @@ class maglist() :
 
 
 ##            t2 = time.time()
-##            print "build : ", (t2-t1)
+##            print ("build : ", (t2-t1))
 ##            t1 = t2
 
 
-##        t2 = time.time()
-##        print " time22 : fin build ", (t2-t1)
-##        t1 = t2
+        t2 = time.time()
+        print (" time22 : fin build ", (t2-t1))
+        t1 = t2
 
 
         # positionnement automatique du curseur
@@ -3760,6 +3760,7 @@ class maglist() :
         global c_colonnes, tab_conversion, config, periph_tables, checkbox_list, link
         global cr, colors;
 
+        print ("====> crée liste", liste)
         treeview =self.arw[liste];
         store = listes[liste];
 
@@ -4506,11 +4507,15 @@ class maglist() :
         coldef = {}
         node = {}
 
+        print ("====> build tree" , name)
+        t1 = time.time()
+
         if not name in self.arw :
             self.build_listes_errors.append(["The treeview", name])
             # only the selection is loaded
             return;
-
+        treeview = self.arw[name]
+        treeview.set_model(None)
 
         try :
             tab = tab_conversion[name];
@@ -4556,6 +4561,7 @@ class maglist() :
 
         coldef = table_data['cols'];
 
+        print ("1---> ",num, time.time() - t1)
         for i in range(1, num) : #(i=1; i<=num; i+= 1)
 
 
@@ -4639,20 +4645,19 @@ class maglist() :
                 if ((parent in node) == False) :
                     node[id]= listes[name].append(None,values1);
                 else :
-
                     node[id]= listes[name].append(node[parent],values1);
             except:
                 print("====> Error in build tree")
 
-
-
+        print ("2---> ",time.time() - t1)
+        treeview.set_model(listes[name])
         self.collapse(name,2);
 
         # theme tree colors;
         # they are taken from the column defined by the color parameter
-        ctree = self.arw[name];
-        ctree.set_reorderable(True);
-        col = ctree.get_column(0);
+
+        treeview.set_reorderable(True);
+        col = treeview.get_column(0);
 
 
         if color_field :
@@ -4666,7 +4671,7 @@ class maglist() :
         # la propriété cell-background évite le quadrillage qui se produit avec background
 
         # activer les lignes pointillées dans l'arbre des thèmes
-        ctree.set_enable_tree_lines(True);
+        treeview.set_enable_tree_lines(True);
         # this does not work when the colors are set by the cell renderer.
 
 

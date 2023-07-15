@@ -2,43 +2,6 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.0"/>
-  <object class="GtkApplicationWindow">
-    <property name="can-focus">False</property>
-    <child>
-      <placeholder/>
-    </child>
-  </object>
-  <object class="GtkDialog">
-    <property name="can-focus">False</property>
-    <property name="type-hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkTextBuffer" id="buffer_perso1">
     <property name="text">&lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Notes :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt; [perso1]</property>
   </object>
@@ -46,28 +9,29 @@
     <property name="text">&lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Notes :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;[perso2]</property>
   </object>
   <object class="GtkTextBuffer" id="detail_auteurbuffer">
-    <property name="text">[auteur,  separator = --- , before =&lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Auteurs : &lt;/span&gt;&lt;/b&gt;&lt;/i&gt;, after = , popup=personnes]
-[collaborateur, separator = --- , before =&lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Collaborateurs :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;]</property>
+    <property name="text">[auteur,  separator = --- , before =&lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Autori : &lt;/span&gt;&lt;/b&gt;&lt;/i&gt;, after = , popup=personnes]
+[collaborateur, separator = --- , before =&lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Collaboratori :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;]</property>
   </object>
   <object class="GtkTextBuffer" id="detail_autres_buffer">
     <property name="text">[complement, , after= 
 ][traduction, after= 
 ][contenu, after= 
-][remarques]</property>
+][remarques, after =
+][ISBN, before =&lt;b&gt;ISBN / ISSN / Impronta : &lt;/b&gt;]</property>
   </object>
   <object class="GtkTextBuffer" id="detail_comp_buffer">
-    <property name="text">[vedette, popup=personnes, separator = --- , before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Vedette :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;, after= ]
-[biographie, popup=personnes,  separator = --- ,  before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Biographie :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;, after= ]
-[g_chartreuses, popup=chartreuses, separator = --- , before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Chartreuses :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;]</property>
+    <property name="text">[vedette, popup=personnes, separator = --- , before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Soggetto :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;, after= ]
+[biographie, popup=personnes,  separator = --- ,  before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Biografia :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;, after= ]
+[g_chartreuses, popup=chartreuses, separator = --- , before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Certose :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;]</property>
   </object>
   <object class="GtkTextBuffer" id="detail_themes_buffer">
-    <property name="text">[g_themes, separator = --- ,  before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Themes :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;] 
-[g_langues, separator = --- , before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Langues :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;]</property>
+    <property name="text">[g_themes, separator = --- ,  before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Soggetti :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;] 
+[g_langues, separator = --- , before = &lt;i&gt;&lt;b&gt;&lt;span foreground="red"&gt;Lingue :&lt;/span&gt; &lt;/b&gt;&lt;/i&gt;]</property>
   </object>
   <object class="GtkTextBuffer" id="detail_titre_buffer">
-    <property name="text">[titre, after= ][sous_titre, after = ][complement,after= ]
-[lieu], [editeur], [date], [g_collections]
- [volumes] vol.,  [pages] ,   [hauteur] ,    [illustrations]</property>
+    <property name="text">[titre, after=] [sous_titre, after = ] / [complement,after= ]
+[lieu] : [editeur], [date] - ([g_collections, separator = --- ] ; [numero, separator = --- ])
+ [volumes] vol. ;  [pages] ;  [hauteur] :   [illustrations]</property>
   </object>
   <object class="GtkListStore" id="liststore1"/>
   <object class="GtkImage" id="menu-item-image1">
@@ -542,6 +506,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="enable-search">False</property>
+                                <signal name="row-activated" handler="ok_liste" object="clist3" swapped="yes"/>
                                 <child internal-child="selection">
                                   <object class="GtkTreeSelection" id="treeview-selection1"/>
                                 </child>
@@ -4718,34 +4683,6 @@
                         <property name="toolbar-style">icons</property>
                         <property name="show-arrow">False</property>
                         <child>
-                          <object class="GtkToolButton">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">font_up</property>
-                            <property name="use-underline">True</property>
-                            <property name="stock-id">gtk-go-up</property>
-                            <signal name="clicked" handler="font_up" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="homogeneous">True</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkToolButton">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">font_down</property>
-                            <property name="use-underline">True</property>
-                            <property name="stock-id">gtk-go-down</property>
-                            <signal name="clicked" handler="font_down" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="homogeneous">True</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkToggleToolButton" id="toggle@hpaned1">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
@@ -5039,6 +4976,8 @@ Clic droit :
                                     <property name="can-focus">True</property>
                                     <property name="search-column">1</property>
                                     <property name="fixed-height-mode">True</property>
+                                    <signal name="cursor-changed" handler="ok_liste" object="sp_persons" swapped="yes"/>
+                                    <signal name="row-activated" handler="ok_liste" object="sp_persons" swapped="yes"/>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection" id="treeview-selection8"/>
                                     </child>
@@ -5479,6 +5418,15 @@ Clic droit :
                               <placeholder/>
                             </child>
                             <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
                               <object class="GtkButton" id="reset@cotes">
                                 <property name="label" translatable="yes">Reset</property>
                                 <property name="visible">True</property>
@@ -5664,50 +5612,7 @@ Clic droit :
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkComboBox" id="combo_section">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">1</property>
-                                <property name="right-attach">2</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBox" id="combo_format">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">1</property>
-                                <property name="right-attach">2</property>
-                                <property name="top-attach">2</property>
-                                <property name="bottom-attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBox" id="combo_notes">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">1</property>
-                                <property name="right-attach">2</property>
-                                <property name="top-attach">3</property>
-                                <property name="bottom-attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBox" id="combo_localisation">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">1</property>
-                                <property name="right-attach">2</property>
-                                <property name="top-attach">4</property>
-                                <property name="bottom-attach">5</property>
-                              </packing>
+                              <placeholder/>
                             </child>
                           </object>
                           <packing>
@@ -5802,7 +5707,7 @@ Clic droit :
                                                         <property name="visible">True</property>
                                                         <property name="can-focus">False</property>
                                                         <property name="xpad">5</property>
-                                                        <property name="label">[section] [num] [format] </property>
+                                                        <property name="label">[section] [format] [num] &lt;sup &gt;[exposant]&lt;/sup&gt; </property>
                                                         <property name="justify">center</property>
                                                         <property name="selectable">True</property>
                                                         <attributes>
@@ -6041,66 +5946,7 @@ Clic droit :
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkHBox" id="hbox10">
-                                            <property name="visible">True</property>
-                                            <property name="can-focus">False</property>
-                                            <child>
-                                              <object class="GtkScrolledWindow" id="scrolledwindow9">
-                                                <property name="visible">True</property>
-                                                <property name="can-focus">True</property>
-                                                <property name="shadow-type">in</property>
-                                                <child>
-                                                  <object class="GtkTextView" id="textperso1">
-                                                    <property name="visible">True</property>
-                                                    <property name="can-focus">True</property>
-                                                    <property name="buffer">buffer_perso1</property>
-                                                  </object>
-                                                </child>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">True</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">0</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkScrolledWindow" id="scrolledwindow10">
-                                                <property name="visible">True</property>
-                                                <property name="can-focus">True</property>
-                                                <property name="shadow-type">in</property>
-                                                <child>
-                                                  <object class="GtkTextView" id="textperso2">
-                                                    <property name="visible">True</property>
-                                                    <property name="can-focus">True</property>
-                                                    <property name="buffer">buffer_perso2</property>
-                                                  </object>
-                                                </child>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">True</property>
-                                                <property name="fill">True</property>
-                                                <property name="position">1</property>
-                                              </packing>
-                                            </child>
-                                            <child>
-                                              <object class="GtkButton" id="save_perso">
-                                                <property name="label" translatable="yes">Save</property>
-                                                <property name="visible">True</property>
-                                                <property name="can-focus">True</property>
-                                                <property name="receives-default">True</property>
-                                              </object>
-                                              <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">False</property>
-                                                <property name="position">2</property>
-                                              </packing>
-                                            </child>
-                                          </object>
-                                          <packing>
-                                            <property name="expand">True</property>
-                                            <property name="fill">True</property>
-                                            <property name="position">3</property>
-                                          </packing>
+                                          <placeholder/>
                                         </child>
                                       </object>
                                     </child>
@@ -6228,11 +6074,11 @@ Clic droit :
                         <property name="border-width">3</property>
                         <child>
                           <object class="GtkEntry" id="@id_livre">
-                            <property name="width-request">35</property>
+                            <property name="width-request">7</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">7</property>
+                            <property name="width-chars">5</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
@@ -6258,11 +6104,11 @@ Clic droit :
                         </child>
                         <child>
                           <object class="GtkEntry" id="saisie@mfn">
-                            <property name="width-request">70</property>
+                            <property name="width-request">50</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">10</property>
+                            <property name="width-chars">5</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
@@ -6270,6 +6116,32 @@ Clic droit :
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label25">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">ISBN</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="saisie@ISBN">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="invisible-char">●</property>
+                            <property name="primary-icon-activatable">False</property>
+                            <property name="secondary-icon-activatable">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">4</property>
                           </packing>
                         </child>
                         <child>
@@ -6281,7 +6153,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">3</property>
+                            <property name="position">5</property>
                           </packing>
                         </child>
                         <child>
@@ -6293,7 +6165,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">4</property>
+                            <property name="position">6</property>
                           </packing>
                         </child>
                         <child>
@@ -6308,48 +6180,16 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">5</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkEntry" id="saisie@section">
-                            <property name="width-request">42</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="invisible-char">●</property>
-                            <property name="width-chars">10</property>
-                            <property name="primary-icon-activatable">False</property>
-                            <property name="secondary-icon-activatable">False</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">6</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkEntry" id="saisie@format">
-                            <property name="width-request">40</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="invisible-char">●</property>
-                            <property name="width-chars">12</property>
-                            <property name="primary-icon-activatable">False</property>
-                            <property name="secondary-icon-activatable">False</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
                             <property name="position">7</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="saisie@num">
-                            <property name="width-request">60</property>
+                          <object class="GtkEntry" id="saisie@section">
+                            <property name="width-request">31</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">10</property>
+                            <property name="width-chars">4</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
@@ -6360,12 +6200,12 @@ Clic droit :
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="saisie@exposant">
-                            <property name="width-request">50</property>
+                          <object class="GtkEntry" id="saisie@format">
+                            <property name="width-request">40</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">12</property>
+                            <property name="width-chars">5</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
@@ -6373,6 +6213,38 @@ Clic droit :
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">9</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="saisie@num">
+                            <property name="width-request">60</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="invisible-char">●</property>
+                            <property name="width-chars">5</property>
+                            <property name="primary-icon-activatable">False</property>
+                            <property name="secondary-icon-activatable">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">10</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="saisie@exposant">
+                            <property name="width-request">50</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="invisible-char">●</property>
+                            <property name="width-chars">5</property>
+                            <property name="primary-icon-activatable">False</property>
+                            <property name="secondary-icon-activatable">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">11</property>
                           </packing>
                         </child>
                         <child>
@@ -6385,7 +6257,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">10</property>
+                            <property name="position">12</property>
                           </packing>
                         </child>
                         <child>
@@ -6400,7 +6272,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">11</property>
+                            <property name="position">13</property>
                           </packing>
                         </child>
                         <child>
@@ -6408,14 +6280,14 @@ Clic droit :
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">11</property>
+                            <property name="width-chars">9</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">12</property>
+                            <property name="position">14</property>
                           </packing>
                         </child>
                         <child>
@@ -6430,7 +6302,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">13</property>
+                            <property name="position">15</property>
                           </packing>
                         </child>
                         <child>
@@ -6438,14 +6310,14 @@ Clic droit :
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">12</property>
+                            <property name="width-chars">5</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">14</property>
+                            <property name="position">16</property>
                           </packing>
                         </child>
                         <child>
@@ -6470,7 +6342,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">19</property>
+                            <property name="position">21</property>
                           </packing>
                         </child>
                         <child>
@@ -6478,14 +6350,14 @@ Clic droit :
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
-                            <property name="width-chars">4</property>
+                            <property name="width-chars">5</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">20</property>
+                            <property name="position">22</property>
                           </packing>
                         </child>
                         <child>
@@ -6499,7 +6371,7 @@ Clic droit :
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">False</property>
-                            <property name="position">21</property>
+                            <property name="position">23</property>
                           </packing>
                         </child>
                         <child>
@@ -6507,13 +6379,14 @@ Clic droit :
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="invisible-char">●</property>
+                            <property name="width-chars">5</property>
                             <property name="primary-icon-activatable">False</property>
                             <property name="secondary-icon-activatable">False</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">22</property>
+                            <property name="position">24</property>
                           </packing>
                         </child>
                       </object>
@@ -6579,6 +6452,7 @@ Clic droit :
                               <object class="GtkTreeView" id="@personnes">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
+                                <signal name="button-press-event" handler="presentation" swapped="no"/>
                                 <child internal-child="selection">
                                   <object class="GtkTreeSelection" id="treeview-selection15"/>
                                 </child>
@@ -7978,7 +7852,6 @@ Clic droit :
             </child>
             <child type="tab">
               <object class="GtkLabel" id="label115">
-                <property name="width-request">-1</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Édition</property>

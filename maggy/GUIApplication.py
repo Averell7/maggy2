@@ -2,12 +2,12 @@
 #
 # Base class for a GUI Application using Tk
 #
-
+from __future__ import generators, print_function, unicode_literals
 import sys
 if sys.version_info[0] < 3:
-    str = str
-    import tkinter as tkinter
-    import tkinter.messagebox as messagebox
+    str = unicode
+    import Tkinter as tkinter
+    import tkMessageBox as messagebox
 else:
     import tkinter
     import tkinter.messagebox as messagebox
@@ -118,9 +118,9 @@ class GUIApplication(object):
             column_weights = [column_weights]
         if not type(row_weights) is list:
             row_weights = [row_weights]
-        for r, rw in zip(list(range(rows)), row_weights):
+        for r, rw in zip(range(rows), row_weights):
             grid.rowconfigure(r, weight=rw)
-        for c, cw in zip(list(range(columns)), column_weights):
+        for c, cw in zip(range(columns), column_weights):
             grid.columnconfigure(c, weight=cw)
 
     def report_callback_exception(self, type, value, tb):

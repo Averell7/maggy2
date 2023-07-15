@@ -34,7 +34,7 @@ from magutils import *
 
 class UserFunctions :
 
-
+    
 
     def __init__(self, mag, arw, link, cursor, config, mem) :
         configdir_u = "d:/Mes Documents/en cours/maggy1.1/config"
@@ -49,17 +49,25 @@ class UserFunctions :
             self.arw["button_cote"].connect("clicked", self.chercher_cote)
         except :
             print("bouton pour les cotes manquant. Voir dans UserFunctions.py")
+        try :
+            self.arw["save_perso"].connect("clicked", self.save_perso)
+        except :
+            print("bouton pour les notes personnelles manquant. Voir dans UserFunctions.py")
+        try :
+            self.arw["numeric_version"].connect("clicked", self.check_numeric_version)
+        except :
+            print("bouton pour les versions numériques manquant. Voir dans UserFunctions.py")
 
 
         try :
             self.arw["@personnes"].connect("cursor-changed", self.presentation)
         except :
             print('contrôle "@presentation" pas trouvé')
-
+            
         # pour les commentaires personnels
         sqlite_file = os.path.join(configdir_u, "gbnew/perso.sqlite")
         if os.path.isfile(sqlite_file):
-            self.link2 = sqlite.connect(sqlite_file)
+            self.link2 = sqlite.connect(sqlite_file)       
             self.link2.row_factory = sqlite.Row
             self.cursor2 = self.link2.cursor()
 
@@ -77,7 +85,7 @@ class UserFunctions :
     def after_load(self, id_fiche, table_config, saisieActive, saisieFlipActive) :
         # launched after the load of a record in the edit window is finished
         # Effacer le champ présentation
-
+       
         """
         Aucun champ ne commence par un [espace].
         Les champs num, notes, compteur, temp, annee, siecle, tri_cote, compteur, datemodification et archives doivent être vides.
@@ -347,6 +355,38 @@ class UserFunctions :
 
 
 
+# ============ Gestion des commentaires personnels =============================
+
+    def save_perso(self, widget) :
+        
+        data1 = get_text(self.arw["textperso1"])[8:]    # on ignore le mot "Notes : " au début
+        data2 = get_text(self.arw["textperso2"])[8:]
+        id_livre = self.mem["selected_record"]
+        # créer l'identifiant s'il n'existe pas
+        req1 = "INSERT OR IGNORE INTO comments (id_livre) VALUES (%d)" % int(id_livre)
+        # mettre à  jour les données
+        req2 = "update comments set perso1 = '%s', perso2 = '%s' where id_livre = %d" % (data1, data2, int(id_livre))
+        self.cursor2.execute(req1)
+        self.cursor2.execute(req2)
+        self.link2.commit()
+        
+        
+    def after_details(self, id_livre):
+        
+        req1 = "select * from complete where id_livre = %s" % str(id_livre)
+        self.cursor.execute(req1)
+        row = self.cursor.fetchone()
+        if row:
+            req2 = "select * from comments where id_livre = %s" % str(id_livre)
+            self.cursor2.execute(req2)
+            row = self.cursor2.fetchone()
+            if row:
+                a = row["perso1"]
+                b = row["perso2"]
+                text1 = get_text(self.arw["textperso1"])
+                text2 = get_text(self.arw["textperso2"])
+                set_text(self.arw["textperso1"], text1 + a)
+                set_text(self.arw["textperso2"], text2 + b)
 # =====================================================================================
 
 
@@ -443,10 +483,10 @@ def main() :
     link.isolation_level = "DEFERRED"
     link.row_factory = sqlite.Row
     cursor = link.cursor()
+    
 
-
-
-
+        
+        
 
 
 

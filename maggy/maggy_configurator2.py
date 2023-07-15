@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
+# version 3.0
 # Version 2.1.0.2   - May 2021
 # Version 2.0.0.48  - April 2016
 # Version 2.0.0     - Averell - Gtk GUI - May 17th, 2012

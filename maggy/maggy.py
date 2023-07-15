@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: utf-8 -*-
 
-# version 2.3.0.11 - août 2021
+# version 3.0.11 - décembre 2022
 
 
 
@@ -12,7 +12,7 @@
 
 #£ import json_decoder
 
-maggy_version = "2.3.0"
+maggy_version = "3.0.11"
 print("Maggy Version : ", maggy_version)
 """
 In this version :
@@ -2932,7 +2932,7 @@ class Prompt2A :
         self.model = {}
         self.ok = 0
 
-        dialog = Gtk.Dialog('Edit', None, Gtk.DIALOG_MODAL|Gtk.DIALOG_NO_SEPARATOR)
+        dialog = Gtk.Dialog('Edit', None, Gtk.DialogFlags.MODAL)
         table = Gtk.Table()
         self.display_table(table, fields)
         dialog.vbox.pack_start(table)
@@ -2971,7 +2971,7 @@ class Prompt2A :
 ##            self.model[row] = Gtk.ListStore(str)
 ##            self.combo[row].set_model(self.model[row])
 ##            self.combo[row].set_text_column(0)
-            self.combo[row] = Gtk.combo_box_entry_new_text()
+            self.combo[row] = Gtk.ComboBoxText.new_with_entry()
             self.entry[row] = self.combo[row].get_child()
             # add completion to the entry
 ##            completion = Gtk.EntryCompletion
@@ -2981,9 +2981,9 @@ class Prompt2A :
 
 
 ##            self.entry[row].connect("changed","allchars","entry")
-            alignment = Gtk.Alignment(1, .5, 0, 0)
-            alignment.add(label)
-            table.attach(alignment, 0, 1, row, row+1)
+##            alignment = Gtk.Alignment(1, .5, 0, 0)
+##            alignment.add(label)
+##            table.attach(alignment, 0, 1, row, row+1)
             table.attach(self.combo[row], 1, 2, row, row+1)
 
 
@@ -3068,12 +3068,7 @@ class maglist() :
     """
 
     def __init__(self) :
-        #global maggy, arw
-        #maggy = mag
-        #self.arw = arw
-        self.ok_list_disable = False
         pass
-
 
     def build_listes(self) :
         t1 = time.time()
@@ -3095,8 +3090,6 @@ class maglist() :
             tab_conversion[liste] = key;
             # list name => configuration name
 
-
-
         listes = {}
         # creation of templates (ListStore or TreeStore depending on the type of list).
         for tab  in config['xtabs'] :
@@ -3107,22 +3100,15 @@ class maglist() :
 
                 listes[treeview] = Gtk.TreeStore(str,str,str,str,str,str,str,str,str,str,str,str,
                 str,str,str,str,str,str,str,str,str,str,str,str);
-
                 self.configure_list(treeview);
-
                 self.build_tree(treeview);
-
-
-
             else :
-
                 listes[treeview] = Gtk.ListStore(str,str,str,str,str,str,str,str,str,str,str,str,
                 str,str,str,str,str,str,str,str,str,str,str,str,
                 str,str,str,str,str,str,str,str,str,str,str,str);
                 # an easier way could be :
                 #model = Gtk.ListStore(*([str] * ncols))
                 #which creates exactly ncols columns of type str.
-
 
                 self.configure_list(treeview);
 
@@ -3132,16 +3118,11 @@ class maglist() :
                 complement = table_data["treeview"];
 
                 if len(entry.strip()) > 0 :
-
-
                     if entry in self.arw :
-
                         self.arw[entry].connect("changed", self.refresh_list,tab);
-
                     else :
                         self.build_listes_errors.append(["Entry", entry])
                         #alert(_("Entry %s does not exist") % entry)
-
 
                 if link :
                     refresh_b = True
@@ -3690,10 +3671,10 @@ class maglist() :
                 selection[groupe].append(idlivre)
 
         treeview.set_model(None)
-       
-        
+
+
         store.clear()
-        
+
 
         for i in range(0, len(mot)) : #(i=0; i<len(word); i+= 1)
 ## if mot[i] == "" :
@@ -3779,7 +3760,8 @@ class maglist() :
             req="select * from %s where %s like '%s%%' %s order by %s " % (fromx, champ, mot, complement, champ);
 
         try :
-            cursor.execute(req)
+            #cursor.execute(sqlite_escape_quotes(req))
+            cursor.execute((req))
         except :
             print("Erreur SQL dans cree_listes")
             sql_error(link,req);
@@ -4515,7 +4497,8 @@ class maglist() :
             # only the selection is loaded
             return;
         treeview = self.arw[name]
-        treeview.set_model(None)
+        treeview.set_model(None)              # no effect
+        treeview.freeze_child_notify()        # no effect
 
         try :
             tab = tab_conversion[name];
@@ -4644,8 +4627,10 @@ class maglist() :
             try:
                 if ((parent in node) == False) :
                     node[id]= listes[name].append(None,values1);
+                    pass
                 else :
                     node[id]= listes[name].append(node[parent],values1);
+                    pass
             except:
                 print("====> Error in build tree")
 
@@ -5185,7 +5170,7 @@ class maglist() :
 
     def inverser(self, widget) :
 
-        global config, periph_tables, order_field, link;
+        global config, periph_tables, order_field, link, db_utils;
 
         info = self.arw['s_info10'];
         buffer1 = info.get_buffer();
@@ -5212,6 +5197,7 @@ class maglist() :
                     linked_field = val['linked_field'];
                 else :
                     linked_field = None
+                print("====> central_def", central_def)
                 id_main = config['central'][central_def]['id_main'];
                 central_table = config['central'][central_def]['table'];
                 i_data = "i_data_" + central_table;
@@ -12493,7 +12479,7 @@ def main():
     global chars, config, myfunctions, mag, ml, alias
     global col_view,fonte1, fonte2;    #???
     global config_info, configdir_u, configname_u, sharedir, config_defaults, config_dialog, con
-    global db_structure, db_type, db_active
+    global db_structure, db_type, db_active, db_utils
     global mem, resultat, affichage
     global arw, query, cr_editable, stores, modelsort, checkbox_list
 
